@@ -1,3 +1,71 @@
 from django.db import models
+from django.contrib.auth.models import User
+from datetime import timedelta
 
-# Create your models here.
+#Choices
+
+EXERCISE_CATEGORIES = [
+    ('str','strength'),
+    ('car','cardio'),
+    ('flx','flexibility'),
+    ('res','resistance'),
+    ('oth','other')
+]
+
+#Workout
+
+class Workout(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    description = models.TextField(max_length=2000)
+    source_url = models.URLField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.name
+    
+#Exercise
+
+class Exercise(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    #Note the parameter 'related_name', since it conditions the inverse relationship (otherwise would be exercise_set)
+    workout = models.ManyToManyField(Workout, through='WorkoutExercise', related_name='exercises', blank=True)
+    name = models.CharField(max_length=100, blank=False)
+    description = models.TextField(max_length=2000)
+    category = models.CharField(max_length=3, choices=EXERCISE_CATEGORIES, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+#WorkoutExercise (relational table)
+
+class WorkoutExercise(models.Model):
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
+    routine = models.ForeignKey(Workout, on_delete=models.CASCADE)
+    order = models.IntegerField(null=True)
+    
+    
+#Sessions (relational table)
+
+class WorkoutSession(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
+    workout = models.ForeignKey(Workout, on_delete=models.CASCADE, editable=False)
+    exercise = models.ManyToManyField(Exercise, through='ExerciseLog', related_name='exercises', editable=False)
+    start_time = models.DateTimeField(editable=False)
+    end_time = models.DateTimeField(null=True)
+    
+    class Meta:
+        get_latest_by = 'start_time'
+        
+#Exercise log (relational table)
+
+class ExerciseLog(models.Model):
+    session = models.ForeignKey(WorkoutSession, on_delete=models.CASCADE)
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
+    series = models.IntegerField(default=0)
+    repetitions = models.IntegerField(default=0)
+    weight = models.FloatField(default=0)
+    duration = models.FloatField(default=0)
+    distance = models.FloatField(default=0)
+    notes = models.TextField(max_length=2000)
+    log_time = models.DateTimeField()
