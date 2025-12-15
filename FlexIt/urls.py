@@ -14,10 +14,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
+
 from django.urls import path, include
 from rest_framework import routers, viewsets
-from FlexItAPI.views import UserViewSet, WorkoutViewSet
+from knox import views as knox_views
+from FlexItAPI.views import LoginView, UserViewSet, WorkoutViewSet
 
 
 # Routers provide an easy way of automatically determining the URL conf.
@@ -28,6 +29,8 @@ router.register(r'workouts', WorkoutViewSet)
 ###
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('api/', include(router.urls)),
+    path(r'login', LoginView.as_view(), name='knox_login'),
+    path(r'logout', knox_views.LogoutView.as_view(), name='knox_logout'),
+    path(r'logoutall', knox_views.LogoutAllView.as_view(), name='knox_logoutall')
 ]
