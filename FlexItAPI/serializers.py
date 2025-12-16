@@ -18,8 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
 class WorkoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workout
-        fields = ['user','name','description','source_url','created_at','updated_at']
-        
+        fields = ['user','name','description','source_url','created_at','updated_at'] 
         
     def create(self, validated_data):
         return Workout.objects.create(**validated_data)

@@ -1,18 +1,34 @@
+from typing import Type
 from django.contrib.auth.models import User
-from rest_framework import viewsets, permissions
+from django.db.models import Model
+from rest_framework import viewsets, permissions, serializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import permission_classes as permission_decorator
 from knox.views import LoginView as KnoxLoginView
-from FlexItAPI.serializers import UserSerializer, WorkoutSerializer
+from FlexItAPI.serializers import UserSerializer, WorkoutSerializer, ExerciseSerializer, WorkourSessionsSerializer
 from FlexItAPI.models import Workout 
 
+##### Helpers ######
 
+def query_search(model:Type[Model], serializer:Type[serializers.Serializer], id:int, **kwargs):
+    user = kwargs.get('user')
+    try:
+        if user:
+            queryset = model.objects.get(pk=id, user=user)
+        else:
+            queryset = model.objects.get(pk=id)
+        output = serializer(queryset).data
+    except:
+        output = {'DoesNotExists': f'No objects of type {model} match the provided search pattern'}
+    return output
+
+# Custom login view
 class LoginView(KnoxLoginView):
     authentication_classes = [BasicAuthentication]
 
-# ViewSets define the view behavior.
+# User views, using Django's default user model.
 class UserListCreate(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = UserSerializer
@@ -39,17 +55,35 @@ class UserDetails(APIView):
     serializer_class = UserSerializer
     
     def get(self,request,id):
-        print(request.data)
-        queryset = User.objects.get(pk=id)
-        serializer = self.serializer_class(queryset)
-        return Response(serializer.data)   
+        output = query_search(User, self.serializer_class, id)
+        return Response(output)   
     
+# Workout views
 class WorkoutListCreate(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = WorkoutSerializer
     
     def get(self, request):
         print(request.data)
-        queryset = Workout.objects.all()
+        queryset = Workout.objects.filter(user=request.user)
         serializer = self.serializer_class(queryset, many=True, context={'request':request})
         return Response(serializer.data)
+    
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid()
+        try:
+            serializer.save()
+            output = serializer.data
+        except:
+            output = serializer.errors
+        return Response(output)
+    
+class WorkoutDetails(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = WorkoutSerializer
+    
+    def get(self,request,id):
+        output = query_search(Workout, self.serializer_class,id, user=request.user)
+        return Response(output)
+    
