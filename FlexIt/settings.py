@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'FlexItAPI.apps.FlexitapiConfig',
     'rest_framework',
-    'knox'
+    'knox',
+    'drf_spectacular'
 ]
 
 MIDDLEWARE = [
@@ -143,11 +144,22 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_AUTHENTICATION_CLASSES':
-        ('knox.auth.TokenAuthentication',)
+        ('knox.auth.TokenAuthentication',),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
     
 }
+
+# These settings are needed to enable the use of the knox-generated token as a Bearer token.
 KNOX_TOKEN_MODEL = 'knox.AuthToken'
 
 REST_KNOX = {
     'AUTH_HEADER_PREFIX': 'Bearer'
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'FlexIt API',
+    'DESCRIPTION': 'Back-end API for FlexIt fitness tracker',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
 }

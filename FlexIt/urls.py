@@ -16,21 +16,15 @@ Including another URLconf
 """
 
 from django.urls import path, include
-from rest_framework import routers, viewsets
 from knox import views as knox_views
-from FlexItAPI.views import LoginView, UserViewSet, WorkoutViewSet
-
-
-# Routers provide an easy way of automatically determining the URL conf.
-router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'workouts', WorkoutViewSet)
-
-###
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from FlexItAPI import views
 
 urlpatterns = [
-    path('api/', include(router.urls)),
-    path(r'login', LoginView.as_view(), name='knox_login'),
+    path('api/', include('FlexItAPI.urls')),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("swagger", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path(r'login', views.LoginView.as_view(), name='knox_login'),
     path(r'logout', knox_views.LogoutView.as_view(), name='knox_logout'),
     path(r'logoutall', knox_views.LogoutAllView.as_view(), name='knox_logoutall')
 ]

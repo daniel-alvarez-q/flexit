@@ -3,5 +3,6 @@ mssql-django==1.6.0
 python-dotenv==1.2.1
 djangorestframework==3.16.1
 django-rest-knox==5.0.2
+drf-spectacular==0.29.0
 markdown
 django-filter
