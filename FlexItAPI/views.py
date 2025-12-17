@@ -24,6 +24,15 @@ def query_search(model:Type[Model], serializer:Type[serializers.Serializer], id:
         output = {'DoesNotExists': f'No objects of type {model} match the provided search pattern'}
     return output
 
+def query_save(serializer):
+    serializer.is_valid(raise_exception=False)
+    try:
+        serializer.save()
+        output = serializer.data
+    except AssertionError as e:
+        output = serializer.errors
+    return output
+
 # Custom login view
 class LoginView(KnoxLoginView):
     authentication_classes = [BasicAuthentication]
@@ -41,12 +50,7 @@ class UserListCreate(APIView):
     
     def post(self,request):
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid()
-        try:
-            serializer.save()
-            output = serializer.data
-        except AssertionError as e:
-            output = serializer.errors
+        output = query_save(serializer)
         return Response(output)
         
 class UserDetails(APIView):
@@ -70,12 +74,7 @@ class WorkoutListCreate(APIView):
     
     def post(self,request):
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid()
-        try:
-            serializer.save()
-            output = serializer.data
-        except:
-            output = serializer.errors
+        output = query_save(serializer)
         return Response(output)
     
 class WorkoutDetails(APIView):
@@ -84,4 +83,10 @@ class WorkoutDetails(APIView):
     
     def get(self,request,id):
         output = query_search(Workout, self.serializer_class,id, user=request.user)
+        return Response(output)
+    
+    def patch(self,request,id):
+        instance = Workout.objects.get(pk=id, user=request.user)
+        serializer = self.serializer_class(instance=instance, data=request.data, partial=True)
+        output = query_save(serializer)
         return Response(output)

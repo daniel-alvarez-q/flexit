@@ -22,6 +22,13 @@ class WorkoutSerializer(serializers.ModelSerializer):
         
     def create(self, validated_data):
         return Workout.objects.create(**validated_data)
+    
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.description = validated_data.get('description', instance.description)
+        instance.source_url = validated_data.get('source_url', instance.source_url)
+        instance.save()
+        return instance
         
 class ExerciseSerializer(serializers.ModelSerializer):
     class Meta:
