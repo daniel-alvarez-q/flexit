@@ -1,7 +1,7 @@
 from typing import Type
 from django.contrib.auth.models import User
 from django.db.models import Model
-from rest_framework import viewsets, permissions, serializers
+from rest_framework import permissions, serializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication
@@ -38,7 +38,6 @@ class UserListCreate(APIView):
         queryset = User.objects.all()
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
-    
     
     def post(self,request):
         serializer = self.serializer_class(data=request.data)
@@ -86,4 +85,3 @@ class WorkoutDetails(APIView):
     def get(self,request,id):
         output = query_search(Workout, self.serializer_class,id, user=request.user)
         return Response(output)
-    

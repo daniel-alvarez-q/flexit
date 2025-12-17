@@ -13,7 +13,6 @@ EXERCISE_CATEGORIES = [
 ]
 
 #Workout
-
 class Workout(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
@@ -26,7 +25,6 @@ class Workout(models.Model):
         return self.name
     
 #Exercise
-
 class Exercise(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     #Note the parameter 'related_name', since it conditions the inverse relationship (otherwise would be exercise_set)
@@ -38,15 +36,12 @@ class Exercise(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
 #WorkoutExercise (relational table)
-
 class WorkoutExercise(models.Model):
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
     routine = models.ForeignKey(Workout, on_delete=models.CASCADE)
-    order = models.IntegerField(null=True)
-    
+    order = models.IntegerField(null=True) 
     
 #Sessions (relational table)
-
 class WorkoutSession(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
     workout = models.ForeignKey(Workout, on_delete=models.CASCADE, editable=False)
@@ -58,7 +53,6 @@ class WorkoutSession(models.Model):
         get_latest_by = 'start_time'
         
 #Exercise log (relational table)
-
 class ExerciseLog(models.Model):
     session = models.ForeignKey(WorkoutSession, on_delete=models.CASCADE)
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
