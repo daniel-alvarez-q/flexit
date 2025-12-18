@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from FlexItAPI.models import Workout,Exercise,WorkoutSession
+from FlexItAPI.models import Workout,Exercise,WorkoutSession,WorkoutExercise
 
 
 
@@ -18,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
 class WorkoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workout
-        fields = ['user','name','description','source_url','created_at','updated_at'] 
+        fields = ['id','user','name','description','source_url','created_at','updated_at'] 
         
     def create(self, validated_data):
         return Workout.objects.create(**validated_data)
@@ -31,11 +31,27 @@ class WorkoutSerializer(serializers.ModelSerializer):
         return instance
         
 class ExerciseSerializer(serializers.ModelSerializer):
+    workouts = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Workout.objects.all(),
+        write_only=True,
+        required=False
+    )
     class Meta:
         model = Exercise
-        fields = ['user','workout','name','description','category','created_at','updated_at']
+        fields = ['id','user','workouts','name','description','category','created_at','updated_at']
+        
+    def create(self, validated_data):
+        workout_instances = validated_data.pop('workouts', None)
+        exercise = Exercise.objects.create(**validated_data)
+        if workout_instances:          
+            exercise.workouts.set(workout_instances)
+        return exercise
 
 class WorkourSessionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkoutSession
-        fields = ['user','workout','start_time','end_time']
+        fields = ['id','user','workout','start_time','end_time']
+            
+            
+        

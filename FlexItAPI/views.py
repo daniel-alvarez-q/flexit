@@ -4,11 +4,12 @@ from django.db.models import Model
 from rest_framework import permissions, serializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import permission_classes as permission_decorator
 from knox.views import LoginView as KnoxLoginView
 from FlexItAPI.serializers import UserSerializer, WorkoutSerializer, ExerciseSerializer, WorkourSessionsSerializer
-from FlexItAPI.models import Workout 
+from FlexItAPI.models import Workout, Exercise 
 
 ##### Helpers ######
 
@@ -26,11 +27,21 @@ def query_search(model:Type[Model], serializer:Type[serializers.Serializer], id:
 
 def query_save(serializer):
     serializer.is_valid(raise_exception=False)
+    print(serializer.initial_data)
+    print(serializer.validated_data)
     try:
         serializer.save()
         output = serializer.data
     except AssertionError as e:
         output = serializer.errors
+    return output
+
+def query_delete(model:Type[Model], id:int,request:Request):
+    try:
+        isinstance = model.objects.get(pk=id, user=request.user)
+        output = isinstance.delete()[1]
+    except Exception as e:
+        output = {'Error': f'{e}'}
     return output
 
 # Custom login view
@@ -39,7 +50,6 @@ class LoginView(KnoxLoginView):
 
 # User views, using Django's default user model.
 class UserListCreate(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = UserSerializer
 
     @permission_decorator([permissions.IsAdminUser])
@@ -54,39 +64,47 @@ class UserListCreate(APIView):
         return Response(output)
         
 class UserDetails(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = UserSerializer
     
     def get(self,request,id):
-        output = query_search(User, self.serializer_class, id)
-        return Response(output)   
+        return Response(query_search(User, self.serializer_class, id))   
     
 # Workout views
 class WorkoutListCreate(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = WorkoutSerializer
     
     def get(self, request):
-        print(request.data)
         queryset = Workout.objects.filter(user=request.user)
         serializer = self.serializer_class(queryset, many=True, context={'request':request})
         return Response(serializer.data)
     
     def post(self,request):
         serializer = self.serializer_class(data=request.data)
-        output = query_save(serializer)
-        return Response(output)
+        return Response(query_save(serializer))
     
 class WorkoutDetails(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = WorkoutSerializer
     
     def get(self,request,id):
-        output = query_search(Workout, self.serializer_class,id, user=request.user)
-        return Response(output)
+        return Response(query_search(Workout, self.serializer_class,id, user=request.user))
     
     def patch(self,request,id):
-        instance = Workout.objects.get(pk=id, user=request.user)
-        serializer = self.serializer_class(instance=instance, data=request.data, partial=True)
-        output = query_save(serializer)
+        try:
+            instance = Workout.objects.get(pk=id, user=request.user)
+            serializer = self.serializer_class(instance=instance, data=request.data, partial=True)
+            output = query_save(serializer)
+        except Exception as e:
+            output = {'Error': f'{e}'}
         return Response(output)
+    
+    def delete(self,request,id):
+        return Response(query_delete(Workout, id, request))
+    
+class ExerciseListCreate(APIView):
+    serializer_class = ExerciseSerializer
+    
+    def get(self,request):
+        return Response(self.serializer_class(Exercise.objects.filter(user=request.user),many=True).data)
+    
+    def post(self,request):
+        return Response(query_save(self.serializer_class(data=request.data)))

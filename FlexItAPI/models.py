@@ -28,7 +28,7 @@ class Workout(models.Model):
 class Exercise(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     #Note the parameter 'related_name', since it conditions the inverse relationship (otherwise would be exercise_set)
-    workout = models.ManyToManyField(Workout, through='WorkoutExercise', related_name='exercises', blank=True)
+    workouts = models.ManyToManyField(Workout, through='WorkoutExercise', related_name='exercises', blank=True)
     name = models.CharField(max_length=100, blank=False)
     description = models.TextField(max_length=2000)
     category = models.CharField(max_length=3, choices=EXERCISE_CATEGORIES, blank=False)
@@ -38,14 +38,14 @@ class Exercise(models.Model):
 #WorkoutExercise (relational table)
 class WorkoutExercise(models.Model):
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
-    routine = models.ForeignKey(Workout, on_delete=models.CASCADE)
+    workout = models.ForeignKey(Workout, on_delete=models.CASCADE)
     order = models.IntegerField(null=True) 
     
 #Sessions (relational table)
 class WorkoutSession(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
     workout = models.ForeignKey(Workout, on_delete=models.CASCADE, editable=False)
-    exercise = models.ManyToManyField(Exercise, through='ExerciseLog', related_name='exercises', editable=False)
+    exercises = models.ManyToManyField(Exercise, through='ExerciseLog', related_name='exercises', editable=False)
     start_time = models.DateTimeField(editable=False)
     end_time = models.DateTimeField(null=True)
     
