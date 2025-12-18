@@ -26,14 +26,13 @@ def query_search(model:Type[Model], serializer:Type[serializers.Serializer], id:
     return output
 
 def query_save(serializer):
-    serializer.is_valid(raise_exception=False)
-    print(serializer.initial_data)
-    print(serializer.validated_data)
     try:
-        serializer.save()
-        output = serializer.data
+        serializer.is_valid(raise_exception=True)
     except AssertionError as e:
         output = serializer.errors
+    else:
+        serializer.save()
+        output = serializer.data
     return output
 
 def query_delete(model:Type[Model], id:int,request:Request):
@@ -108,3 +107,19 @@ class ExerciseListCreate(APIView):
     
     def post(self,request):
         return Response(query_save(self.serializer_class(data=request.data)))
+    
+class ExerciseDetails(APIView):
+    serializer_class = ExerciseSerializer
+    
+    def get(self,request,id):
+        return Response(query_search(Exercise, self.serializer_class,id,user=request.user))
+    
+    def patch(self, request, id):
+        try:
+            instance = Exercise.objects.get(pk=id, user=request.user)
+            serializer = self.serializer_class(instance=instance, data=request.data, partial=True)
+            output = query_save(serializer)
+        except Exception as e:
+            output = {'Error': f'{e}'}
+        return Response(output)
+    

@@ -44,9 +44,20 @@ class ExerciseSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         workout_instances = validated_data.pop('workouts', None)
         exercise = Exercise.objects.create(**validated_data)
-        if workout_instances:          
+        if workout_instances:
             exercise.workouts.set(workout_instances)
         return exercise
+    
+    def update(self, instance, validated_data):
+        workout_instances = validated_data.pop('workouts', [])
+        workouts_updated = Workout.objects.filter(pk__in=[x['id'] for x in instance.workouts.values()]+[x.id for x in workout_instances])
+        instance.name = validated_data.get('name', instance.name)
+        instance.description = validated_data.get('description', instance.description)
+        instance.category = validated_data.get('category', instance.category)
+        instance.save()
+        instance.workouts.set(workouts_updated)
+        return instance
+        
 
 class WorkourSessionsSerializer(serializers.ModelSerializer):
     class Meta:

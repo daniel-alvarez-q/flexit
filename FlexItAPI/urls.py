@@ -12,5 +12,6 @@ urlpatterns = [
     path(r'user/<int:id>', views.UserDetails.as_view(), name='user-detail'),
     path(r'workouts', views.WorkoutListCreate.as_view(), name='workouts'),
     path(r'workout/<int:id>', views.WorkoutDetails.as_view(), name='workout-detail'),
-    path(f'exercises', views.ExerciseListCreate.as_view(), name='exercises')
+    path(r'exercises', views.ExerciseListCreate.as_view(), name='exercises'),
+    path(r'exercise/<int:id>', views.ExerciseDetails.as_view(), name='exercise-detail')
 ]
