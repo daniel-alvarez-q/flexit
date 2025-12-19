@@ -21,11 +21,11 @@ def query_search(model:Type[Model], serializer:Type[serializers.Serializer], id:
         else:
             queryset = model.objects.get(pk=id)
         output = serializer(queryset).data
-    except:
-        output = {'DoesNotExists': f'No objects of type {model} match the provided search pattern'}
+    except Exception as e:
+        output = {'Error performing query': e}
     return output
 
-def query_save(serializer):
+def query_save(serializer, **kwargs):
     try:
         serializer.is_valid(raise_exception=True)
     except AssertionError as e:
@@ -35,12 +35,13 @@ def query_save(serializer):
         output = serializer.data
     return output
 
-def query_delete(model:Type[Model], id:int,request:Request):
+def query_delete(model:Type[Model],id:int,request:Request):
+    user = request.user
     try:
-        isinstance = model.objects.get(pk=id, user=request.user)
+        isinstance = model.objects.get(pk=id, user=user)
         output = isinstance.delete()[1]
     except Exception as e:
-        output = {'Error': f'{e}'}
+        output = {'Error performing query': f'{e}'}
     return output
 
 # Custom login view
@@ -66,7 +67,17 @@ class UserDetails(APIView):
     serializer_class = UserSerializer
     
     def get(self,request,id):
-        return Response(query_search(User, self.serializer_class, id))   
+        return Response(query_search(User, self.serializer_class, id))
+    
+    def delete(self,request,id):
+        user = request.user
+        try:
+            if not user.is_staff:
+                assert user.id == id, 'User does not have the necessary role to delete users other than itself.'
+            output = User.objects.get(pk=id).delete()
+        except Exception as e:
+            output = {'Error performing query': f'{e}'}
+        return Response(output)   
     
 # Workout views
 class WorkoutListCreate(APIView):
@@ -99,6 +110,18 @@ class WorkoutDetails(APIView):
     def delete(self,request,id):
         return Response(query_delete(Workout, id, request))
     
+class WorkoutExercises(APIView):
+    serializer_class = ExerciseSerializer
+
+    def get(self,request,workout_id):
+        try:
+            workout_instance = Workout.objects.get(pk=workout_id, user=request.user)
+            exercises = workout_instance.exercises.values()
+            output = self.serializer_class(exercises, many=True).data
+        except Exception as e:
+            output = {f"Error: {e}"}
+        return Response(output)
+    
 class ExerciseListCreate(APIView):
     serializer_class = ExerciseSerializer
     
@@ -123,3 +146,5 @@ class ExerciseDetails(APIView):
             output = {'Error': f'{e}'}
         return Response(output)
     
+    def delete(self,request, id):
+        return Response(query_delete(Exercise, id, request))

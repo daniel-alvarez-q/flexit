@@ -1,19 +1,33 @@
+import re
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from FlexItAPI.models import Workout,Exercise,WorkoutSession,WorkoutExercise
 
+##### Helpers #####
+
+# def username_validator(input:str):
+#     if not re.fullmatch(r"^[\w.@+-]+\Z", input):
+#         raise serializers.ValidationError('Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.')
+#     return 
 
 
 # Serializers define the API representation.
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
+    password = serializers.CharField(required=True, write_only=True)
+    is_staff = serializers.BooleanField(default=False, write_only=True)
     
     class Meta:
         model = User
-        fields = ['id','username', 'email','is_staff']
+        fields = ['id','username', 'email','is_staff','password']
         
     def create(self, validated_data):
-        return User.objects.create(**validated_data)
+        password = validated_data.pop('password', None)
+        instance = User.objects.create(**validated_data)
+        if password:
+            instance.set_password(password)
+            instance.save()
+        return instance
         
 class WorkoutSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,16 +51,23 @@ class ExerciseSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
+    user = serializers.PrimaryKeyRelatedField(
+        many=False,
+        queryset=User.objects.all(),
+        write_only=True,
+        required=True
+    )
+    
     class Meta:
         model = Exercise
         fields = ['id','user','workouts','name','description','category','created_at','updated_at']
         
     def create(self, validated_data):
         workout_instances = validated_data.pop('workouts', None)
-        exercise = Exercise.objects.create(**validated_data)
+        instance = Exercise.objects.create(**validated_data)
         if workout_instances:
-            exercise.workouts.set(workout_instances)
-        return exercise
+            instance.workouts.set(workout_instances)
+        return instance
     
     def update(self, instance, validated_data):
         workout_instances = validated_data.pop('workouts', [])
@@ -58,7 +79,6 @@ class ExerciseSerializer(serializers.ModelSerializer):
         instance.workouts.set(workouts_updated)
         return instance
         
-
 class WorkourSessionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkoutSession
