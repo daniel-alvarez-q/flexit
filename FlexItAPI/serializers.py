@@ -10,7 +10,6 @@ from FlexItAPI.models import Workout,Exercise,WorkoutSession,WorkoutExercise
 #         raise serializers.ValidationError('Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.')
 #     return 
 
-
 # Serializers define the API representation.
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
@@ -27,6 +26,15 @@ class UserSerializer(serializers.ModelSerializer):
         if password:
             instance.set_password(password)
             instance.save()
+        return instance
+    
+    def update(self,instance,validated_data):
+        password = validated_data.pop('password', None)
+        instance.username = validated_data.get('username', instance.username)
+        instance.email = validated_data.get('email', instance.email)
+        if password:
+            instance.set_password(password)
+        instance.save()
         return instance
         
 class WorkoutSerializer(serializers.ModelSerializer):

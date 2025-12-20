@@ -83,7 +83,10 @@ class UserDetails(APIView):
             output = User.objects.get(pk=id).delete()
         except Exception as e:
             output = {'Error performing query': f'{e}'}
-        return Response(output)   
+        return Response(output)
+    
+    def patch(self,request,id):
+        pass  
     
 # Workout views
 class WorkoutListCreate(APIView):
