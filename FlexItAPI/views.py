@@ -51,8 +51,14 @@ class LoginView(KnoxLoginView):
 # User views, using Django's default user model.
 class UserListCreate(APIView):
     serializer_class = UserSerializer
+    
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [permissions.AllowAny()]
+        if self.request.method == "GET":
+            return [permissions.IsAdminUser()]
+        return super().get_permissions()
 
-    @permission_decorator([permissions.IsAdminUser])
     def get(self,request):
         queryset = User.objects.all()
         serializer = self.serializer_class(queryset, many=True)

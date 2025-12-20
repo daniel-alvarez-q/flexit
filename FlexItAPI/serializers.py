@@ -15,11 +15,11 @@ from FlexItAPI.models import Workout,Exercise,WorkoutSession,WorkoutExercise
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True, write_only=True)
-    is_staff = serializers.BooleanField(default=False, write_only=True)
+    is_staff = serializers.BooleanField(default=False, read_only=True)
     
     class Meta:
         model = User
-        fields = ['id','username', 'email','is_staff','password']
+        fields = ['id','username', 'email','password','is_staff']
         
     def create(self, validated_data):
         password = validated_data.pop('password', None)
