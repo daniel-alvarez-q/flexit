@@ -1,7 +1,7 @@
 from typing import Type
 from django.contrib.auth.models import User
 from django.db.models import Model
-from rest_framework import permissions, serializers
+from rest_framework import permissions, serializers, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -13,37 +13,42 @@ from FlexItAPI.models import Workout, Exercise
 
 ##### Helpers ######
 
-def query_search(model:Type[Model], serializer:Type[serializers.Serializer], id:int, **kwargs):
+def query_search(model:Type[Model], serializer:Type[serializers.Serializer], instance_id:int, **kwargs):
     user = kwargs.get('user')
     try:
         if user:
-            queryset = model.objects.get(pk=id, user=user)
+            queryset = model.objects.get(pk=instance_id, user=user)
         else:
-            queryset = model.objects.get(pk=id)
-        output = serializer(queryset).data
+            queryset = model.objects.get(pk=instance_id)
+        return Response(serializer(queryset).data)
     except Exception as e:
-        output = {'Error performing query': e}
-    return output
+        return Response({'Error fetching data': f'{e}'}, status=status.HTTP_404_NOT_FOUND)
 
 def query_save(serializer, **kwargs):
+    user = kwargs.get('user')
     try:
         serializer.is_valid(raise_exception=True)
-    except AssertionError as e:
-        output = serializer.errors
+    except:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
-        serializer.save()
-        output = serializer.data
-    return output
+        if user:   
+            serializer.save(user=user)
+        else:
+            serializer.save()
+        return Response(serializer.data)
 
-def query_delete(model:Type[Model],id:int,request:Request):
+def query_delete(model:Type[Model],instance_id:int,request:Request):
     user = request.user
     try:
-        isinstance = model.objects.get(pk=id, user=user)
-        output = isinstance.delete()[1]
+        instance = model.objects.get(pk=instance_id, user=user)
+        return Response(instance.delete()[1])
     except Exception as e:
-        output = {'Error performing query': f'{e}'}
-    return output
+        return Response({'Error fetching data': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
+def query_validate_role(user:User,user_id:int):
+    if not user.is_staff and user.pk != user_id:
+        raise PermissionError('This user does not have the necessary role to perform this operation.')
+            
 # Custom login view
 class LoginView(KnoxLoginView):
     authentication_classes = [BasicAuthentication]
@@ -60,33 +65,34 @@ class UserListCreate(APIView):
         return super().get_permissions()
 
     def get(self,request):
-        queryset = User.objects.all()
-        serializer = self.serializer_class(queryset, many=True)
+        serializer = self.serializer_class(User.objects.all(), many=True)
         return Response(serializer.data)
     
     def post(self,request):
         serializer = self.serializer_class(data=request.data)
-        output = query_save(serializer)
-        return Response(output)
+        return query_save(serializer)
         
 class UserDetails(APIView):
     serializer_class = UserSerializer
     
     def get(self,request,id):
-        return Response(query_search(User, self.serializer_class, id))
+        return query_search(User, self.serializer_class, id)
     
     def delete(self,request,id):
-        user = request.user
         try:
-            if not user.is_staff:
-                assert user.id == id, 'User does not have the necessary role to delete users other than itself.'
-            output = User.objects.get(pk=id).delete()
+            query_validate_role(request.user, id)
+            return Response(User.objects.get(pk=id).delete())
         except Exception as e:
-            output = {'Error performing query': f'{e}'}
-        return Response(output)
+            return Response({'Error fetching data': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
     
     def patch(self,request,id):
-        pass  
+        try:
+            query_validate_role(request.user,id)
+            instance = User.objects.get(pk=id)
+            serializer = self.serializer_class(data=request.data, instance=instance)
+            return query_save(serializer)
+        except Exception as e:
+             return Response({'Error fetching data': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
     
 # Workout views
 class WorkoutListCreate(APIView):
@@ -99,37 +105,35 @@ class WorkoutListCreate(APIView):
     
     def post(self,request):
         serializer = self.serializer_class(data=request.data)
-        return Response(query_save(serializer))
+        return query_save(serializer, user=request.user)
     
 class WorkoutDetails(APIView):
     serializer_class = WorkoutSerializer
     
     def get(self,request,id):
-        return Response(query_search(Workout, self.serializer_class,id, user=request.user))
+        return query_search(Workout, self.serializer_class,id, user=request.user)
     
     def patch(self,request,id):
         try:
             instance = Workout.objects.get(pk=id, user=request.user)
             serializer = self.serializer_class(instance=instance, data=request.data, partial=True)
-            output = query_save(serializer)
+            return query_save(serializer)
         except Exception as e:
-            output = {'Error': f'{e}'}
-        return Response(output)
+            return Response({'Error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self,request,id):
-        return Response(query_delete(Workout, id, request))
+        return query_delete(Workout, id, request)
     
 class WorkoutExercises(APIView):
     serializer_class = ExerciseSerializer
 
-    def get(self,request,workout_id):
+    def get(self,request,id):
         try:
-            workout_instance = Workout.objects.get(pk=workout_id, user=request.user)
-            exercises = workout_instance.exercises.values()
-            output = self.serializer_class(exercises, many=True).data
+            workout_instance = Workout.objects.get(pk=id, user=request.user)
+            exercises = workout_instance.exercises.all()
+            return Response(self.serializer_class(exercises, many=True).data)
         except Exception as e:
-            output = {f"Error: {e}"}
-        return Response(output)
+            return Response({f"Error fetching data: {e}"}, status=status.HTTP_400_BAD_REQUEST)
     
 class ExerciseListCreate(APIView):
     serializer_class = ExerciseSerializer
@@ -138,22 +142,21 @@ class ExerciseListCreate(APIView):
         return Response(self.serializer_class(Exercise.objects.filter(user=request.user),many=True).data)
     
     def post(self,request):
-        return Response(query_save(self.serializer_class(data=request.data)))
+        return query_save(self.serializer_class(data=request.data), user=request.user)
     
 class ExerciseDetails(APIView):
     serializer_class = ExerciseSerializer
     
     def get(self,request,id):
-        return Response(query_search(Exercise, self.serializer_class,id,user=request.user))
+        return query_search(Exercise, self.serializer_class,id,user=request.user)
     
     def patch(self, request, id):
         try:
             instance = Exercise.objects.get(pk=id, user=request.user)
             serializer = self.serializer_class(instance=instance, data=request.data, partial=True)
-            output = query_save(serializer)
+            return query_save(serializer)
         except Exception as e:
-            output = {'Error': f'{e}'}
-        return Response(output)
+            return Response({'Error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self,request, id):
-        return Response(query_delete(Exercise, id, request))
+        return query_delete(Exercise, id, request)

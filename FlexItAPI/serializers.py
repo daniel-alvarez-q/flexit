@@ -38,9 +38,15 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
         
 class WorkoutSerializer(serializers.ModelSerializer):
+    source_url=serializers.URLField(allow_null=True, required=False)
+    user = serializers.PrimaryKeyRelatedField(
+        many=False,
+        read_only=True,
+    )
+    
     class Meta:
         model = Workout
-        fields = ['id','user','name','description','source_url','created_at','updated_at'] 
+        fields = ['id','name','description','source_url','user','created_at','updated_at'] 
         
     def create(self, validated_data):
         return Workout.objects.create(**validated_data)
@@ -61,14 +67,12 @@ class ExerciseSerializer(serializers.ModelSerializer):
     )
     user = serializers.PrimaryKeyRelatedField(
         many=False,
-        queryset=User.objects.all(),
-        write_only=True,
-        required=True
+        read_only=True,
     )
     
     class Meta:
         model = Exercise
-        fields = ['id','user','workouts','name','description','category','created_at','updated_at']
+        fields = ['id','workouts','name','description','category','user','created_at','updated_at']
         
     def create(self, validated_data):
         workout_instances = validated_data.pop('workouts', None)
@@ -79,7 +83,7 @@ class ExerciseSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         workout_instances = validated_data.pop('workouts', [])
-        workouts_updated = Workout.objects.filter(pk__in=[x['id'] for x in instance.workouts.values()]+[x.id for x in workout_instances])
+        workouts_updated = Workout.objects.filter(pk__in=[x.id for x in instance.workouts.all()]+[x.id for x in workout_instances])
         instance.name = validated_data.get('name', instance.name)
         instance.description = validated_data.get('description', instance.description)
         instance.category = validated_data.get('category', instance.category)
