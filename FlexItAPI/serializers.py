@@ -1,4 +1,4 @@
-import re
+import re,datetime
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from FlexItAPI.models import Workout,Exercise,WorkoutSession,WorkoutExercise
@@ -12,9 +12,14 @@ from FlexItAPI.models import Workout,Exercise,WorkoutSession,WorkoutExercise
 
 # Serializers define the API representation.
 class UserSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True)
-    password = serializers.CharField(required=True, write_only=True)
-    is_staff = serializers.BooleanField(default=False, read_only=True)
+    email = serializers.EmailField(
+        required=True)
+    password = serializers.CharField(
+        required=True, 
+        write_only=True)
+    is_staff = serializers.BooleanField(
+        default=False,
+        read_only=True)
     
     class Meta:
         model = User
@@ -38,11 +43,12 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
         
 class WorkoutSerializer(serializers.ModelSerializer):
-    source_url=serializers.URLField(allow_null=True, required=False)
+    source_url=serializers.URLField(
+        allow_null=True,
+        required=False)
     user = serializers.PrimaryKeyRelatedField(
         many=False,
-        read_only=True,
-    )
+        read_only=True)
     
     class Meta:
         model = Workout
@@ -92,9 +98,27 @@ class ExerciseSerializer(serializers.ModelSerializer):
         return instance
         
 class WorkourSessionsSerializer(serializers.ModelSerializer):
+    workout=serializers.PrimaryKeyRelatedField(
+        queryset = Workout.objects.all(),
+        required = True
+    )
+    exercises=serializers.PrimaryKeyRelatedField(
+        queryset=Exercise.objects.all(),
+        required=False,
+        many=True
+    )
+    
     class Meta:
         model = WorkoutSession
-        fields = ['id','user','workout','start_time','end_time']
-            
+        fields = ['id','workout','exercises','user','start_time','end_time']
+        
+    def create(self,validated_data):
+        exercises = validated_data.pop('exercises', [])
+        workoutsession = WorkoutSession(**validated_data)
+        workoutsession.start_time = datetime.datetime.now(datetime.timezone.utc)
+        workoutsession.save()
+        # workoutsession.exercises.set(exercises)
+        return workoutsession
+     
             
         

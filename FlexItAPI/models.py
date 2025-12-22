@@ -45,8 +45,8 @@ class WorkoutExercise(models.Model):
 class WorkoutSession(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
     workout = models.ForeignKey(Workout, on_delete=models.CASCADE, editable=False)
-    exercises = models.ManyToManyField(Exercise, through='ExerciseLog', related_name='exercises', editable=False)
-    start_time = models.DateTimeField(editable=False)
+    exercises = models.ManyToManyField(Exercise, through='ExerciseLog', related_name='exercises', editable=True, blank=True)
+    start_time = models.DateTimeField(editable=False, blank=False)
     end_time = models.DateTimeField(null=True)
     
     class Meta:

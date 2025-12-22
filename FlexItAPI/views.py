@@ -9,7 +9,7 @@ from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import permission_classes as permission_decorator
 from knox.views import LoginView as KnoxLoginView
 from FlexItAPI.serializers import UserSerializer, WorkoutSerializer, ExerciseSerializer, WorkourSessionsSerializer
-from FlexItAPI.models import Workout, Exercise 
+from FlexItAPI.models import Workout, Exercise, WorkoutSession, ExerciseLog
 
 ##### Helpers ######
 
@@ -53,7 +53,8 @@ def query_validate_role(user:User,user_id:int):
 class LoginView(KnoxLoginView):
     authentication_classes = [BasicAuthentication]
 
-# User views, using Django's default user model.
+###### User views, using Django's default user model #######
+
 class UserListCreate(APIView):
     serializer_class = UserSerializer
     
@@ -94,7 +95,8 @@ class UserDetails(APIView):
         except Exception as e:
              return Response({'Error fetching data': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
     
-# Workout views
+###### Workout views #######
+
 class WorkoutListCreate(APIView):
     serializer_class = WorkoutSerializer
     
@@ -134,7 +136,9 @@ class WorkoutExercises(APIView):
             return Response(self.serializer_class(exercises, many=True).data)
         except Exception as e:
             return Response({f"Error fetching data: {e}"}, status=status.HTTP_400_BAD_REQUEST)
-    
+
+###### Exercise views #######
+
 class ExerciseListCreate(APIView):
     serializer_class = ExerciseSerializer
     
@@ -160,3 +164,15 @@ class ExerciseDetails(APIView):
     
     def delete(self,request, id):
         return query_delete(Exercise, id, request)
+    
+###### WorkoutSession views #######
+
+class WorkoutSessionListCreate(APIView):
+    serializer_class = WorkourSessionsSerializer
+    
+    def get(self,request):
+        return Response(self.serializer_class(WorkoutSession.objects.filter(user=request.user), many=True).data)
+     
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        return query_save(serializer,user=request.user)
