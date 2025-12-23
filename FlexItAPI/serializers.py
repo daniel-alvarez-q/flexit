@@ -114,23 +114,24 @@ class WorkoutSessionSerializer(serializers.ModelSerializer):
         queryset=Workout.objects.all(),
         required=True
     )
-    exercises=ExerciseLogSerializer(
+    exercise_logs=ExerciseLogSerializer(
         many=True, 
-        required=False,
-        source='exercise_logs',
+        required=False
     )
     
     class Meta:
         model = WorkoutSession
-        fields = ['id','workout','exercises','user','start_time','end_time']
+        fields = ['id','workout','exercise_logs','user','start_time','end_time']
         
     def create(self,validated_data):
-        exercise_logs = validated_data.pop('exercises',[])
+        exercise_logs = validated_data.pop('exercise_logs',[])
         workoutsession = WorkoutSession(**validated_data)
         workoutsession.start_time = datetime.datetime.now(datetime.timezone.utc)
         workoutsession.save()
         for log_data in exercise_logs:
-            ExerciseLog.objects.create(**log_data)
+            log = ExerciseLog(**log_data)
+            log.session = workoutsession
+            log.save()
         return workoutsession
     
     def update(self,instance,validated_data):
