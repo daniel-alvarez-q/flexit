@@ -11,6 +11,10 @@ from FlexItAPI.models import Workout,Exercise,WorkoutSession,ExerciseLog
 #     return 
 
 # Serializers define the API representation.
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(required=True, write_only=True)
+
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required=True)

@@ -1,15 +1,15 @@
 from typing import Type
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db.models import Model
 from rest_framework import permissions, serializers, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
-from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import permission_classes as permission_decorator
 from knox.views import LoginView as KnoxLoginView
-from FlexItAPI.serializers import UserSerializer, WorkoutSerializer, ExerciseSerializer, WorkoutSessionSerializer
-from FlexItAPI.models import Workout, Exercise, WorkoutSession, ExerciseLog
+from FlexItAPI.serializers import LoginSerializer,UserSerializer, WorkoutSerializer, ExerciseSerializer, WorkoutSessionSerializer
+from FlexItAPI.models import Workout, Exercise, WorkoutSession
 
 ##### Helpers ######
 
@@ -51,7 +51,30 @@ def query_validate_role(user:User,user_id:int):
             
 # Custom login view
 class LoginView(KnoxLoginView):
-    authentication_classes = [BasicAuthentication]
+    authentication_classes = []
+    permission_classes = [permissions.AllowAny]
+    serializer_class = LoginSerializer
+    
+    def post(self, request, format=None):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        
+        if not username or not password:
+            return Response(
+                {'error': 'Username and password are required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        user = authenticate(username=username, password=password)
+        
+        if user is None:
+            return Response(
+                {'error': 'Invalid username or password.'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        request.user = user
+        return super().post(request)
 
 ###### User views, using Django's default user model #######
 
@@ -160,7 +183,7 @@ class ExerciseDetails(APIView):
             serializer = self.serializer_class(instance=instance, data=request.data, partial=True)
             return query_save(serializer)
         except Exception as e:
-            return Response({'Error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'Error performing patch operation': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self,request, id):
         return query_delete(Exercise, id, request)
@@ -184,5 +207,12 @@ class WorkoutSessionDetails(APIView):
         return query_search(WorkoutSession, self.serializer_class, id, user=request.user)
     
     def patch(self,request,id):
-        instance = WorkoutSession.objects.get(pk=id, user=request.user)
-        return query_save(self.serializer_class(instance=instance, data=request.data, partial=True))
+        try:
+            instance = WorkoutSession.objects.get(pk=id, user=request.user)
+        except Exception as e:
+            return Response({'Error performing patch operation': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return query_save(self.serializer_class(instance=instance, data=request.data, partial=True))
+        
+    def delete(self,request, id):
+        return query_delete(WorkoutSession, id, request)
