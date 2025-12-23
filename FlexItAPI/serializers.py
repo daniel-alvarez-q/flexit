@@ -1,7 +1,7 @@
 import re,datetime
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from FlexItAPI.models import Workout,Exercise,WorkoutSession,WorkoutExercise
+from FlexItAPI.models import Workout,Exercise,WorkoutSession,ExerciseLog
 
 ##### Helpers #####
 
@@ -78,7 +78,7 @@ class ExerciseSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Exercise
-        fields = ['id','workouts','name','description','category','user','created_at','updated_at']
+        fields = ['id','workouts','name','description','series','repetitions','weight','duration','distance','category','user','created_at','updated_at']
         
     def create(self, validated_data):
         workout_instances = validated_data.pop('workouts', None)
@@ -88,7 +88,7 @@ class ExerciseSerializer(serializers.ModelSerializer):
         return instance
     
     def update(self, instance, validated_data):
-        workout_instances = validated_data.pop('workouts', [])
+        workout_instances = validated_data.pop('workouts',[])
         workouts_updated = Workout.objects.filter(pk__in=[x.id for x in instance.workouts.all()]+[x.id for x in workout_instances])
         instance.name = validated_data.get('name', instance.name)
         instance.description = validated_data.get('description', instance.description)
@@ -96,16 +96,28 @@ class ExerciseSerializer(serializers.ModelSerializer):
         instance.save()
         instance.workouts.set(workouts_updated)
         return instance
-        
-class WorkourSessionsSerializer(serializers.ModelSerializer):
-    workout=serializers.PrimaryKeyRelatedField(
-        queryset = Workout.objects.all(),
-        required = True
+    
+class ExerciseLogSerializer(serializers.ModelSerializer):
+    session=serializers.PrimaryKeyRelatedField(
+        read_only=True 
     )
-    exercises=serializers.PrimaryKeyRelatedField(
-        queryset=Exercise.objects.all(),
+    exercise=serializers.PrimaryKeyRelatedField(
+        queryset=Exercise.objects.all()
+    )
+    
+    class Meta:
+        model = ExerciseLog
+        fields = ['session','exercise','series','repetitions','weight','duration','distance','notes','log_time']
+        
+class WorkoutSessionSerializer(serializers.ModelSerializer):
+    workout=serializers.PrimaryKeyRelatedField(
+        queryset=Workout.objects.all(),
+        required=True
+    )
+    exercises=ExerciseLogSerializer(
+        many=True, 
         required=False,
-        many=True
+        source='exercise_logs',
     )
     
     class Meta:
@@ -113,12 +125,21 @@ class WorkourSessionsSerializer(serializers.ModelSerializer):
         fields = ['id','workout','exercises','user','start_time','end_time']
         
     def create(self,validated_data):
-        exercises = validated_data.pop('exercises', [])
+        exercise_logs = validated_data.pop('exercises',[])
         workoutsession = WorkoutSession(**validated_data)
         workoutsession.start_time = datetime.datetime.now(datetime.timezone.utc)
         workoutsession.save()
-        # workoutsession.exercises.set(exercises)
+        for log_data in exercise_logs:
+            ExerciseLog.objects.create(**log_data)
         return workoutsession
-     
-            
-        
+    
+    def update(self,instance,validated_data):
+        exercise_logs = validated_data.pop('exercise_logs',[])
+        instance.workout = validated_data.get('workout', instance.workout)
+        instance.end_time = validated_data.get('end_time', instance.end_time)
+        instance.save()
+        for log_data in exercise_logs:
+            log = ExerciseLog(**log_data)
+            log.session = instance
+            log.save()
+        return instance

@@ -8,7 +8,7 @@ from rest_framework.request import Request
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import permission_classes as permission_decorator
 from knox.views import LoginView as KnoxLoginView
-from FlexItAPI.serializers import UserSerializer, WorkoutSerializer, ExerciseSerializer, WorkourSessionsSerializer
+from FlexItAPI.serializers import UserSerializer, WorkoutSerializer, ExerciseSerializer, WorkoutSessionSerializer
 from FlexItAPI.models import Workout, Exercise, WorkoutSession, ExerciseLog
 
 ##### Helpers ######
@@ -168,7 +168,7 @@ class ExerciseDetails(APIView):
 ###### WorkoutSession views #######
 
 class WorkoutSessionListCreate(APIView):
-    serializer_class = WorkourSessionsSerializer
+    serializer_class = WorkoutSessionSerializer
     
     def get(self,request):
         return Response(self.serializer_class(WorkoutSession.objects.filter(user=request.user), many=True).data)
@@ -176,3 +176,13 @@ class WorkoutSessionListCreate(APIView):
     def post(self,request):
         serializer = self.serializer_class(data=request.data)
         return query_save(serializer,user=request.user)
+    
+class WorkoutSessionDetails(APIView):
+    serializer_class = WorkoutSessionSerializer
+    
+    def get(self,request,id):
+        return query_search(WorkoutSession, self.serializer_class, id, user=request.user)
+    
+    def patch(self,request,id):
+        instance = WorkoutSession.objects.get(pk=id, user=request.user)
+        return query_save(self.serializer_class(instance=instance, data=request.data, partial=True))

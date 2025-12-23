@@ -31,6 +31,11 @@ class Exercise(models.Model):
     workouts = models.ManyToManyField(Workout, through='WorkoutExercise', related_name='exercises', blank=True)
     name = models.CharField(max_length=100, blank=False)
     description = models.TextField(max_length=2000)
+    series = models.IntegerField(default=0)
+    repetitions = models.IntegerField(default=0)
+    weight = models.FloatField(default=0)
+    duration = models.FloatField(default=0)
+    distance = models.FloatField(default=0)
     category = models.CharField(max_length=3, choices=EXERCISE_CATEGORIES, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -41,11 +46,11 @@ class WorkoutExercise(models.Model):
     workout = models.ForeignKey(Workout, on_delete=models.CASCADE)
     order = models.IntegerField(null=True) 
     
-#Sessions (relational table)
+#Sessions
 class WorkoutSession(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
     workout = models.ForeignKey(Workout, on_delete=models.CASCADE, editable=False)
-    exercises = models.ManyToManyField(Exercise, through='ExerciseLog', related_name='exercises', editable=True, blank=True)
+    exercises = models.ManyToManyField(Exercise, through='ExerciseLog', related_name='logged_sessions', editable=True, blank=True)
     start_time = models.DateTimeField(editable=False, blank=False)
     end_time = models.DateTimeField(null=True)
     
@@ -54,7 +59,7 @@ class WorkoutSession(models.Model):
         
 #Exercise log (relational table)
 class ExerciseLog(models.Model):
-    session = models.ForeignKey(WorkoutSession, on_delete=models.CASCADE)
+    session = models.ForeignKey(WorkoutSession, on_delete=models.CASCADE, related_name='exercise_logs')
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
     series = models.IntegerField(default=0)
     repetitions = models.IntegerField(default=0)
