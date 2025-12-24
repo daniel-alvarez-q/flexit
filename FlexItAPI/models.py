@@ -12,11 +12,19 @@ EXERCISE_CATEGORIES = [
     ('oth','other')
 ]
 
+DIFICULTY_CATEGORIES = [
+    ('ext', 'extreme'),
+    ('hig', 'high'),
+    ('med', 'medium'),
+    ('low', 'low')
+]
+
 #Workout
 class Workout(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     description = models.TextField(max_length=2000)
+    difficulty = models.CharField(max_length=3, choices=DIFICULTY_CATEGORIES, default='med')
     source_url = models.URLField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -31,6 +39,7 @@ class Exercise(models.Model):
     workouts = models.ManyToManyField(Workout, through='WorkoutExercise', related_name='exercises', blank=True)
     name = models.CharField(max_length=100, blank=False)
     description = models.TextField(max_length=2000)
+    difficulty = models.CharField(max_length=3, choices=DIFICULTY_CATEGORIES, default='med')
     series = models.IntegerField(default=0)
     repetitions = models.IntegerField(default=0)
     weight = models.FloatField(default=0)

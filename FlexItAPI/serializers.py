@@ -56,7 +56,7 @@ class WorkoutSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Workout
-        fields = ['id','name','description','source_url','user','created_at','updated_at'] 
+        fields = ['id','name','description','difficulty','source_url','user','created_at','updated_at'] 
         
     def create(self, validated_data):
         return Workout.objects.create(**validated_data)
@@ -82,7 +82,7 @@ class ExerciseSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Exercise
-        fields = ['id','workouts','name','description','series','repetitions','weight','duration','distance','category','user','created_at','updated_at']
+        fields = ['id','workouts','name','description','difficulty','series','repetitions','weight','duration','distance','category','user','created_at','updated_at']
         
     def create(self, validated_data):
         workout_instances = validated_data.pop('workouts', None)
