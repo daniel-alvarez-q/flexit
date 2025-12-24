@@ -27,9 +27,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-@=ai(%-wo3l8oaaq@c_o2-&1d!invtzbky)#vcrmbjq-%os_!5'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -76,26 +73,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'FlexIt.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
-
-DATABASES = {
-    'default': {
-        'ENGINE': os.getenv('DB_ENGINE'),
-        'HOST':os.getenv('DB_HOST'),
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD':os.getenv('DB_PASSWORD'),
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server'
-        } 
-    }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
