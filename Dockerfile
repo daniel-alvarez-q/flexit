@@ -53,5 +53,8 @@ COPY . /app
 # Expose the port that the application listens on.
 EXPOSE 8080
 
+# Export the DJANGO_SETTINGS_MODULE variable
+# RUN export DJANGO_SETTINGS_MODULE=myproject.settings.production
+
 # Start the application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["uvicorn", "FlexIt.asgi", "--bind=0.0.0.0:8000", "--workers 4"]
