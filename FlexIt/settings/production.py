@@ -11,7 +11,7 @@ ALLOWED_HOSTS = ["*"]
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE'),
-        'HOST':os.getenv('DB_HOST'),
+        'HOST':os.getenv('DB_HOST_DOCKER'),
         'PORT':os.getenv('DB_PORT'),
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
