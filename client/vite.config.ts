@@ -9,8 +9,13 @@ export default defineConfig({
     port:3000,
     strictPort: true,
   },
-  server:{
+  server: {
     port:3000,
-    strictPort:true,
+    strictPort: true,
+    proxy: {
+      '/api': 'http://localhost:8000',
+      '/login': 'http://localhost:8000',
+      '/logout': 'http://localhost:8000'
+    }
   }
 })
