@@ -1,10 +1,24 @@
-import { useState } from 'react'
+import React,{ useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
+import axios from 'axios'
+import instance from'./auth_interceptor.tsx'
 import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
+  const [data, setData] = useState(null)
+
+  useEffect(() => {
+    instance.get('api/workouts')
+      .then(response => {
+        setData(response.data);
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.error('Error feching data: ', error);
+      });
+  }, []);
 
   return (
     <>

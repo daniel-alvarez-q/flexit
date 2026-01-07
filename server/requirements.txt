@@ -6,5 +6,6 @@ django-rest-knox==5.0.2
 drf-spectacular==0.29.0
 uvicorn==0.40.0
 pyodbc==5.3.0
+django-cors-headers==4.9.0
 markdown
 django-filter
