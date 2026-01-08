@@ -1,27 +1,40 @@
-import React,{ useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import axios from 'axios'
 import instance from'./auth_interceptor.tsx'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
-  const [data, setData] = useState(null)
+import NavBar from './shared/components/Navbar/index.ts'
 
-  useEffect(() => {
+type Workout = {id: string; name:string}
+
+const navLinks = [
+  {'uri':'/workouts', 'descriptor': 'Workouts'},
+  {'uri':'/exercises', 'descriptor': 'Exercises'}
+]
+
+const sessionLinks = [
+  {'uri':'/login', 'descriptor': 'Login'},
+  {'uri':'/signup', 'descriptor': 'Signup'}
+]
+
+function App() {
+  const [data, setData] = useState<Workout[]>([])
+
+  function retrieveWorkouts(){
     instance.get('api/workouts')
       .then(response => {
         setData(response.data);
-        console.log(response.data);
       })
       .catch(error => {
         console.error('Error feching data: ', error);
       });
-  }, []);
+  }
 
   return (
     <>
+    <NavBar appName={'FlexIt'} navLinks={navLinks} sessionLinks={sessionLinks}/>
       <div>
         <a href="https://vite.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
@@ -32,16 +45,18 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+        <button onClick={retrieveWorkouts}>
+          Workouts!
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <ul>
+        {
+          data.length > 0 ? data.map(workout =>
+          <li key={workout.id}>
+            {workout.name} 
+          </li>) : <div className="section-message">Could not retrieve workouts!</div>
+        }
+      </ul>
     </>
   )
 }
