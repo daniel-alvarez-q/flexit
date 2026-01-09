@@ -1,23 +1,13 @@
-import { useState } from "react";
+import { NavLink } from 'react-router-dom'
+import type {NavbarConfig, NavbarLinks} from './navbar.types'
 import './navbar.css'
 
-type links = {
-    uri:string;
-    descriptor:string;
-}
-
-type navbarConfig = {
-    appName:string;
-    navLinks: Array<links>;
-    sessionLinks: Array<links>;
-}
-
-function linkList(list:Array<links>){
+function linkList(list:Array<NavbarLinks>){
     try{
         return(
             list.map((link, i) =>
                 <li key={i} className="nav-item">
-                    <a className="nav-link" href={link['uri']}>{link['descriptor']}</a>
+                    <NavLink className="nav-link" to={link['uri']}>{link['descriptor']}</NavLink>
                 </li>
             )
         )
@@ -26,12 +16,11 @@ function linkList(list:Array<links>){
     }
 }
 
-function NavBar({appName, navLinks, sessionLinks}: navbarConfig){
-
+function NavBar({appName, navLinks, sessionLinks}: NavbarConfig){
     return(
         <div className="navbar">
             <div className="navbar-brand">
-                <a href="/">{appName}</a>
+                <NavLink to="/">{appName}</NavLink>
             </div>
             <div className="navbar-collapse">
                 <ul className="navbar-nav" key='centerLinks'>

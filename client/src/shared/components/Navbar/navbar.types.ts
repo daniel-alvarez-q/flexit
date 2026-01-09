@@ -1,10 +1,10 @@
-type links = {
+export type NavbarLinks = {
     uri:string;
     descriptor:string;
 }
 
-type navbarConfig = {
+export type NavbarConfig = {
     appName:string;
-    navLinks: Array<links>;
-    sessionLinks: Array<links>;
+    navLinks: Array<NavbarLinks>;
+    sessionLinks: Array<NavbarLinks>;
 }

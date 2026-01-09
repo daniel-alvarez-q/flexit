@@ -7,7 +7,7 @@ const instance = axios.create({
 instance.interceptors.request.use(
     config => {
         //Add token or custom headers if needed
-        config.headers['Authorization'] = 'Bearer 5d2abadb557853877f1f30869fef18c8893dfb227f16226fdc4e649f05dde32b';
+        config.headers['Authorization'] = 'Bearer fd5194198bb7cd54909fccbe1e3e9c5d4b279053d7cfec2fcd4add4716c13b9b';
         return config;
     },
     error => {

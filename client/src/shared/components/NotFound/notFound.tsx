@@ -1,7 +1,7 @@
 function NotFound(){
     return(
         <>
-            <h1>This address does not exists (yet)!!</h1>
+            <h1>This address does not exist (yet)!!</h1>
         </>
     )
 }

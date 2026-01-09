@@ -15,9 +15,11 @@ function RootLayout(){
     return(
         <>
             <NavBar appName={'FlexIt'} navLinks={navLinks} sessionLinks={sessionLinks}/>
-            <main>
-                <Outlet></Outlet>
-            </main>
+            <div className="container">
+              <main>
+                  <Outlet></Outlet>
+              </main>
+            </div>
         </>
     )
 }

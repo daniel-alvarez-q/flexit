@@ -41,10 +41,6 @@
 .navbar-brand a{
     color:#FFFFFF
 }
-
-.navbar-brand a:hover{
-    color:var(--tertiary-color)
-}
   
 .navbar-collapse{
     display: flex;
@@ -71,7 +67,7 @@
 }
 
 .nav-link:hover{
-    color:var(--tertiary-color)
+    color:var(--font-color)
 }
 
 .ms-auto{
