@@ -1,4 +1,5 @@
 from typing import Type
+import json
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db.models import Model
@@ -72,9 +73,14 @@ class LoginView(KnoxLoginView):
                 {'error': 'Invalid username or password.'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
-        
         request.user = user
-        return super().post(request)
+        response = super().post(request)
+        response.data['user'] = {'username': user.username, 
+                                 'first_name':user.first_name, 
+                                 'last_name': user.last_name, 
+                                 'email':user.email, 
+                                 'is_staff': user.is_staff}
+        return response
 
 ###### User views, using Django's default user model #######
 

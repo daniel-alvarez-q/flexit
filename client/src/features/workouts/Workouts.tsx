@@ -15,8 +15,6 @@ function Workouts(){
             console.error('Error feching data: ', error);
         });
         }, []);
-    
-    console.log(data)
 
     return(
         <>
