@@ -1,25 +1,21 @@
 import { Outlet } from "react-router-dom";
 import NavBar from "../shared/components/Navbar";
+import { AuthProvider } from "../context/AuthContext";
 
-const navLinks = [
-  {'uri':'/workouts', 'descriptor': 'Workouts'},
-  {'uri':'/exercises', 'descriptor': 'Exercises'}
-]
 
-const sessionLinks = [
-  {'uri':'/login', 'descriptor': 'Login'},
-  {'uri':'/signup', 'descriptor': 'Signup'}
-]
 
 function RootLayout(){
+
     return(
         <>
-            <NavBar appName={'FlexIt'} navLinks={navLinks} sessionLinks={sessionLinks}/>
+          <AuthProvider>
+            <NavBar appName={'FlexIt'}/>
             <div className="container">
               <main>
                   <Outlet></Outlet>
               </main>
             </div>
+          </AuthProvider>
         </>
     )
 }

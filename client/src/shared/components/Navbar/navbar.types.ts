@@ -5,6 +5,4 @@ export type NavbarLinks = {
 
 export type NavbarConfig = {
     appName:string;
-    navLinks: Array<NavbarLinks>;
-    sessionLinks: Array<NavbarLinks>;
 }
