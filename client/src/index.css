@@ -11,6 +11,7 @@
   --optional-secondary-color: #3CFFD0;
   --tertiary-color: #d7f31f;
   --font-color: #FFFFFF;
+  --font-color-dark: #292929;
   
   --alert-color: #D7263D;
   --success-color: #4CAF50;
@@ -73,10 +74,14 @@ a:hover {
 }
 
 button {
+  display: inline-block;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
+  line-height: 1.5;
+  text-align: center;
+  vertical-align: middle;
   
   border: 1px solid transparent;
   border-radius: 8px;
@@ -84,16 +89,45 @@ button {
   background-color: var(--main-color);
   color: var(--background-all);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: background-color 0.25s ease, border-color 0.25s ease, opacity 0.25s ease;
 }
 
-button:hover {
+button:hover:not(:disabled) {
+  background-color: var(--secondary-color);
+  color: var(--font-color);
   border-color: var(--warning-color);
 }
 
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+button:disabled {
+  background-color: var(--background-section);
+  color: #f7f7f7;
+  cursor: not-allowed;
+  opacity: 0.6;
+  border-color: transparent;
+}
+
+/* Button Size Classes */
+button.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  min-width: 200px;
+}
+
+button.btn-md {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  min-width: 150px;
+}
+
+button.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.875rem;
+  min-width: 100px;
 }
 
 /* ============================================
@@ -283,39 +317,33 @@ textarea.input-md {
 /* ============================================
    Button Variants
    ============================================ */
-.custom-btn {
-  display: inline-block;
-  padding: 0.75rem 0.8rem;
-  
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.5;
-  text-align: center;
-  text-decoration: none;
-  vertical-align: middle;
-  
-  background-color: var(--main-color);
-  color: var(--background-all);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  
-  transition: background-color 0.25s ease;
-}
-
-.custom-btn:hover {
+/* Additional button color variants can be added here */
+button.btn-secondary {
   background-color: var(--secondary-color);
   color: var(--font-color);
 }
 
-.custom-btn.btn-lg {
-  width: 300px;
-  font-size: 1.1rem;
+button.btn-secondary:hover:not(:disabled) {
+  background-color: var(--main-color);
+  color: var(--background-all);
 }
 
-.custom-btn.btn-md {
-  width: 200px;
-  font-size: 1rem;
+button.btn-success {
+  background-color: var(--success-color);
+  color: var(--font-color);
+}
+
+button.btn-success:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+button.btn-alert {
+  background-color: var(--alert-color);
+  color: var(--font-color);
+}
+
+button.btn-alert:hover:not(:disabled) {
+  opacity: 0.9;
 }
 
 /* ============================================

@@ -1,30 +1,33 @@
 import { useState } from "react"
 import { useAuth } from "../../context/AuthContext"
 import { useNavigate } from "react-router-dom";
+import EventMessage from "../../shared/components/EventMessage";
 
 function Signin(){
 
-    const navigate = useNavigate()
-
-    const { login, user } = useAuth()!;
-    
+    const navigate = useNavigate();
+    const { login } = useAuth()!;
     const [credentials,setCredentials] = useState({
         'username':'',
         'password':'',
-    })
+    });
+    const [status, setStatus] = useState('typing')
+    const [error, setError] = useState<string | null>(null)
 
     const handleSubmit = async (form:FormData) => {
+        status!=='submitting' ? setStatus('submitting') : status
         try{
             await login(credentials);
             navigate('/');
         }catch(error:any){
+            setStatus('typing')
+            setCredentials({...credentials, password:''})
             if (error.response){
-                console.error(`Error code ${error.status}: ${error.response.data.error}`)
+                setError(`Error code ${error.status}: ${error.response.data.error}`)
             }else{
-                console.error('Network error or no response')
+                setError('Network error or no response')
             }
         }
-        // navigate('/')
     }  
 
     return(
@@ -60,8 +63,13 @@ function Signin(){
                             />
                         </div>
                     </div>
+                    {error !== null && 
+                        <EventMessage message={error}></EventMessage>
+                    }
                     <div className="form-group">
-                        <button>Sign in</button>
+                        <button disabled={status==='submitting' 
+                            || credentials.username.length === 0 
+                            || credentials.password.length === 0}>Sign in</button>
                     </div>
                 </form>
             </div>
