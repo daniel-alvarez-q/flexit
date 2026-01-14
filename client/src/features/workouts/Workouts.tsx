@@ -1,13 +1,13 @@
 import { useState, useEffect} from "react"
 import type { Workout } from "./workouts.types"
-import instance from "../../auth_interceptor"
+import axios_instance from "../../request_interceptor"
 import Card from "../../shared/components/Card"
 
 function Workouts(){
     const [data, setData] = useState<Workout[]>([])
     
     useEffect(() => {
-        instance.get('api/workouts')
+        axios_instance.get('api/workouts')
         .then(response => {
             setData(response.data);
         })
@@ -18,7 +18,7 @@ function Workouts(){
 
     return(
         <>
-            <h1>Workouts!</h1>
+            <h1>Workouts</h1>
             <div className="row">
                 {data.length > 1 ? data.map(workout =>
                     <Card key={workout.id} uri='workouts' id={workout.id} title={workout.name} footer={workout.source_url} body={workout.description} />
