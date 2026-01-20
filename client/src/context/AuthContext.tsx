@@ -27,7 +27,20 @@ export const AuthProvider = ({children}:AuthProviderProps) => {
     //Check localStorage for existing user on app load
     useEffect(()=>{
         const storedUser = localStorage.getItem('username');
-        if (storedUser){
+        const tokenExpiry = localStorage.getItem('access-token-expiration')
+
+        if (tokenExpiry){
+            if(new Date() >= new Date(tokenExpiry)){
+                console.log('Auth token has expired')
+                localStorage.removeItem('access-token')
+                localStorage.removeItem('access-token-expiration')
+                localStorage.removeItem('username')
+                user!==null ? setUser(null) : user   
+                setLoading(true)
+            }
+        }
+
+        if(storedUser){
             setUser(storedUser);
         };
         setLoading(false)

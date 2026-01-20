@@ -1,7 +1,7 @@
 import './eventMessage.css'
 
 type EventMessageProps = {
-    message: string;
+    message?: string;
     style?: string;
 }
 
