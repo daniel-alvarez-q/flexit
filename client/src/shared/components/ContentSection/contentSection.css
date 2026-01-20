@@ -1,0 +1,23 @@
+.content-section{
+    background-color: var(--background-section);
+    display: grid;
+    padding: 32px;
+    width: auto;
+    min-width: 100px;
+    border-radius: 8px;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.content-section .title{
+    font-size: clamp(1.8rem, 2vw, 1rem);
+    text-align: left;
+    color:var(--font-color);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.content-section .content{
+    font-size: clamp(0.8rem, 2vw, 1rem);
+}

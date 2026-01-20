@@ -1,13 +1,14 @@
 import { useState, useEffect} from "react"
 import type { Workout } from "./workouts.types"
-import instance from "../../auth_interceptor"
+import axios_instance from "../../request_interceptor"
 import Card from "../../shared/components/Card"
+import EventMessage from "../../shared/components/EventMessage"
 
 function Workouts(){
     const [data, setData] = useState<Workout[]>([])
     
     useEffect(() => {
-        instance.get('api/workouts')
+        axios_instance.get('api/workouts')
         .then(response => {
             setData(response.data);
         })
@@ -18,11 +19,11 @@ function Workouts(){
 
     return(
         <>
-            <h1>Workouts!</h1>
+            <div className="template-title">Workouts</div>
             <div className="row">
                 {data.length > 1 ? data.map(workout =>
                     <Card key={workout.id} uri='workouts' id={workout.id} title={workout.name} footer={workout.source_url} body={workout.description} />
-                ) : <h2>No workouts could be loaded!</h2>}
+                ) : <EventMessage style="loading"></EventMessage>}
 
             </div>
 

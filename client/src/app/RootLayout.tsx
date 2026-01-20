@@ -10,11 +10,9 @@ function RootLayout(){
         <>
           <AuthProvider>
             <NavBar appName={'FlexIt'}/>
-            <div className="container">
-              <main>
+              <main className="container">
                   <Outlet></Outlet>
               </main>
-            </div>
           </AuthProvider>
         </>
     )
