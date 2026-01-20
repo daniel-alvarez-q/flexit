@@ -18,7 +18,9 @@ function Exercises(){
 
     return(
         <>
-            <h1>Exercises</h1>
+            <div className="row">
+                <div className="template-title">Exercises</div>
+            </div>
             <div className="row">
                 { exercises.length >1 ?exercises.map(exercise =>
                     <Card 

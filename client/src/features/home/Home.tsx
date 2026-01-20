@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import axios_instance from "../../request_interceptor";
 import EventMessage from "../../shared/components/EventMessage";
-import HorizontalCard from "../../shared/components/HorizontalCard";
 import Table from "../../shared/components/Table";
 import type { columnConfig } from "../../shared/components/Table/table.types";
+import ContentSection from "../../shared/components/ContentSection";
 
 
 type workoutSessionsType = {
@@ -58,33 +58,27 @@ function Home(){
                 );
                 
                 setWorkoutSessions(sessionsWithWorkouts);
+                console.log(sessionsWithWorkouts)
             })
             .catch(error => {
                 setError(error.message);
                 console.error(error);
             });
     },[user])
-    //         workoutSessions.forEach(session => {
-    //             axios_instance.get(`api/workout/${session.workout}`).then(response =>{
-    //                 session.workout_data=response.data
-    //                 console.log(session)
-    //             }).catch(error =>{
-    //                 console.error(error)
-    //             })
-    //         })
-    //         }
-    //     }, [workoutSessions])
-    
 
     return(
         <>
-            <h1>Latest workout sessions</h1>
+            <div className="row">
+                {user ? <div className="template-title">Welcome, {user}</div> : <div className="template-title">Welcome!</div>}
+            </div>
             <div className="row">
             {
                 error ?
                 <EventMessage message={error} style='full-width-error'></EventMessage>
                 : workoutSessions ?
-                <Table<workoutSessionsType> data={workoutSessions} columns={columns}></Table>
+                <ContentSection title="Latest workout sessions">
+                    <Table<workoutSessionsType> data={workoutSessions} columns={columns}></Table>
+                </ContentSection>
                 :<EventMessage style="loading"></EventMessage>
             }
             </div>

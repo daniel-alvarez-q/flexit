@@ -23,7 +23,7 @@
     padding-right: 2rem;
     padding-left: 1rem;
     box-sizing: border-box;
-    background-color: var(--background-section);
+    background-color: var(--navbar-color);
     color: var(--font-color);
 }
 

@@ -33,7 +33,7 @@ function Signin(){
     return(
         <>
             <div className="row">
-                <h1>Login</h1>
+                <div className="template-title">Sign in</div>
             </div>
             <div className="row">
                 <form action={handleSubmit} className="form-md">

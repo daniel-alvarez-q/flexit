@@ -1,43 +1,58 @@
 table.table-custom{
-    border: 1px solid var(--tertiary-color);
-    text-align: center;
+    border-collapse: collapse;
+    text-align: left;
     width: 100%;
-    overflow-y: scroll;
-    min-height: 100px;
-    table-layout: fixed;
+    background-color: var(--background-card);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     font-size: clamp(0.9rem, 2vw, 1rem);
     line-height: 1.5;
 }
 
-.table-custom tr{
-    border-top: 1px solid var(--tertiary-color);
-    min-height: 56px;
+.table-custom thead{
+    background-color: rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--tertiary-color);
 }
 
 .table-custom th{
     color: var(--tertiary-color);
-    padding: 12px 16px;
+    padding: 16px 20px;
     font-weight: 600;
-    line-height: 1.4;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    letter-spacing: 0.5px;
+    line-height: 0.6;
+}
+
+.table-custom tbody tr{
+    border-bottom: 1px solid var(--tertiary-color);
+    transition: background-color 0.2s ease;
+}
+
+.table-custom tbody tr:hover{
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.table-custom tbody tr:last-child{
+    border-bottom: none;
 }
 
 .table-custom td{
-    padding: 12px 16px;
+    padding: 16px 20px;
     overflow: hidden;
     vertical-align: middle;
+    color: var(--font-color);
+    font-size: clamp(0.7rem, 2vw, 0.85rem);
 }
 
 @media (max-width: 768px){
-    .table-custom tr{
-        min-height: 48px;
-    }
-
     .table-custom th{
         padding: 12px 12px;
+        font-size: 0.8rem;
     }
 
     .table-custom td{
-        padding: 10px 12px;
+        padding: 12px 12px;
     }
 }
 
@@ -46,12 +61,6 @@ table.table-custom{
     .main-row.fixed{
         flex-flow: column nowrap;
         gap:1rem;
-    }
-
-
-    .template-title{
-        font-size: 3rem;
-        text-align: center;
     }
 
     .custom-form.form-lg{

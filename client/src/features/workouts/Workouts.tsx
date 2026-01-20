@@ -19,7 +19,7 @@ function Workouts(){
 
     return(
         <>
-            <h1>Workouts</h1>
+            <div className="template-title">Workouts</div>
             <div className="row">
                 {data.length > 1 ? data.map(workout =>
                     <Card key={workout.id} uri='workouts' id={workout.id} title={workout.name} footer={workout.source_url} body={workout.description} />

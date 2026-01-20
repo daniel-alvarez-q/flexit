@@ -3,8 +3,10 @@
    ============================================ */
 :root {
   --background-all: #1a1a1a;
-  --background-section: #545353;
+  --background-section: #000000;
   --background-card: #292929;
+
+  --navbar-color: #000000;
   
   --main-color: #FA4B2A;
   --secondary-color: #5200FF;
@@ -256,6 +258,8 @@ textarea.input-md {
    Layout Utilities
    ============================================ */
 .container {
+  display: grid;
+  gap: 2rem;
   max-width: 1280px;
   margin: 0 auto;
   padding-right: var(--bs-gutter-x, 0.75rem);
@@ -301,9 +305,11 @@ textarea.input-md {
    Typography & Text Utilities
    ============================================ */
 .template-title {
-  font-size: 5rem;
+  font-size: 4rem;
   font-weight: 700;
   padding-top: 0;
+  text-align: center;
+  width: 100%;
 }
 
 .section-message {
