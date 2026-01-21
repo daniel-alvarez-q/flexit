@@ -46,6 +46,46 @@
     background-color: var(--tertiary-color);
 }
 
+.main-card.action {
+    color: var(--font-color);
+    background-color: transparent;
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.main-card.action:hover {
+    border-color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.05);
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.main-card.action .card-header {
+    border-bottom: none;
+    background: transparent;
+    flex: 0;
+}
+
+.main-card.action .card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 1.4rem;
+    line-height: 0.7;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.main-card.action:hover .card-body {
+    opacity: 1;
+}
+
 /* Card Header Section */
 .main-card > .card-header {
     display: flex;

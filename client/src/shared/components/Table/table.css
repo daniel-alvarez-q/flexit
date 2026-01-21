@@ -8,6 +8,7 @@ table.table-custom{
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     font-size: clamp(0.9rem, 2vw, 1rem);
     line-height: 1.5;
+    table-layout: auto;
 }
 
 .table-custom thead{
@@ -22,6 +23,7 @@ table.table-custom{
     font-size: clamp(0.85rem, 2vw, 0.95rem);
     letter-spacing: 0.5px;
     line-height: 0.6;
+    word-wrap: break-word;
 }
 
 .table-custom tbody tr{
@@ -43,16 +45,20 @@ table.table-custom{
     vertical-align: middle;
     color: var(--font-color);
     font-size: clamp(0.7rem, 2vw, 0.85rem);
+    word-wrap: break-word;
+    max-width: 0;
 }
 
 @media (max-width: 768px){
     .table-custom th{
-        padding: 12px 12px;
-        font-size: 0.8rem;
+        padding: 8px 6px;
+        font-size: 0.75rem;
+        letter-spacing: 0.3px;
     }
 
     .table-custom td{
-        padding: 12px 12px;
+        padding: 8px 6px;
+        font-size: 0.7rem;
     }
 }
 
