@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" role="img" aria-label="FlexIt! app icon">
+  <!-- Background badge -->
+  <rect x="1" y="1" width="28" height="28" rx="7" fill="#0F172A"></rect>
+  <rect x="1" y="1" width="28" height="28" rx="7" fill="none" stroke="#334155" stroke-width="1"></rect>
+
+  <!-- Dumbbell -->
+  <!-- Left weight -->
+  <rect x="5" y="10" width="4" height="10" rx="1.5" fill="#F59E0B"></rect>
+  <rect x="9" y="11.5" width="2" height="7" rx="1" fill="#F59E0B"></rect>
+
+  <!-- Bar -->
+  <rect x="11" y="13.5" width="8" height="3" rx="1.5" fill="#E5E7EB"></rect>
+
+  <!-- Right weight -->
+  <rect x="19" y="11.5" width="2" height="7" rx="1" fill="#F59E0B"></rect>
+  <rect x="21" y="10" width="4" height="10" rx="1.5" fill="#F59E0B"></rect>
+
+  <!-- Subtle highlight -->
+  <rect x="11" y="13.5" width="8" height="1.2" rx="0.6" fill="#FFFFFF" opacity="0.35"></rect>
+</svg>

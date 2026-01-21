@@ -9,7 +9,7 @@ function RootLayout(){
     return(
         <>
           <AuthProvider>
-            <NavBar appName={'FlexIt'}/>
+            <NavBar appName={'FlexIt!'}/>
               <main className="container">
                   <Outlet></Outlet>
               </main>
