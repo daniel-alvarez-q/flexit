@@ -1,0 +1,121 @@
+/* ============================================
+   Form Styles
+   ============================================ */
+
+/* Base form element styles */
+form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+}
+
+input,
+select,
+textarea {
+    padding: 0.5rem;
+    font-family: inherit;
+    font-size: 1rem;
+    border: 2px solid var(--background-section);
+    border-radius: 5px;
+    background-color: var(--background-card);
+    color: var(--font-color);
+    transition: border-color 0.25s ease;
+  width: 100%;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--main-color);
+}
+
+label {
+    font-size: 1rem;
+    margin-bottom: 4px;
+    color: var(--font-color);
+}
+
+/* Form variant classes */
+.form-lg {
+    min-width: 66%;
+    gap: 20px;
+}
+
+.form-md {
+    width: 60%;
+    gap: 20px;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+  align-items: flex-start;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-row > .form-group {
+    flex: 1;
+  width: 100%;
+}
+
+/* Label variants */
+.label-lg {
+    font-size: 1.2rem;
+}
+
+.label-accent {
+    color: var(--tertiary-color);
+}
+
+/* Input variant - inverse style */
+input.inverse,
+select.inverse,
+textarea.inverse {
+    background-color: transparent;
+    border: 2px solid var(--tertiary-color);
+    color: var(--tertiary-color);
+}
+
+input.inverse:focus,
+select.inverse:focus,
+textarea.inverse:focus {
+    border-color: var(--secondary-color);
+}
+
+select.inverse option {
+    background-color: var(--background-all);
+    color: var(--font-color);
+}
+
+/* Input size variants */
+input.input-lg,
+select.input-lg {
+    height: 40px;
+}
+
+input.input-md,
+select.input-md {
+    height: 35px;
+}
+
+textarea.input-lg {
+    min-height: 120px;
+}
+
+textarea.input-md {
+    min-height: 80px;
+}
+
+.form-text {
+    color: var(--font-color);
+    font-size: 0.875rem;
+    margin-top: 4px;
+}

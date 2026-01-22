@@ -1,9 +1,8 @@
-import { useState, useEffect, type EventHandler, type ReactEventHandler} from "react"
-import type { Workout, WorkoutCreate } from "./workouts.types"
+import { useState, useEffect, type ReactEventHandler} from "react"
+import type { Workout } from "./workouts.types"
 import axios_instance from "../../request_interceptor"
 import Card from "../../shared/components/Card"
 import EventMessage from "../../shared/components/EventMessage"
-import ContentSection from "../../shared/components/ContentSection"
 import Popup from "../../shared/components/Popup"
 
 function Workouts(){
