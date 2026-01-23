@@ -10,7 +10,7 @@ function Card({id, title, subtitle, body, footer, style='default', uri=null, onC
                     <div className="card-header">
                         <div className="card-title">
                             <span className="card-title-text">
-                                {uri ? (<NavLink to={uri+'/'+id}>{title}</NavLink>): title}
+                                {uri ? (<NavLink to={`/${uri}/${id}`}>{title}</NavLink>): title}
                             </span>
                         </div>
                         {subtitle && (

@@ -1,4 +1,4 @@
-export type Workout = {
+export type WorkoutInstance = {
     'id':number;
     'name':string;
     'description':string;

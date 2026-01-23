@@ -1,12 +1,12 @@
 import { useState, useEffect, type ReactEventHandler} from "react"
-import type { Workout } from "./workouts.types"
+import type { WorkoutInstance } from "./workouts.types"
 import axios_instance from "../../request_interceptor"
 import Card from "../../shared/components/Card"
 import EventMessage from "../../shared/components/EventMessage"
 import Popup from "../../shared/components/Popup"
 
 function Workouts(){
-    const [data, setData] = useState<Workout[]>([])
+    const [data, setData] = useState<WorkoutInstance[]>([])
     const [newWorkout, setNewWorkout] = useState<Object>(
         {
             name:'',
@@ -47,7 +47,7 @@ function Workouts(){
         }
     }
 
-    const workout_list = (data:Workout[]|null) => {
+    const workout_list = (data:WorkoutInstance[]|null) => {
         if (data){
             let mapped_workouts = data.map(workout => 
                 <Card key={workout.id} uri='workouts' id={workout.id} title={workout.name} footer={workout.source_url} body={workout.description} />
