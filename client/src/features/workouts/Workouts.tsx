@@ -108,7 +108,9 @@ function Workouts(){
 
     return(
         <>
-            <div className="template-title">Workouts</div>
+            <div className="row">
+                <div className="template-title">Workouts</div>
+            </div>
             <div className="row">
                 {workout_list(data)}
             </div>

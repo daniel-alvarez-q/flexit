@@ -261,28 +261,53 @@ textarea.input-md {
 /* ============================================
    Layout Utilities
    ============================================ */
+/* ============================================
+   Bootstrap-Style Container System
+   ============================================ */
 .container {
-  display: grid;
-  gap: 2rem;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding-right: var(--bs-gutter-x, 0.75rem);
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
   padding-left: var(--bs-gutter-x, 0.75rem);
-  text-align: center;
+  padding-right: var(--bs-gutter-x, 0.75rem);
+}
+
+@media (min-width: 576px) {
+  .container {
+    max-width: 540px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 992px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1320px;
+  }
 }
 
 .container-fluid {
-  --gutter-x: 1.5rem;
-  --gutter-y: 0;
-  
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-right: auto;
+  padding-left: var(--bs-gutter-x, 0.75rem);
+  padding-right: var(--bs-gutter-x, 0.75rem);
   margin-left: auto;
-  padding-right: calc(var(--gutter-x) * 0.5);
-  padding-left: calc(var(--gutter-x) * 0.5);
+  margin-right: auto;
 }
 
 .row {
