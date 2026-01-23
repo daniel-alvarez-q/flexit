@@ -28,12 +28,16 @@ function Workout(){
         :
         <EventMessage style="loading"></EventMessage>}
         <div className="row">
+            <div className="col-12 col-sm-4">
                 <ContentSection>
-                <p>Section 1</p>
-            </ContentSection>
-            <ContentSection>
-                <p>Section 2</p>
-            </ContentSection>
+                    <p>Section 1</p>
+                </ContentSection>
+            </div>
+            <div className="col-12 col-sm-8">
+                <ContentSection>
+                    <p>Section 2</p>
+                </ContentSection>
+            </div>
         </div>
         </>
         

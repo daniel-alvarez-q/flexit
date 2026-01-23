@@ -50,9 +50,11 @@ function Workouts(){
     const workout_list = (data:WorkoutInstance[]|null) => {
         if (data){
             let mapped_workouts = data.map(workout => 
-                <Card key={workout.id} uri='workouts' id={workout.id} title={workout.name} footer={workout.source_url} body={workout.description} />
+                <div className="col-12 col-lg-3 custom-justify-content-center">
+                    <Card key={workout.id} uri='workouts' id={workout.id} title={workout.name} footer={workout.source_url} body={workout.description} />
+                </div>
             )
-            mapped_workouts.push(<Card key={mapped_workouts.length + 2} body='Create a new workout' style="action" onClick={()=>setCreatingWorkouts(!creatingWorkout)}></Card>)
+            mapped_workouts.push(<div className="col-12 col-lg-3 custom-justify-content-center"><Card key={mapped_workouts.length + 2} body='Create a new workout' style="action" onClick={()=>setCreatingWorkouts(!creatingWorkout)}></Card></div>)
             return mapped_workouts
         }else{
             return <EventMessage style="loading"></EventMessage>
@@ -111,7 +113,7 @@ function Workouts(){
             <div className="row">
                 <div className="template-title">Workouts</div>
             </div>
-            <div className="row">
+            <div className="row justify-content-center g-4">
                 {workout_list(data)}
             </div>
             {creatingWorkout &&

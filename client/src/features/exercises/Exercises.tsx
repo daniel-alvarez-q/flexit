@@ -21,16 +21,17 @@ function Exercises(){
             <div className="row">
                 <div className="template-title">Exercises</div>
             </div>
-            <div className="row">
+            <div className="row justify-content-center g-4">
                 { exercises.length >1 ?exercises.map(exercise =>
-                    <Card 
-                    key={exercise.id}
-                    id={exercise.id} 
-                    title={exercise.name} 
-                    body={exercise.description} 
-                    footer={`Last updated: ${exercise.updated_at}`} 
-                    style="exercise"></Card>
-                    
+                    <div className="col-12 col-lg-3 custom-justify-content-center">
+                        <Card 
+                        key={exercise.id}
+                        id={exercise.id} 
+                        title={exercise.name} 
+                        body={exercise.description} 
+                        footer={`Last updated: ${exercise.updated_at}`} 
+                        style="exercise"></Card>
+                    </div>
                 ):<EventMessage style="loading"></EventMessage>}
             </div>
         </>

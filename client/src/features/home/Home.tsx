@@ -71,16 +71,18 @@ function Home(){
             <div className="row">
                 {user ? <div className="template-title">Welcome, {user}</div> : <div className="template-title">Welcome!</div>}
             </div>
-            <div className="row">
-            {
-                error ?
-                <EventMessage message={error} style='full-width-error'></EventMessage>
-                : workoutSessions ?
-                <ContentSection title="Latest workout sessions">
-                    <Table<workoutSessionsType> data={workoutSessions} columns={columns}></Table>
-                </ContentSection>
-                :<EventMessage style="loading"></EventMessage>
-            }
+            <div className="row justify-content-center">
+                <div className="col-12">
+                    {
+                    error ?
+                    <EventMessage message={error} style='full-width-error'></EventMessage>
+                    : workoutSessions ?
+                    <ContentSection title="Latest workout sessions">
+                        <Table<workoutSessionsType> data={workoutSessions} columns={columns}></Table>
+                    </ContentSection>
+                    :<EventMessage style="loading"></EventMessage>
+                    }
+                </div>
             </div>
         </>
     )

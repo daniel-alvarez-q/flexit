@@ -35,43 +35,45 @@ function Signin(){
             <div className="row">
                 <div className="template-title">Sign in</div>
             </div>
-            <div className="row">
-                <form action={handleSubmit} className="form-md">
-                    <div className="form-group">
-                        <div className="form-row">
-                            <label htmlFor="username">Username</label>
+            <div className="row justify-content-center">
+                <div className="col-8 custom-justify-content-center">
+                    <form action={handleSubmit} className="form-md">
+                        <div className="form-group">
+                            <div className="form-row">
+                                <label htmlFor="username">Username</label>
+                            </div>
+                            <div className="form-row">
+                                <input 
+                                    type="text" 
+                                    value={credentials.username} 
+                                    name="username"
+                                    onChange={(e)=>setCredentials({...credentials, username:e.target.value})}
+                                />
+                            </div>
                         </div>
-                        <div className="form-row">
-                            <input 
-                                type="text" 
-                                value={credentials.username} 
-                                name="username"
-                                onChange={(e)=>setCredentials({...credentials, username:e.target.value})}
-                            />
+                        <div className="form-group">
+                            <div className="form-row">
+                                <label htmlFor="password">Password</label>
+                            </div>
+                            <div className="form-row">
+                                <input 
+                                    type="password" 
+                                    value={credentials.password} 
+                                    name="password"
+                                    onChange={(e)=>setCredentials({...credentials, password:e.target.value})}
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div className="form-group">
-                        <div className="form-row">
-                            <label htmlFor="password">Password</label>
+                        {error !== null && 
+                            <EventMessage message={error}></EventMessage>
+                        }
+                        <div className="form-group">
+                            <button disabled={status==='submitting' 
+                                || credentials.username.length === 0 
+                                || credentials.password.length === 0}>Sign in</button>
                         </div>
-                        <div className="form-row">
-                            <input 
-                                type="password" 
-                                value={credentials.password} 
-                                name="password"
-                                onChange={(e)=>setCredentials({...credentials, password:e.target.value})}
-                            />
-                        </div>
-                    </div>
-                    {error !== null && 
-                        <EventMessage message={error}></EventMessage>
-                    }
-                    <div className="form-group">
-                        <button disabled={status==='submitting' 
-                            || credentials.username.length === 0 
-                            || credentials.password.length === 0}>Sign in</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </>
     )
