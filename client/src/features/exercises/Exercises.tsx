@@ -21,7 +21,7 @@ function Exercises(){
             <div className="row">
                 <div className="template-title">Exercises</div>
             </div>
-            <div className="row justify-content-center g-3">
+            <div className="row justify-content-center g-4">
                 { exercises.length >1 ?exercises.map(exercise =>
                     <div className="col-12 col-lg-3 custom-justify-content-center">
                         <Card 

@@ -9,7 +9,15 @@
 .workout-attribute{
     flex-basis: auto;
     text-align: left;
-    font-size: clamp(0.7rem, 3vw, 0.9rem);
+    font-size: clamp(0.9rem, 3vw, 1.0rem);
+}
+
+.workout-exercises{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    gap:1rem
 }
 
 .workout-exercise-list{
@@ -17,5 +25,16 @@
     flex-direction: column;
     flex-wrap: nowrap;
     justify-content: space-around;
-    gap:1rem
+    gap:1rem;
+    max-height: 450px;
+    overflow: scroll;
+}
+
+.workout-exercise-list::-webkit-scrollbar {
+    display: none;
+}
+
+.workout-exercise-list {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }

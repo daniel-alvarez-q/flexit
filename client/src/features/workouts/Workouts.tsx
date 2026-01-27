@@ -113,7 +113,7 @@ function Workouts(){
             <div className="row">
                 <div className="template-title">Workouts</div>
             </div>
-            <div className="row justify-content-center g-3">
+            <div className="row justify-content-center g-4">
                 {workout_list(data)}
             </div>
             {creatingWorkout &&
