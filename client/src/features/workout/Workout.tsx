@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, type FormEvent } from "react"
 import { useParams } from "react-router-dom"
 import type { WorkoutInstance } from "../workouts/workouts.types"
 import type { ExerciseInstance } from "../exercises/exercises.types"
@@ -7,19 +7,32 @@ import ContentSection from "../../shared/components/ContentSection"
 import EventMessage from "../../shared/components/EventMessage"
 import HorizontalCard from "../../shared/components/HorizontalCard"
 import Popup from "../../shared/components/Popup"
+import Form from "../../shared/components/Form"
 import './workout.css'
 
 function Workout(){
-    const [workout,setWorkout] = useState<WorkoutInstance>()
+    const [workout,setWorkout] = useState<WorkoutInstance|null>(null)
     const [exercises, setExercises] = useState<ExerciseInstance[]|null>(null)
+    const [exercise, setExercise] = useState<Partial<ExerciseInstance>>({
+        'workouts':[],
+        'name':'',
+        'description':'',
+        'difficulty': '',
+        'category':'',
+        'series':0,
+        'repetitions':0,
+        'duration':0,
+        'distance':0,
+    })
     const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
+    const [error, setError] = useState<string|null>(null)
     const params = useParams()
 
-    useEffect(()=>{
+
+    const fetch_workout = () => {
         axios_instance.get(`api/workout/${params.workoutId}`).then(async response =>{
             setWorkout(response.data)
             const retrieved_exercises = await axios_instance.get(`api/workout/${params.workoutId}/exercises`).then(response => {
-                console.log(response.data);
                 return response.data
             }).catch(error =>{
                 console.log(error)
@@ -28,6 +41,10 @@ function Workout(){
         }).catch(error=>{
             console.error(error)
         })
+    }
+
+    useEffect(()=>{
+        fetch_workout()
     },[])
 
     const workout_details = (workout: WorkoutInstance)=>{
@@ -62,15 +79,142 @@ function Workout(){
                 </div>
                 }
                 <div>
-                    <button className="btn-lg" onClick={(e) => create_exercise(e)}>Add new exercise</button>
+                    <button className="btn-lg" onClick={() => setCreatingExercise(!creatingExercise)}>Add new exercise</button>
                 </div>
             </div>
         )
     }
 
-    const create_exercise = (e:React.MouseEvent)=>{
-        setCreatingExercise(!creatingExercise)
-        console.log(e)
+    const handleExerciseSubmit = (e:FormEvent)=>{
+        e.preventDefault()
+        if(workout){
+            exercise.workouts?.push(workout.id)
+            console.log(exercise)
+            axios_instance.post('api/exercises', exercise).then(response => {
+            console.log(response)
+            setCreatingExercise(!creatingExercise)
+            setExercise({
+                'workouts':[],
+                'name':'',
+                'description':'',
+                'difficulty': '',
+                'category':'',
+                'series':0,
+                'repetitions':0,
+                'duration':0,
+                'distance':0,
+            })
+            fetch_workout()
+        }).catch(error =>{
+            console.log(error)
+        })
+        }else{
+            setError('No workout data is available!')
+        }
+    }
+
+    const exercise_form = () => {
+        return(
+            <form onSubmit={(e) => handleExerciseSubmit(e)}>
+                <div className="form-group">
+                    <div className="form-row">
+                        <label htmlFor="name">Name</label>
+                    </div>
+                    <div className="form-row">
+                        <input type="text" name="name" id="name" onChange={(e) => setExercise({...exercise, 'name':e.target.value})}/>
+                    </div>
+                </div>
+                <div className="form-group">
+                    <div className="form-row">
+                        <label htmlFor="description">Description</label>
+                    </div>
+                    <div className="form-row">
+                        <input type="text" name="description" id="description" onChange={(e)=> setExercise({...exercise, 'description':e.target.value})}/>
+                    </div>
+                </div>
+                <div className="form-group">
+                    <div className="form-row">
+                        <label htmlFor="difficulty">Difficulty</label>
+                    </div>
+                    <div className="form-row">
+                        <select name="difficulty" id="difficulty" onChange={(e) => setExercise({...exercise, 'difficulty':e.target.value})}>
+                            <option value="ext">Extreme</option>
+                            <option value="hig">High</option>
+                            <option value="med">Medium</option>
+                            <option value="low">Low</option>
+
+                        </select>
+                    </div>
+                </div>
+                <div className="form-group">
+                    <div className="form-row">
+                        <label htmlFor="category">Category</label>
+                    </div>
+                    <div className="form-row">
+                        <select name="category" id="category" onChange={(e) => setExercise({...exercise, 'category':e.target.value})}>
+                            <option value="str">Strength</option>
+                            <option value="car">Cardio</option>
+                            <option value="flx">Flexibility</option>
+                            <option value="res">Resistance</option>
+                            <option value="oth">Other</option>
+                        </select>
+                    </div>
+                </div>
+                {exercise.category === 'str' ?
+                    <>
+                        <div className="form-group">
+                            <div className="form-row">
+                                <label htmlFor="series">Series</label>
+                            </div>
+                            <div className="form-row">
+                                <input type="number" name="series" id="series" onChange={(e) => setExercise({...exercise, 'series': Number(e.target.value)})}/>
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <div className="form-row">
+                                <label htmlFor="repetitions">Repetitions</label>
+                            </div>
+                            <div className="form-row">
+                                <input type="number" name="repetitions" id="repetitions" onChange={(e) => setExercise({...exercise, 'repetitions': Number(e.target.value)})}/>
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <div className="form-row">
+                                <label htmlFor="weight">Weight</label>
+                            </div>
+                            <div className="form-row">
+                                <input type="number" name="weight" id="weight" onChange={(e) => setExercise({...exercise, 'weight': Number(e.target.value)})}/>
+                            </div>
+                        </div>
+                    </>
+                : exercise.category === 'car' ?
+                    <>
+                    <div className="form-group">
+                        <div className="form-row">
+                            <label htmlFor="distance">Distance (km)</label>
+                        </div>
+                        <div className="form-row">
+                            <input type="number" name="distance" id="distance" onChange={(e) => setExercise({...exercise, 'distance': Number(e.target.value)})}/>
+                        </div>
+                    </div>      
+                    <div className="form-group">
+                        <div className="form-row">
+                            <label htmlFor="duratin">Duration (minutes)</label>
+                        </div>
+                        <div className="form-row">
+                            <input type="number" name="duration" id="duration" onChange={(e) => setExercise({...exercise, 'duration': Number(e.target.value)})}/>
+                        </div>
+                    </div>              
+                    </>
+                : exercise.category === 'flx'
+                }
+                <div className="form-group">
+                    <div className="form-row">
+                        <button className="btn-md">Create</button>
+                    </div>
+                </div>
+            </form>
+        )
     }
     
     return(
@@ -97,7 +241,7 @@ function Workout(){
         <EventMessage style="loading"></EventMessage>}
         {creatingExercise &&
             <Popup title="New exercise" onClose={()=> setCreatingExercise(!creatingExercise)}>
-                <p>Test</p>
+                {exercise_form()}
             </Popup>
             }
         </>
