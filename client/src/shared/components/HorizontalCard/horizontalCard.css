@@ -5,7 +5,7 @@
     align-items: flex-start;
     width: 100%;
     max-width: 100%;
-    border-radius: 8px;
+    border-radius: 4px;
     justify-content: space-between;
     background-color: var(--main-color);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -69,7 +69,7 @@ a.horizontal-card:hover{
 
 .horizontal-card > .header > .title::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
+    border-radius: 4px;
 }
 
 .horizontal-card > .header > .title::-webkit-scrollbar-thumb:hover {
@@ -119,7 +119,7 @@ a.horizontal-card:hover{
 
 .horizontal-card > .body > .content::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
+    border-radius: 4px;
 }
 
 .horizontal-card > .body > .content::-webkit-scrollbar-thumb:hover {

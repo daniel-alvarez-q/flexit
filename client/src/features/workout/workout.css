@@ -1,0 +1,21 @@
+.workout-detail{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    gap:1rem
+}
+
+.workout-attribute{
+    flex-basis: auto;
+    text-align: left;
+    font-size: clamp(0.7rem, 3vw, 0.9rem);
+}
+
+.workout-exercise-list{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    gap:1rem
+}

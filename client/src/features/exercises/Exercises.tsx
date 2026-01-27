@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
 import axios_instance from "../../request_interceptor"
-import type { exercise_overview } from "./exercises.types"
+import type { ExerciseInstance } from "./exercises.types"
 import Card from "../../shared/components/Card"
 import EventMessage from "../../shared/components/EventMessage"
 
 function Exercises(){
 
-    const [exercises,setExercises] = useState<exercise_overview[]>([])
+    const [exercises,setExercises] = useState<ExerciseInstance[]>([])
 
     useEffect(()=>{
         axios_instance.get('api/exercises').then(response => {
@@ -21,7 +21,7 @@ function Exercises(){
             <div className="row">
                 <div className="template-title">Exercises</div>
             </div>
-            <div className="row justify-content-center g-4">
+            <div className="row justify-content-center g-3">
                 { exercises.length >1 ?exercises.map(exercise =>
                     <div className="col-12 col-lg-3 custom-justify-content-center">
                         <Card 

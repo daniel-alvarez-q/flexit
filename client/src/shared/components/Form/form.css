@@ -17,7 +17,7 @@ textarea {
     font-family: inherit;
     font-size: 1rem;
     border: 2px solid var(--background-section);
-    border-radius: 5px;
+    border-radius: 4px;
     background-color: var(--background-card);
     color: var(--font-color);
     transition: border-color 0.25s ease;

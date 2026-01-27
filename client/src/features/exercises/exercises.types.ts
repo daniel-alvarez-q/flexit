@@ -1,4 +1,4 @@
-export type exercise_overview ={
+export type ExerciseInstance ={
     id:number;
     name:string;
     description:string;
