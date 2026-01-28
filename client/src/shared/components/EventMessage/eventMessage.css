@@ -102,3 +102,36 @@
         left: 100%;
     }
 }
+
+/* ============================================
+   Solid Variant - Full Opacity
+   ============================================ */
+.message.solid.error {
+    background-color: rgba(255, 59, 48, 1);
+    border-color: rgba(255, 59, 48, 1);
+}
+
+.message.solid.warning {
+    background-color: rgba(255, 204, 0, 1);
+    border-color: rgba(255, 204, 0, 1);
+}
+
+.message.solid.success {
+    background-color: rgba(52, 199, 89, 1);
+    border-color: rgba(52, 199, 89, 1);
+}
+
+.message.solid.info {
+    background-color: rgba(0, 122, 255, 1);
+    border-color: rgba(0, 122, 255, 1);
+}
+
+.message.solid.full-width-error {
+    background-color: rgba(255, 59, 48, 1);
+    border-color: rgba(255, 59, 48, 1);
+}
+
+.message.solid.loading {
+    background-color: rgba(255, 255, 255, 0.15);
+    opacity: 1;
+}

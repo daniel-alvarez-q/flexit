@@ -25,6 +25,7 @@ function Workout(){
         'distance':0,
     })
     const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
+    const [activeSession, setActiveSession] = useState<boolean>(false)
     const [error, setError] = useState<string|null>(null)
     const params = useParams()
 
@@ -35,10 +36,12 @@ function Workout(){
             const retrieved_exercises = await axios_instance.get(`api/workout/${params.workoutId}/exercises`).then(response => {
                 return response.data
             }).catch(error =>{
+                setError(error.message)
                 console.log(error)
             })
             setExercises(retrieved_exercises)
         }).catch(error=>{
+            setError(error.message)
             console.error(error)
         })
     }
@@ -106,6 +109,7 @@ function Workout(){
             })
             fetch_workout()
         }).catch(error =>{
+            setError(error.message)
             console.log(error)
         })
         }else{
@@ -152,11 +156,11 @@ function Workout(){
                     </div>
                     <div className="form-row">
                         <select name="category" id="category" onChange={(e) => setExercise({...exercise, 'category':e.target.value})}>
+                            <option value="oth">Other</option>
                             <option value="str">Strength</option>
                             <option value="car">Cardio</option>
                             <option value="flx">Flexibility</option>
                             <option value="res">Resistance</option>
-                            <option value="oth">Other</option>
                         </select>
                     </div>
                 </div>
@@ -208,6 +212,9 @@ function Workout(){
                     </>
                 : exercise.category === 'flx'
                 }
+                {error &&
+                    <EventMessage message={error} style="error solid"></EventMessage>
+                }
                 <div className="form-group">
                     <div className="form-row">
                         <button className="btn-md">Create</button>
@@ -226,9 +233,20 @@ function Workout(){
             </div>
             <div className="row g-3">
                 <div className="col-12 col-sm-5">
-                    <ContentSection title="Workout details">
-                        {workout_details(workout)}
-                    </ContentSection>
+                    <div className="row g-3">
+                        <div className="col-12">
+                            <ContentSection title="Workout details">
+                                {workout_details(workout)}
+                            </ContentSection>
+                        </div>
+                        <div className="col-12">
+                            <div className="col-12">
+                        <ContentSection title="Workout sessions">
+                            <button className="btn-lg">Start a new session</button>
+                        </ContentSection>
+                </div>
+                        </div>
+                    </div>
                 </div>
                 <div className="col-12 col-sm-7">
                     <ContentSection title="Exercises">
@@ -240,7 +258,7 @@ function Workout(){
         :
         <EventMessage style="loading"></EventMessage>}
         {creatingExercise &&
-            <Popup title="New exercise" onClose={()=> setCreatingExercise(!creatingExercise)}>
+            <Popup title="New exercise" onClose={()=> {setCreatingExercise(!creatingExercise); setError(null)}}>
                 {exercise_form()}
             </Popup>
             }

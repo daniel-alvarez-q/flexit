@@ -92,7 +92,7 @@ button {
   border: 1px solid transparent;
   border-radius: 4px;
   
-  background-color: var(--main-color);
+  background-color: var(--font-color);
   color: var(--background-all);
   cursor: pointer;
   /* transition: background-color 0.25s ease, border-color 0.25s ease, opacity 0.25s ease; */
@@ -348,7 +348,7 @@ button.btn-alert:hover:not(:disabled) {
     color: #747bff;
   }
 
-  button {
-    background-color: #f9f9f9;
-  }
+  /* button {
+    background-color: var(--main-color);
+  } */
 }

@@ -12,9 +12,10 @@ urlpatterns = [
     path(r'user/<int:id>', views.UserDetails.as_view(), name='user-detail'),
     path(r'workouts', views.WorkoutListCreate.as_view(), name='workouts'),
     path(r'workout/<int:id>', views.WorkoutDetails.as_view(), name='workout-detail'),
-    path(f'workout/<int:id>/exercises', views.WorkoutExercises.as_view(),name='workoutexercises'),
+    path(r'workout/<int:id>/exercises', views.WorkoutExercises.as_view(),name='workoutexercises'),
+    path(r'workout/<int:id>/sessions', views.WorkoutSessions.as_view(), name='workoutsessions'),
     path(r'exercises', views.ExerciseListCreate.as_view(), name='exercises'),
     path(r'exercise/<int:id>', views.ExerciseDetails.as_view(), name='exercise-detail'),
-    path(r'workoutsessions', views.WorkoutSessionListCreate.as_view(), name='workoutsessions'),
-    path(r'workoutsession/<int:id>', views.WorkoutSessionDetails.as_view(), name='workoutsession-detail')
+    path(r'workoutsessions', views.WorkoutSessionListCreate.as_view(), name='sessions'),
+    path(r'workoutsession/<int:id>', views.WorkoutSessionDetails.as_view(), name='session-detail')
 ]
