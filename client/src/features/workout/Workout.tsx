@@ -2,13 +2,15 @@ import { useEffect, useState, type FormEvent } from "react"
 import { useParams } from "react-router-dom"
 import type { WorkoutInstance } from "../workouts/workouts.types"
 import type { ExerciseInstance } from "../exercises/exercises.types"
+import type { WorkoutSessionInstance } from "./workout.types"
+import type { columnConfig } from "../../shared/components/Table/table.types"
 import axios_instance from "../../request_interceptor"
 import ContentSection from "../../shared/components/ContentSection"
 import EventMessage from "../../shared/components/EventMessage"
 import HorizontalCard from "../../shared/components/HorizontalCard"
 import Popup from "../../shared/components/Popup"
-import Form from "../../shared/components/Form"
 import './workout.css'
+import Table from "../../shared/components/Table"
 
 function Workout(){
     const [workout,setWorkout] = useState<WorkoutInstance|null>(null)
@@ -24,22 +26,77 @@ function Workout(){
         'duration':0,
         'distance':0,
     })
+    const [sessions, setSessions] = useState<WorkoutSessionInstance[]>([])
+    const columns: columnConfig<WorkoutSessionInstance>[]=[
+        {key: 'id', header:'Id'},
+        {key: 'start_time', header:"Start Time"},
+        {key: 'end_time', header:"End Time"}
+    ]
     const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
-    const [activeSession, setActiveSession] = useState<boolean>(false)
+    const [activeSession, setActiveSession] = useState<WorkoutSessionInstance|null>(null)
     const [error, setError] = useState<string|null>(null)
     const params = useParams()
 
+    // Effects for initial data load
+
+    const fetch_exercises = async (id:number) =>{
+        setError(null)
+        await axios_instance.get(`api/workout/${id}/exercises`).then(response => {
+            setExercises(response.data)
+        }).catch(error =>{
+            console.log(error)
+            setError(error.message)
+        })
+    }
+
+    const fetch_sessions = async(id:number) =>{
+        setError(null)
+        await axios_instance.get(`api/workout/${id}/sessions`).then(response =>{
+            setSessions(response.data)
+            if(response.data && response.data.length > 0 && !response.data[0].end_time){
+                setActiveSession(response.data[0])
+            }else{
+                setActiveSession(null)
+            }
+        }).catch(error => {
+            console.log(error)
+            setError(error.message)
+        })
+    }
+
+    const update_session = async(id:number, data:Partial<WorkoutSessionInstance>) => {
+        setError(null)
+        await axios_instance.patch(`api/workoutsession/${id}`,data).then(response =>{
+            console.log(response)
+        }).catch(error => {
+            console.error(error)
+            setError(error.message)
+        })
+    }
+
+    const create_session = async(data:object) => {
+        setError(null)
+        return await axios_instance.post(`api/workoutsessions`,data).then(response =>{
+            console.log(response)
+            return response.data
+        }).catch(error => {
+            console.error(error)
+            setError(error.message)
+            return null
+        })
+    }
 
     const fetch_workout = () => {
+        setError(null)
         axios_instance.get(`api/workout/${params.workoutId}`).then(async response =>{
             setWorkout(response.data)
-            const retrieved_exercises = await axios_instance.get(`api/workout/${params.workoutId}/exercises`).then(response => {
-                return response.data
-            }).catch(error =>{
-                setError(error.message)
-                console.log(error)
-            })
-            setExercises(retrieved_exercises)
+            
+            //Workout exercises
+            fetch_exercises(Number(params.workoutId))
+
+            //Workout sessions
+            fetch_sessions(Number(params.workoutId))
+
         }).catch(error=>{
             setError(error.message)
             console.error(error)
@@ -48,9 +105,60 @@ function Workout(){
 
     useEffect(()=>{
         fetch_workout()
-    },[])
+    },[params.workoutId])
 
-    const workout_details = (workout: WorkoutInstance)=>{
+    //Event handlers
+
+    const handleExerciseSubmit = (e:FormEvent)=>{
+        e.preventDefault()
+        setError(null)
+        if(workout){
+            axios_instance.post('api/exercises', {...exercise, workouts: [workout.id]}).then(response => {
+            console.log(response)
+            setCreatingExercise(!creatingExercise)
+            setExercise({
+                'workouts':[],
+                'name':'',
+                'description':'',
+                'difficulty': '',
+                'category':'',
+                'series':0,
+                'repetitions':0,
+                'duration':0,
+                'distance':0,
+            })
+            fetch_workout()
+        }).catch(error =>{
+            setError(error.message)
+            console.log(error)
+        })
+        }else{
+            setError('No workout data is available!')
+        }
+    }
+
+    const handleSessionAction = async () =>{
+        setError(null)
+        console.log(activeSession?.end_time)
+        if(activeSession){
+            const session_termination_data:Partial<WorkoutSessionInstance> = {
+                'end_time': new Date().toISOString()
+            }
+            await update_session(activeSession.id, session_termination_data)
+            await fetch_sessions(Number(params.workoutId))
+        }else{
+            const session_init_data:Partial<WorkoutSessionInstance> = {
+                'workout':Number(params.workoutId),
+                'start_time': new Date().toISOString(),
+            }
+            await create_session(session_init_data)
+            await fetch_sessions(Number(params.workoutId))
+        }
+    }
+
+    // Visual elements
+
+     const workout_details = (workout: WorkoutInstance)=>{
         return(
             <div className="workout-detail">
                 <div className="workout-attribute">
@@ -86,35 +194,6 @@ function Workout(){
                 </div>
             </div>
         )
-    }
-
-    const handleExerciseSubmit = (e:FormEvent)=>{
-        e.preventDefault()
-        if(workout){
-            exercise.workouts?.push(workout.id)
-            console.log(exercise)
-            axios_instance.post('api/exercises', exercise).then(response => {
-            console.log(response)
-            setCreatingExercise(!creatingExercise)
-            setExercise({
-                'workouts':[],
-                'name':'',
-                'description':'',
-                'difficulty': '',
-                'category':'',
-                'series':0,
-                'repetitions':0,
-                'duration':0,
-                'distance':0,
-            })
-            fetch_workout()
-        }).catch(error =>{
-            setError(error.message)
-            console.log(error)
-        })
-        }else{
-            setError('No workout data is available!')
-        }
     }
 
     const exercise_form = () => {
@@ -240,11 +319,21 @@ function Workout(){
                             </ContentSection>
                         </div>
                         <div className="col-12">
-                            <div className="col-12">
-                        <ContentSection title="Workout sessions">
-                            <button className="btn-lg">Start a new session</button>
-                        </ContentSection>
-                </div>
+                            <ContentSection title="Current session">
+                                <div className="workout-sessions">
+                                    {activeSession &&
+                                        <p>Workout exercises</p>
+                                    }
+                                    <button className="btn-lg" onClick={()=> handleSessionAction()}>{!activeSession ? 'Start a new session' : 'End current session'}</button>
+                                </div>
+                            </ContentSection>
+                        </div>
+                        <div className="col-12">
+                            <ContentSection title="Past sessions">
+                                <div className="workout-sessions-table">
+                                    <Table<WorkoutSessionInstance> data={sessions} columns={columns}></Table>
+                                </div>
+                            </ContentSection>
                         </div>
                     </div>
                 </div>

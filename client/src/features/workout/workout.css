@@ -10,6 +10,7 @@
     flex-basis: auto;
     text-align: left;
     font-size: clamp(0.9rem, 3vw, 1.0rem);
+    overflow:hidden
 }
 
 .workout-exercises{
@@ -37,4 +38,23 @@
 .workout-exercise-list {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+.workout-sessions{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    gap:1rem;
+    max-height: 450px;
+    overflow: scroll;
+}
+
+.workout-sessions::-webkit-scrollbar {
+    display: none;
+}
+
+.workout-sessions-table{
+    max-height: 400px;
+    overflow-y: scroll;
 }

@@ -36,7 +36,7 @@ function Signin(){
                 <div className="template-title">Sign in</div>
             </div>
             <div className="row justify-content-center">
-                <div className="col-8 custom-justify-content-center">
+                <div className="col-12 col-sm-8 custom-justify-content-center">
                     <form action={handleSubmit} className="form-md">
                         <div className="form-group">
                             <div className="form-row">

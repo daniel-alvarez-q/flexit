@@ -4,32 +4,20 @@ import axios_instance from "../../request_interceptor";
 import EventMessage from "../../shared/components/EventMessage";
 import Table from "../../shared/components/Table";
 import type { columnConfig } from "../../shared/components/Table/table.types";
+import type { WorkoutSessionInstance } from "../workout/workout.types";
 import ContentSection from "../../shared/components/ContentSection";
-
-
-type workoutSessionsType = {
-    id:number;
-    workout:number;
-    workout_name:string;
-    exercise_logs:object[];
-    user:number;
-    start_time:string;
-    end_time:string;
-    workout_data: object;
-};
 
 function Home(){
 
     const {user} = useAuth()!
-    const [workoutSessions, setWorkoutSessions] = useState<workoutSessionsType[]|null>(null)
+    const [workoutSessions, setWorkoutSessions] = useState<WorkoutSessionInstance[]|null>(null)
     const [error,setError] = useState<string|null>(null)
-    const columns: columnConfig<workoutSessionsType>[]=[
+    const columns: columnConfig<WorkoutSessionInstance>[]=[
         {key: 'id', header:'Id'},
         {key: 'workout_name', header:"Workout"},
         {key: 'start_time', header:"Start Time"},
         {key: 'end_time', header:"End Time"}
     ]
-
 
     useEffect(()=>{
         axios_instance.get('api/workoutsessions')
@@ -38,7 +26,7 @@ function Home(){
                 
                 // Fetch workout details for each session
                 const sessionsWithWorkouts = await Promise.all(
-                    sessions.map(async (session: workoutSessionsType) => {
+                    sessions.map(async (session: WorkoutSessionInstance) => {
                         try {
                             const workoutResponse = await axios_instance.get(`api/workout/${session.workout}`);
                             return {
@@ -78,7 +66,7 @@ function Home(){
                     <EventMessage message={error} style='full-width-error'></EventMessage>
                     : workoutSessions ?
                     <ContentSection title="Latest workout sessions">
-                        <Table<workoutSessionsType> data={workoutSessions} columns={columns}></Table>
+                        <Table<WorkoutSessionInstance> data={workoutSessions} columns={columns}></Table>
                     </ContentSection>
                     :<EventMessage style="loading"></EventMessage>
                     }

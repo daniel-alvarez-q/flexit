@@ -172,7 +172,7 @@ class WorkoutSessions(APIView):
     def get(self,request,id):
         try:
             workout_instance = Workout.objects.get(pk=id, user=request.user)
-            workout_sessions = workout_instance.workoutsession_set.all()
+            workout_sessions = workout_instance.workoutsession_set.all().order_by('-start_time') #Note it is set in descending order! 
             return Response(self.serializer_class(workout_sessions, many=True).data)
         except Exception as e:
             return Response({f"Error fetching data: {e}"}, status=status.HTTP_400_BAD_REQUEST)    
