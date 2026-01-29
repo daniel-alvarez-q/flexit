@@ -58,3 +58,8 @@
     max-height: 400px;
     overflow-y: scroll;
 }
+
+.workout-sessions-form{
+    justify-content: left;
+    text-align: left;
+}

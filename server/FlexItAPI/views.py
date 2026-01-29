@@ -211,7 +211,7 @@ class WorkoutSessionListCreate(APIView):
     serializer_class = WorkoutSessionSerializer
     
     def get(self,request):
-        return Response(self.serializer_class(WorkoutSession.objects.filter(user=request.user), many=True).data)
+        return Response(self.serializer_class(WorkoutSession.objects.filter(user=request.user).order_by('-start_time'), many=True).data)
      
     def post(self,request):
         serializer = self.serializer_class(data=request.data)

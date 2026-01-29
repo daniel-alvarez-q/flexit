@@ -22,7 +22,7 @@ function Home(){
     useEffect(()=>{
         axios_instance.get('api/workoutsessions')
             .then(async (response) => {
-                const sessions = response.data;
+                const sessions = response.data.slice(0,10);
                 
                 // Fetch workout details for each session
                 const sessionsWithWorkouts = await Promise.all(
@@ -66,7 +66,7 @@ function Home(){
                     <EventMessage message={error} style='full-width-error'></EventMessage>
                     : workoutSessions ?
                     <ContentSection title="Latest workout sessions">
-                        <Table<WorkoutSessionInstance> data={workoutSessions} columns={columns}></Table>
+                        <Table<WorkoutSessionInstance> data={workoutSessions.reverse()} columns={columns}></Table>
                     </ContentSection>
                     :<EventMessage style="loading"></EventMessage>
                     }

@@ -4,6 +4,7 @@ import type { WorkoutInstance } from "../workouts/workouts.types"
 import type { ExerciseInstance } from "../exercises/exercises.types"
 import type { WorkoutSessionInstance } from "./workout.types"
 import type { columnConfig } from "../../shared/components/Table/table.types"
+import type { ExerciseSessionLogInstance } from "./workout.types"
 import axios_instance from "../../request_interceptor"
 import ContentSection from "../../shared/components/ContentSection"
 import EventMessage from "../../shared/components/EventMessage"
@@ -13,6 +14,7 @@ import './workout.css'
 import Table from "../../shared/components/Table"
 
 function Workout(){
+    // Data-bounded states
     const [workout,setWorkout] = useState<WorkoutInstance|null>(null)
     const [exercises, setExercises] = useState<ExerciseInstance[]|null>(null)
     const [exercise, setExercise] = useState<Partial<ExerciseInstance>>({
@@ -26,16 +28,20 @@ function Workout(){
         'duration':0,
         'distance':0,
     })
+    const [activeSession, setActiveSession] = useState<WorkoutSessionInstance|null>(null)
     const [sessions, setSessions] = useState<WorkoutSessionInstance[]>([])
+    const [exerciseLog, setExerciseLog] = useState<Partial<ExerciseSessionLogInstance>>({})
+    // Component behavior states
+    const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
+    const [error, setError] = useState<string|null>(null)
+    const params = useParams()
+
+    // Other
     const columns: columnConfig<WorkoutSessionInstance>[]=[
         {key: 'id', header:'Id'},
         {key: 'start_time', header:"Start Time"},
         {key: 'end_time', header:"End Time"}
     ]
-    const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
-    const [activeSession, setActiveSession] = useState<WorkoutSessionInstance|null>(null)
-    const [error, setError] = useState<string|null>(null)
-    const params = useParams()
 
     // Effects for initial data load
 
@@ -185,7 +191,7 @@ function Workout(){
                 <EventMessage style="warning" message="No exercises have been created for this workout"></EventMessage> 
                 :<div className="workout-exercise-list">
                     {exercises.map(exercise => 
-                        <HorizontalCard key={exercise.id} id={exercise.id} title={exercise.name} body={exercise.description}></HorizontalCard>
+                        <HorizontalCard key={exercise.id} id={exercise.id} title={exercise.name} subtitle={exercise.category} body={exercise.description} uri="/exercise"></HorizontalCard>
                     )}
                 </div>
                 }
@@ -302,6 +308,26 @@ function Workout(){
             </form>
         )
     }
+
+    const session_exercise_form = (exercises:ExerciseInstance[]) =>{
+        return(
+            <form action="" className="workout-sessions-form">
+                <div className="row g-2">
+                    <div className="col-12 col-sm-6">
+                        <label htmlFor="exercise">Exercise</label>
+                        <select name="exercise" id="exercise" onChange={e => setExerciseLog({...exerciseLog, exercise:Number(e.target.value)})}>
+                            {exercises?.map(exercise =>
+                                <option value={exercise.id}>{exercise.name}</option>
+                            )}
+                        </select>
+                    </div>
+                    {
+                        exerciseLog.exercise && <p>Selected exercise {exerciseLog.exercise}</p>
+                    }
+                </div>
+            </form>
+        )
+    }
     
     return(
         <>
@@ -321,10 +347,10 @@ function Workout(){
                         <div className="col-12">
                             <ContentSection title="Current session">
                                 <div className="workout-sessions">
-                                    {activeSession &&
-                                        <p>Workout exercises</p>
+                                    {activeSession && exercises &&
+                                        session_exercise_form(exercises)
                                     }
-                                    <button className="btn-lg" onClick={()=> handleSessionAction()}>{!activeSession ? 'Start a new session' : 'End current session'}</button>
+                                    <button className="btn-lg" disabled={!exercises} onClick={()=> handleSessionAction()}>{!activeSession ? 'Start a new session' : 'End current session'}</button>
                                 </div>
                             </ContentSection>
                         </div>

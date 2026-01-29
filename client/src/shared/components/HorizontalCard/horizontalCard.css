@@ -57,6 +57,7 @@ a.horizontal-card:hover{
     margin-bottom: 4px;
     word-break: break-word;
     max-height: calc(1.3em * 2);
+    text-align: left;
 }
 
 .horizontal-card > .header > .title::-webkit-scrollbar {

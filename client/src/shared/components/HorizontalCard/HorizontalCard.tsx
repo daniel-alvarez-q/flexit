@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import './horizontalCard.css'
 
 type HorizontalCardType = {
-    id:number;
+    id?:number;
     title:string;
     subtitle?:string|null;
     body:string;
@@ -14,7 +14,7 @@ function HorizontalCard({id, title, subtitle=null, body, uri=null}: HorizontalCa
         <div className="horizontal-card">
             <div className="header">
                 <div className="title">
-                    {uri ? <NavLink to={`${uri}/${id}`}>{title}</NavLink> : title}
+                    {uri && id ? <NavLink to={`${uri}/${id}`}>{title}</NavLink> : title}
                 </div>
                 {subtitle && <div className='subtitle'>{subtitle}</div>}
             </div>
