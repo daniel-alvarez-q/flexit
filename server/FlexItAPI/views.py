@@ -9,8 +9,8 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.decorators import permission_classes as permission_decorator
 from knox.views import LoginView as KnoxLoginView
-from FlexItAPI.serializers import LoginSerializer,UserSerializer, WorkoutSerializer, ExerciseSerializer, WorkoutSessionSerializer
-from FlexItAPI.models import Workout, Exercise, WorkoutSession
+from FlexItAPI.serializers import LoginSerializer,UserSerializer, WorkoutSerializer, ExerciseSerializer, WorkoutSessionSerializer, ExerciseLogSerializer
+from FlexItAPI.models import Workout, Exercise, WorkoutSession, ExerciseLog
 
 ##### Helpers ######
 
@@ -27,16 +27,14 @@ def query_search(model:Type[Model], serializer:Type[serializers.Serializer], ins
 
 def query_save(serializer, **kwargs):
     user = kwargs.get('user')
-    try:
-        serializer.is_valid(raise_exception=True)
-    except:
+    print(serializer)
+    if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    if user:   
+        serializer.save(user=user)
     else:
-        if user:   
-            serializer.save(user=user)
-        else:
-            serializer.save()
-        return Response(serializer.data)
+        serializer.save()
+    return Response(serializer.data)
 
 def query_delete(model:Type[Model],instance_id:int,request:Request):
     user = request.user
@@ -233,3 +231,15 @@ class WorkoutSessionDetails(APIView):
         
     def delete(self,request, id):
         return query_delete(WorkoutSession, id, request)
+    
+    ###### ExerciseLog views ######
+    
+class ExerciseLogListCreate(APIView):
+    serializer_class = ExerciseLogSerializer
+    
+    def post(self,request):
+        try:
+            serializer = self.serializer_class(data=request.data)
+            return query_save(serializer)
+        except Exception as e:
+            return Response({'Error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)

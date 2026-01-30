@@ -103,7 +103,7 @@ class ExerciseSerializer(serializers.ModelSerializer):
     
 class ExerciseLogSerializer(serializers.ModelSerializer):
     session=serializers.PrimaryKeyRelatedField(
-        read_only=True 
+        queryset=WorkoutSession.objects.all()
     )
     exercise=serializers.PrimaryKeyRelatedField(
         queryset=Exercise.objects.all()

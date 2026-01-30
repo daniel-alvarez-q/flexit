@@ -1,3 +1,4 @@
+import { AxiosError } from "axios"
 import { useEffect, useState, type FormEvent } from "react"
 import { useParams } from "react-router-dom"
 import type { WorkoutInstance } from "../workouts/workouts.types"
@@ -115,6 +116,22 @@ function Workout(){
         })
     }
 
+    const create_exercise_log = async(data:Partial<ExerciseSessionLogInstance>) =>{
+        setError(null)
+        try{
+            await axios_instance.post('api/exerciselogs', data=data)
+            return true
+        }catch(error){
+            if(error instanceof AxiosError ){
+                setError(error.message)
+                return false
+            }else{
+                setError('Internal client or network connectivity error')
+                return false
+            }
+        }
+    }
+
     useEffect(()=>{
         fetch_workout()
     },[params.workoutId])
@@ -165,6 +182,15 @@ function Workout(){
             }
             await create_session(session_init_data)
             await fetch_sessions(Number(params.workoutId))
+        }
+    }
+
+    const handleExerciseLogSubmit = async(e:FormEvent) =>{
+        e.preventDefault()
+        setExerciseLog({...exerciseLog, 'session': Number(activeSession?.id), log_time:(new Date()).toISOString()})
+        console.log(exerciseLog)
+        if (!create_exercise_log(exerciseLog)){
+            await setCreatingLog(!creatingLog)
         }
     }
 
@@ -317,7 +343,7 @@ function Workout(){
 
     const session_exercise_form = (exercises:Record<number,ExerciseInstance>) =>{
         return(
-            <form action="" className="workout-sessions-form">
+            <form action="" className="workout-sessions-form" onSubmit={e=> handleExerciseLogSubmit(e)}>
                 <div className="row g-2">
                     <div className="col-12 col-md-6">
                         <label htmlFor="exercise">Exercise</label>
@@ -334,15 +360,15 @@ function Workout(){
                             <>
                                 <div className="col-6 col-md-3">
                                     <label htmlFor="series">Series</label>
-                                    <input type="number" id="series" name="series" min="0"/>
+                                    <input type="number" id="series" name="series" min="0" onChange={e => setExerciseLog({...exerciseLog, 'series':Number(e.target.value)})}/>
                                 </div>
                                 <div className="col-6 col-md-3">
                                     <label htmlFor="reps">Repetitions</label>
-                                    <input type="number" name="reps" id="reps" min="0"/>
+                                    <input type="number" name="reps" id="reps" min="0" onChange={e => setExerciseLog({...exerciseLog, 'repetitions':Number(e.target.value)})}/>
                                 </div>
                                 <div className="col-6 col-md-3">
                                     <label htmlFor="weight">Weight</label>
-                                    <input type="number" name="weight" id="weight" min="0" step="0.1"/>
+                                    <input type="number" name="weight" id="weight" min="0" step="0.1" onChange={e => setExerciseLog({...exerciseLog, 'weight':Number(e.target.value)})}/>
                                 </div>
                             </>
                             : 
@@ -350,21 +376,26 @@ function Workout(){
                             <>
                                 <div className="col-6 col-md-3">
                                     <label htmlFor="distance">Distance</label>
-                                    <input type="number" id="distance" name="distance"/>
+                                    <input type="number" id="distance" name="distance" onChange={e => setExerciseLog({...exerciseLog, 'distance':Number(e.target.value)})}/>
                                 </div>
                                 <div className="col-6 col-md-3">
                                     <label htmlFor="duration">Duration</label>
-                                    <input type="number" id="duration" name="duration"/>
+                                    <input type="number" id="duration" name="duration" onChange={e => setExerciseLog({...exerciseLog, 'duration':Number(e.target.value)})}/>
                                 </div>                            
                             </>
                             : null}
                             <div className="col-12 col-md-6">
                                 <label htmlFor="notes">Notes</label>
-                                <input type="text" id="notes" name="notes"/>
+                                <input type="text" id="notes" name="notes" onChange={e => setExerciseLog({...exerciseLog, 'notes':e.target.value})}/>
                             </div>  
                         </>
                             : null
                     }
+                </div>
+                <div className="row">
+                    <div className="col-6 justify-content-center">
+                        <button className="btn-md">Create</button>
+                    </div>
                 </div>
             </form>
         )
