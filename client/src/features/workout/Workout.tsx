@@ -33,6 +33,7 @@ function Workout(){
     const [exerciseLog, setExerciseLog] = useState<Partial<ExerciseSessionLogInstance>>({})
     // Component behavior states
     const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
+    const [creatingLog, setCreatingLog] = useState<boolean>(false)
     const [error, setError] = useState<string|null>(null)
     const params = useParams()
 
@@ -314,11 +315,11 @@ function Workout(){
         )
     }
 
-    const session_exercise_form = (exercises:ExerciseInstance[]) =>{
+    const session_exercise_form = (exercises:Record<number,ExerciseInstance>) =>{
         return(
             <form action="" className="workout-sessions-form">
                 <div className="row g-2">
-                    <div className="col-12 col-sm-6">
+                    <div className="col-12 col-md-6">
                         <label htmlFor="exercise">Exercise</label>
                         <select name="exercise" id="exercise" onChange={e => setExerciseLog({...exerciseLog, exercise:Number(e.target.value)})}>
                             {Object.values(exercises)?.map(exercise =>
@@ -327,7 +328,42 @@ function Workout(){
                         </select>
                     </div>
                     {
-                        exerciseLog.exercise && <p>Selected exercise {exerciseLog.exercise}</p>
+                        exerciseLog.exercise ?
+                        <>
+                        {exercises[exerciseLog.exercise].category === 'str' ?
+                            <>
+                                <div className="col-6 col-md-3">
+                                    <label htmlFor="series">Series</label>
+                                    <input type="number" id="series" name="series" min="0"/>
+                                </div>
+                                <div className="col-6 col-md-3">
+                                    <label htmlFor="reps">Repetitions</label>
+                                    <input type="number" name="reps" id="reps" min="0"/>
+                                </div>
+                                <div className="col-6 col-md-3">
+                                    <label htmlFor="weight">Weight</label>
+                                    <input type="number" name="weight" id="weight" min="0" step="0.1"/>
+                                </div>
+                            </>
+                            : 
+                            exercises[exerciseLog.exercise].category === 'car' ?
+                            <>
+                                <div className="col-6 col-md-3">
+                                    <label htmlFor="distance">Distance</label>
+                                    <input type="number" id="distance" name="distance"/>
+                                </div>
+                                <div className="col-6 col-md-3">
+                                    <label htmlFor="duration">Duration</label>
+                                    <input type="number" id="duration" name="duration"/>
+                                </div>                            
+                            </>
+                            : null}
+                            <div className="col-12 col-md-6">
+                                <label htmlFor="notes">Notes</label>
+                                <input type="text" id="notes" name="notes"/>
+                            </div>  
+                        </>
+                            : null
                     }
                 </div>
             </form>
@@ -352,11 +388,23 @@ function Workout(){
                         <div className="col-12">
                             <ContentSection title="Current session">
                                 <div className="workout-sessions">
-                                    {activeSession && exercises &&
-                                        session_exercise_form(Object.values(exercises))
+                                    {activeSession && activeSession.exercise_logs.length === 0 ?
+                                        <EventMessage style="warning" message="No exercises have been logged"></EventMessage>
+                                        :null
                                     }
-                                    <button className="btn-lg" disabled={Object.keys(exercises).length === 0} onClick={()=> handleSessionAction()}>{!activeSession ? 'Start a new session' : 'End current session'}</button>
+                                    <div className="row g-3">
+                                        {activeSession &&
+                                            <div className="col-6">
+                                                <button className="btn-md btn-full" onClick={()=> setCreatingLog(!creatingLog)}>Log exercise</button>
+                                            </div>
+                                        }
+                                        <div className={activeSession ? "col-6" : "col-12"}>
+                                            <button className={activeSession ? "btn-md btn-full btn-alert" : "btn-md btn-full"} disabled={Object.keys(exercises).length === 0} onClick={()=> handleSessionAction()}>{!activeSession ? 'Start a new session' : 'End session'}</button>
+                                        </div>
+                                    </div>
+                                    
                                 </div>
+                                
                             </ContentSection>
                         </div>
                         <div className="col-12">
@@ -383,7 +431,10 @@ function Workout(){
             <Popup title="New exercise" onClose={()=> {setCreatingExercise(!creatingExercise); setError(null)}}>
                 {exercise_form()}
             </Popup>
-            }
+        }
+        {activeSession && exercises && creatingLog &&
+            <Popup title="Log exercise" onClose={()=> setCreatingLog(!creatingLog)}>{session_exercise_form(exercises)}</Popup>
+        }
         </>
         
     )
