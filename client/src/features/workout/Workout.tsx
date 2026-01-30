@@ -123,6 +123,7 @@ function Workout(){
             return true
         }catch(error){
             if(error instanceof AxiosError ){
+                console.error(error)
                 setError(error.message)
                 return false
             }else{
@@ -187,10 +188,11 @@ function Workout(){
 
     const handleExerciseLogSubmit = async(e:FormEvent) =>{
         e.preventDefault()
-        setExerciseLog({...exerciseLog, 'session': Number(activeSession?.id), log_time:(new Date()).toISOString()})
+        setExerciseLog({...exerciseLog, 'session': Number(activeSession?.id), log_time:(new Date()).toISOString(), notes:''})
         console.log(exerciseLog)
         if (!create_exercise_log(exerciseLog)){
-            await setCreatingLog(!creatingLog)
+            await setCreatingLog(false)
+            await setExerciseLog({})
         }
     }
 

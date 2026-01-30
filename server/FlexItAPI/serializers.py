@@ -108,6 +108,7 @@ class ExerciseLogSerializer(serializers.ModelSerializer):
     exercise=serializers.PrimaryKeyRelatedField(
         queryset=Exercise.objects.all()
     )
+    notes=serializers.CharField(required=False, max_length=2000, allow_blank=True)
     
     class Meta:
         model = ExerciseLog
