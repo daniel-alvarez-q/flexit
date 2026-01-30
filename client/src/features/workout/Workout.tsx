@@ -16,7 +16,7 @@ import Table from "../../shared/components/Table"
 function Workout(){
     // Data-bounded states
     const [workout,setWorkout] = useState<WorkoutInstance|null>(null)
-    const [exercises, setExercises] = useState<ExerciseInstance[]|null>(null)
+    const [exercises, setExercises] = useState<Record<number,ExerciseInstance>>({})
     const [exercise, setExercise] = useState<Partial<ExerciseInstance>>({
         'workouts':[],
         'name':'',
@@ -48,7 +48,12 @@ function Workout(){
     const fetch_exercises = async (id:number) =>{
         setError(null)
         await axios_instance.get(`api/workout/${id}/exercises`).then(response => {
-            setExercises(response.data)
+            const exercise_map = response.data.reduce((acc:Record<number,ExerciseInstance>,exercise:ExerciseInstance) =>{
+                acc[exercise.id] = exercise
+                return acc
+            }, {})
+            console.log(exercise_map)
+            setExercises(exercise_map)
         }).catch(error =>{
             console.log(error)
             setError(error.message)
@@ -70,13 +75,20 @@ function Workout(){
         })
     }
 
-    const update_session = async(id:number, data:Partial<WorkoutSessionInstance>) => {
+    const fetch_workout = () => {
         setError(null)
-        await axios_instance.patch(`api/workoutsession/${id}`,data).then(response =>{
-            console.log(response)
-        }).catch(error => {
-            console.error(error)
+        axios_instance.get(`api/workout/${params.workoutId}`).then(async response =>{
+            setWorkout(response.data)
+            
+            //Workout exercises
+            fetch_exercises(Number(params.workoutId))
+
+            //Workout sessions
+            fetch_sessions(Number(params.workoutId))
+
+        }).catch(error=>{
             setError(error.message)
+            console.error(error)
         })
     }
 
@@ -92,20 +104,13 @@ function Workout(){
         })
     }
 
-    const fetch_workout = () => {
+    const update_session = async(id:number, data:Partial<WorkoutSessionInstance>) => {
         setError(null)
-        axios_instance.get(`api/workout/${params.workoutId}`).then(async response =>{
-            setWorkout(response.data)
-            
-            //Workout exercises
-            fetch_exercises(Number(params.workoutId))
-
-            //Workout sessions
-            fetch_sessions(Number(params.workoutId))
-
-        }).catch(error=>{
-            setError(error.message)
+        await axios_instance.patch(`api/workoutsession/${id}`,data).then(response =>{
+            console.log(response)
+        }).catch(error => {
             console.error(error)
+            setError(error.message)
         })
     }
 
@@ -182,15 +187,15 @@ function Workout(){
         )
     }
 
-    const exercise_list = (exercises:ExerciseInstance[]|null) => {
+    const exercise_list = (exercises:Record<number, ExerciseInstance>|null) => {
         return(
             <div className="workout-exercises">
                 {!exercises ?
                 <EventMessage style="loading"></EventMessage>
-                : exercises.length<1 ?
+                : Object.keys(exercises).length < 1 ?
                 <EventMessage style="warning" message="No exercises have been created for this workout"></EventMessage> 
                 :<div className="workout-exercise-list">
-                    {exercises.map(exercise => 
+                    {Object.values(exercises).map(exercise => 
                         <HorizontalCard key={exercise.id} id={exercise.id} title={exercise.name} subtitle={exercise.category} body={exercise.description} uri="/exercise"></HorizontalCard>
                     )}
                 </div>
@@ -316,7 +321,7 @@ function Workout(){
                     <div className="col-12 col-sm-6">
                         <label htmlFor="exercise">Exercise</label>
                         <select name="exercise" id="exercise" onChange={e => setExerciseLog({...exerciseLog, exercise:Number(e.target.value)})}>
-                            {exercises?.map(exercise =>
+                            {Object.values(exercises)?.map(exercise =>
                                 <option value={exercise.id}>{exercise.name}</option>
                             )}
                         </select>
@@ -348,9 +353,9 @@ function Workout(){
                             <ContentSection title="Current session">
                                 <div className="workout-sessions">
                                     {activeSession && exercises &&
-                                        session_exercise_form(exercises)
+                                        session_exercise_form(Object.values(exercises))
                                     }
-                                    <button className="btn-lg" disabled={!exercises} onClick={()=> handleSessionAction()}>{!activeSession ? 'Start a new session' : 'End current session'}</button>
+                                    <button className="btn-lg" disabled={Object.keys(exercises).length === 0} onClick={()=> handleSessionAction()}>{!activeSession ? 'Start a new session' : 'End current session'}</button>
                                 </div>
                             </ContentSection>
                         </div>
@@ -364,9 +369,11 @@ function Workout(){
                     </div>
                 </div>
                 <div className="col-12 col-sm-7">
-                    <ContentSection title="Exercises">
-                        {exercise_list(exercises)}
-                    </ContentSection>
+                    {exercises &&
+                        <ContentSection title="Exercises">
+                            {exercise_list(exercises)}
+                        </ContentSection>
+                    }
                 </div>
             </div>
         </>

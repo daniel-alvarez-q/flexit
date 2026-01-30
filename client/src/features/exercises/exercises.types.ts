@@ -1,5 +1,5 @@
 export type ExerciseInstance ={
-    id?:number;
+    id:number;
     name:string;
     description:string;
     difficulty:string;
