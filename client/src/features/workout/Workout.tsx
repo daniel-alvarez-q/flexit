@@ -18,17 +18,7 @@ function Workout(){
     // Data-bounded states
     const [workout,setWorkout] = useState<WorkoutInstance|null>(null)
     const [exercises, setExercises] = useState<Record<number,ExerciseInstance>>({})
-    const [exercise, setExercise] = useState<Partial<ExerciseInstance>>({
-        'workouts':[],
-        'name':'',
-        'description':'',
-        'difficulty': '',
-        'category':'',
-        'series':0,
-        'repetitions':0,
-        'duration':0,
-        'distance':0,
-    })
+    const [exercise, setExercise] = useState<Partial<ExerciseInstance>>({})
     const [activeSession, setActiveSession] = useState<WorkoutSessionInstance|null>(null)
     const [sessions, setSessions] = useState<WorkoutSessionInstance[]>([])
     const [exerciseLog, setExerciseLog] = useState<Partial<ExerciseSessionLogInstance>>({})
@@ -39,10 +29,16 @@ function Workout(){
     const params = useParams()
 
     // Other
-    const columns: columnConfig<WorkoutSessionInstance>[]=[
+    const session_columns: columnConfig<WorkoutSessionInstance>[]=[
         {key: 'id', header:'Id'},
         {key: 'start_time', header:"Start Time"},
         {key: 'end_time', header:"End Time"}
+    ]
+
+    const exercise_log_columns: columnConfig<ExerciseSessionLogInstance>[] = [
+        {key: 'exercise', header:'Exercise'},
+        {key: 'notes', 'header':'Notes'},
+        {key:'log_time', header:'Log time'}
     ]
 
     // Effects for initial data load
@@ -188,11 +184,12 @@ function Workout(){
 
     const handleExerciseLogSubmit = async(e:FormEvent) =>{
         e.preventDefault()
-        setExerciseLog({...exerciseLog, 'session': Number(activeSession?.id), log_time:(new Date()).toISOString(), notes:''})
-        console.log(exerciseLog)
-        if (!create_exercise_log(exerciseLog)){
+        const payload = {...exerciseLog, 'session': Number(activeSession?.id), log_time:(new Date()).toISOString(), notes:''}
+        console.log(payload)
+        if (await create_exercise_log(payload)){
             await setCreatingLog(false)
             await setExerciseLog({})
+            await fetch_sessions(Number(params.workoutId))
         }
     }
 
@@ -422,8 +419,9 @@ function Workout(){
                             <ContentSection title="Current session">
                                 <div className="workout-sessions">
                                     {activeSession && activeSession.exercise_logs.length === 0 ?
-                                        <EventMessage style="warning" message="No exercises have been logged"></EventMessage>
-                                        :null
+                                        <EventMessage style="warning" message="No exercises have been logged"></EventMessage>    
+                                    :activeSession && activeSession?.exercise_logs.length > 0 &&
+                                        <Table<ExerciseSessionLogInstance> data={activeSession?.exercise_logs} columns={exercise_log_columns}></Table>
                                     }
                                     <div className="row g-3">
                                         {activeSession &&
@@ -443,7 +441,7 @@ function Workout(){
                         <div className="col-12">
                             <ContentSection title="Past sessions">
                                 <div className="workout-sessions-table">
-                                    <Table<WorkoutSessionInstance> data={sessions} columns={columns}></Table>
+                                    <Table<WorkoutSessionInstance> data={sessions} columns={session_columns}></Table>
                                 </div>
                             </ContentSection>
                         </div>
