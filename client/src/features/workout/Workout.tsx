@@ -19,8 +19,9 @@ function Workout(){
     const [workout,setWorkout] = useState<WorkoutInstance|null>(null)
     const [exercises, setExercises] = useState<Record<number,ExerciseInstance>>({})
     const [exercise, setExercise] = useState<Partial<ExerciseInstance>>({})
+    const [sessions, setSessions] = useState<Partial<WorkoutSessionInstance>[]>([])
     const [activeSession, setActiveSession] = useState<WorkoutSessionInstance|null>(null)
-    const [sessions, setSessions] = useState<WorkoutSessionInstance[]>([])
+    const [exerciseLogs, setExerciseLogs] = useState<Record<number,Partial<ExerciseSessionLogInstance>[]>>([])
     const [exerciseLog, setExerciseLog] = useState<Partial<ExerciseSessionLogInstance>>({})
     // Component behavior states
     const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
@@ -35,10 +36,10 @@ function Workout(){
         {key: 'end_time', header:"End Time"}
     ]
 
-    const exercise_log_columns: columnConfig<ExerciseSessionLogInstance>[] = [
+    const exercise_log_columns: columnConfig<Partial<ExerciseSessionLogInstance>>[] = [
         {key: 'exercise', header:'Exercise'},
         {key: 'notes', 'header':'Notes'},
-        {key:'log_time', header:'Log time'}
+        {key: 'log_time', header:'Log time'}
     ]
 
     // Effects for initial data load
@@ -50,7 +51,6 @@ function Workout(){
                 acc[exercise.id] = exercise
                 return acc
             }, {})
-            console.log(exercise_map)
             setExercises(exercise_map)
         }).catch(error =>{
             console.log(error)
@@ -62,10 +62,12 @@ function Workout(){
         setError(null)
         await axios_instance.get(`api/workout/${id}/sessions`).then(response =>{
             setSessions(response.data)
-            if(response.data && response.data.length > 0 && !response.data[0].end_time){
+            if(response.data && response.data.length > 0) {
+                if (!response.data[0].end_time){
                 setActiveSession(response.data[0])
-            }else{
-                setActiveSession(null)
+                }else{
+                    setActiveSession(null)
+                }
             }
         }).catch(error => {
             console.log(error)
@@ -77,13 +79,6 @@ function Workout(){
         setError(null)
         axios_instance.get(`api/workout/${params.workoutId}`).then(async response =>{
             setWorkout(response.data)
-            
-            //Workout exercises
-            fetch_exercises(Number(params.workoutId))
-
-            //Workout sessions
-            fetch_sessions(Number(params.workoutId))
-
         }).catch(error=>{
             setError(error.message)
             console.error(error)
@@ -130,8 +125,38 @@ function Workout(){
     }
 
     useEffect(()=>{
-        fetch_workout()
+        const load = async()=>{
+        //workout
+        await fetch_workout()
+        //Workout exercises
+        await fetch_exercises(Number(params.workoutId))
+        //Workout sessions
+        await fetch_sessions(Number(params.workoutId))
+        }
+
+        load()
     },[params.workoutId])
+
+    useEffect(()=>{
+        let test: Record<number, Partial<ExerciseSessionLogInstance>[]> = {}
+        
+        if (sessions){
+            sessions.map((session)=> {
+                if (session.exercise_logs){
+                    let logs = session.exercise_logs.map((log)=>{
+                    return exercises[log.exercise]
+                    })
+
+                
+                test[session.id] = session.exercise_logs
+                }
+                
+            })
+            setExerciseLogs(test)
+            console.log(test)
+        }
+        
+    }, [sessions, exercises])
 
     //Event handlers
 
@@ -184,7 +209,7 @@ function Workout(){
 
     const handleExerciseLogSubmit = async(e:FormEvent) =>{
         e.preventDefault()
-        const payload = {...exerciseLog, 'session': Number(activeSession?.id), log_time:(new Date()).toISOString(), notes:''}
+        const payload = {...exerciseLog, 'session': Number(activeSession?.id), log_time:(new Date()).toISOString()}
         console.log(payload)
         if (await create_exercise_log(payload)){
             await setCreatingLog(false)
@@ -341,6 +366,7 @@ function Workout(){
     }
 
     const session_exercise_form = (exercises:Record<number,ExerciseInstance>) =>{
+
         return(
             <form action="" className="workout-sessions-form" onSubmit={e=> handleExerciseLogSubmit(e)}>
                 <div className="row g-2">
@@ -421,7 +447,7 @@ function Workout(){
                                     {activeSession && activeSession.exercise_logs.length === 0 ?
                                         <EventMessage style="warning" message="No exercises have been logged"></EventMessage>    
                                     :activeSession && activeSession?.exercise_logs.length > 0 &&
-                                        <Table<ExerciseSessionLogInstance> data={activeSession?.exercise_logs} columns={exercise_log_columns}></Table>
+                                        <Table<Partial<ExerciseSessionLogInstance>> data={exerciseLogs[activeSession?.id]} columns={exercise_log_columns}></Table>
                                     }
                                     <div className="row g-3">
                                         {activeSession &&
@@ -467,7 +493,6 @@ function Workout(){
             <Popup title="Log exercise" onClose={()=> setCreatingLog(!creatingLog)}>{session_exercise_form(exercises)}</Popup>
         }
         </>
-        
     )
 }
 

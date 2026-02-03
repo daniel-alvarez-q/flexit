@@ -2,7 +2,7 @@ export type WorkoutSessionInstance = {
     id:number;
     workout:number;
     workout_name?:string;
-    exercise_logs:Object[];
+    exercise_logs:ExerciseSessionLogInstance[];
     user:number;
     start_time:string;
     end_time:string;
@@ -12,6 +12,7 @@ export type WorkoutSessionInstance = {
 export type ExerciseSessionLogInstance = {
     session:number;
     exercise:number;
+    exercise_name?:string;
     series?:number;
     repetitions?:number;
     weight?: number;
