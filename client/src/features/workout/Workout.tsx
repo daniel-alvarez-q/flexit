@@ -18,7 +18,7 @@ function Workout(){
     // Data-bounded states
     const [workout,setWorkout] = useState<Workout|null>(null)
     const [exercises, setExercises] = useState<Record<number,Exercise>>({})
-    const [exercise, setExercise] = useState<ExerciseCreate>({})
+    const [exercise, setExercise] = useState<ExerciseCreate>({category:'str', difficulty:'ext'})
     const [sessions, setSessions] = useState<WorkoutSession[]>([])
     const [activeSession, setActiveSession] = useState<WorkoutSession|null>(null)
     const [exerciseLogs, setExerciseLogs] = useState<Record<number,Partial<ExerciseLog>[]>>({})
@@ -75,6 +75,7 @@ function Workout(){
     }
 
     const fetch_workout = () => {
+        console.log(`ENV: ${import.meta.env.VITE_BACKEND_URL}`)
         setError(null)
         axios_instance.get(`api/workout/${params.workoutId}`).then(async response =>{
             setWorkout(response.data)
@@ -284,9 +285,9 @@ function Workout(){
                         <label htmlFor="category">Category</label>
                     </div>
                     <div className="form-row">
-                        <select name="category" id="category" onChange={(e) => setExercise({...exercise, 'category':e.target.value})}>
-                            <option value="oth">Other</option>
+                        <select name="category" id="category" value={exercise.category} onChange={(e) => setExercise({...exercise, 'category':e.target.value})}>
                             <option value="str">Strength</option>
+                            <option value="oth">Other</option>
                             <option value="car">Cardio</option>
                             <option value="flx">Flexibility</option>
                             <option value="res">Resistance</option>
@@ -342,7 +343,7 @@ function Workout(){
                 : exercise.category === 'flx'
                 }
                 {error &&
-                    <EventMessage message={error} style="error solid compact"></EventMessage>
+                    <EventMessage message={error} style="error compact"></EventMessage>
                 }
                 <div className="form-group">
                     <div className="form-row">
@@ -358,7 +359,7 @@ function Workout(){
         return(
             <form action="" className="workout-sessions-form" onSubmit={e=> handleExerciseLogSubmit(e)}>
                 <div className="row g-2">
-                    <div className="col-12 col-md-6">
+                    <div className="col-12 col-lg-3">
                         <label htmlFor="exercise">Exercise</label>
                         <select name="exercise" id="exercise" onChange={e => setExerciseLog({...exerciseLog, exercise:Number(e.target.value)})}>
                             {Object.values(exercises)?.map(exercise =>
@@ -371,15 +372,15 @@ function Workout(){
                     <>
                     {exercises[exerciseLog.exercise].category === 'str' ?
                         <>
-                            <div className="col-6 col-md-3">
+                            <div className="col-6 col-lg-3">
                                 <label htmlFor="series">Series</label>
                                 <input type="number" id="series" name="series" min="0" onChange={e => setExerciseLog({...exerciseLog, 'series':Number(e.target.value)})}/>
                             </div>
-                            <div className="col-6 col-md-3">
+                            <div className="col-6 col-lg-3">
                                 <label htmlFor="reps">Repetitions</label>
                                 <input type="number" name="reps" id="reps" min="0" onChange={e => setExerciseLog({...exerciseLog, 'repetitions':Number(e.target.value)})}/>
                             </div>
-                            <div className="col-6 col-md-3">
+                            <div className="col-6 col-lg-3">
                                 <label htmlFor="weight">Weight</label>
                                 <input type="number" name="weight" id="weight" min="0" step="0.1" onChange={e => setExerciseLog({...exerciseLog, 'weight':Number(e.target.value)})}/>
                             </div>
@@ -387,17 +388,17 @@ function Workout(){
                         : 
                         exercises[exerciseLog.exercise].category === 'car' ?
                         <>
-                            <div className="col-6 col-md-3">
+                            <div className="col-6 col-lg-3">
                                 <label htmlFor="distance">Distance (km)</label>
                                 <input type="number" id="distance" name="distance" onChange={e => setExerciseLog({...exerciseLog, 'distance':Number(e.target.value)})}/>
                             </div>
-                            <div className="col-6 col-md-3">
+                            <div className="col-6 col-lg-3">
                                 <label htmlFor="duration">Duration (minutes)</label>
                                 <input type="number" id="duration" name="duration" onChange={e => setExerciseLog({...exerciseLog, 'duration':Number(e.target.value)})}/>
                             </div>                            
                         </>
                         : null}
-                        <div className="col-12 col-md-6">
+                        <div className="col-12 col-lg-6">
                             <label htmlFor="notes">Notes</label>
                             <textarea id="notes" name="notes" onChange={e => setExerciseLog({...exerciseLog, 'notes':e.target.value})}></textarea>
                         </div>  
@@ -480,12 +481,12 @@ function Workout(){
         :
         <EventMessage style="loading"></EventMessage>}
         {creatingExercise &&
-            <Popup title="New exercise" onClose={()=> {setCreatingExercise(!creatingExercise); setError(null)}}>
+            <Popup title="New exercise" onClose={()=> {setCreatingExercise(!creatingExercise); setError(null);}}>
                 {exercise_form()}
             </Popup>
         }
         {activeSession && exercises && creatingLog &&
-            <Popup title="Log exercise" onClose={()=> {setCreatingLog(!creatingLog); setError(null); setExercise({})}}>{session_exercise_form(exercises)}</Popup>
+            <Popup title="Log exercise" onClose={()=> {setCreatingLog(!creatingLog); setError(null);}}>{session_exercise_form(exercises)}</Popup>
         }
         </>
     )

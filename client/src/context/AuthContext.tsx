@@ -2,7 +2,7 @@ import {createContext, useContext, useState, useEffect} from "react";
 import type { ReactNode } from "react";
 import axios from 'axios'
 
-const BASE_URL:string = 'http://127.0.0.1:8000'
+const BASE_URL:string = `${import.meta.env.VITE_BACKEND_URL}`
 
 type AuthContextType = {
     login: (credentials: LoginCredentials) => Promise<void>;
