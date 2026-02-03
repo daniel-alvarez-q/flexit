@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
 import axios_instance from "../../request_interceptor"
-import type { ExerciseInstance } from "./exercises.types"
+import type { Exercise } from "./exercises.types"
 import Card from "../../shared/components/Card"
 import EventMessage from "../../shared/components/EventMessage"
 
 function Exercises(){
 
-    const [exercises,setExercises] = useState<ExerciseInstance[]>([])
+    const [exercises,setExercises] = useState<Exercise[]>([])
 
     useEffect(()=>{
         axios_instance.get('api/exercises').then(response => {

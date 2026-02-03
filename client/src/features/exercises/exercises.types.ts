@@ -1,4 +1,4 @@
-export type ExerciseInstance ={
+export type Exercise ={
     id:number;
     name:string;
     description:string;
@@ -9,8 +9,10 @@ export type ExerciseInstance ={
     weight?:number;
     duration?:number;
     distance?:number;
-    user?:number;
-    workouts?:number[];
+    user:number;
+    workouts:number[];
     created_at:string;
     updated_at:string
 }
+
+export type ExerciseCreate = Partial<Omit<Exercise, 'id'|'created_at'|'updated_at'|'user'>>

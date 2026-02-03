@@ -25,7 +25,7 @@ class Workout(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(max_length=2000)
     difficulty = models.CharField(max_length=3, choices=DIFICULTY_CATEGORIES, default='med')
-    source_url = models.URLField(null=True)
+    source_url = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

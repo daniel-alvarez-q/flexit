@@ -1,26 +1,29 @@
 import { useState, useEffect, type ReactEventHandler} from "react"
-import type { WorkoutInstance } from "./workouts.types"
+import type { Workout, WorkoutCreate } from "./workouts.types"
 import axios_instance from "../../request_interceptor"
 import Card from "../../shared/components/Card"
 import EventMessage from "../../shared/components/EventMessage"
 import Popup from "../../shared/components/Popup"
 
 function Workouts(){
-    const [data, setData] = useState<WorkoutInstance[]>([])
-    const [newWorkout, setNewWorkout] = useState<Object>(
+    //Data-bounded states
+    const [error, setError] = useState<string|null>(null)
+    const [workouts, setWorkouts] = useState<Workout[]>([])
+    const [newWorkout, setNewWorkout] = useState<WorkoutCreate>(
         {
             name:'',
             description:'',
-            difficulty:'',
-            source_url:''
+            difficulty:''
         }
     )
     const [creatingWorkout, setCreatingWorkouts] = useState<boolean>(false)
 
+    //Effects and data load
     const fetchWorkouts = ()=>{
+        setError(null)
         axios_instance.get('api/workouts')
         .then(response => {
-            setData(response.data);
+            setWorkouts(response.data);
         })
         .catch(error => {
             console.error('Error feching data: ', error);
@@ -28,9 +31,11 @@ function Workouts(){
     }
     
     useEffect(() => {fetchWorkouts()},[])
-         
+
+    //Event handlers 
     const handleWorkoutSubmit = async (e:React.FormEvent)=>{
         e.preventDefault();
+        setError(null)
         try{
             const response = await axios_instance.post('api/workouts',newWorkout);
             console.log(response.data);
@@ -38,20 +43,21 @@ function Workouts(){
             setNewWorkout({
                 name:'',
                 description:'',
-                difficulty:'',
-                source_url:''
+                difficulty:''
             });
             fetchWorkouts();
         }catch(error){
             console.log(`Error! ${error}`);
+            setError(`${error}`)
         }
     }
 
-    const workout_list = (data:WorkoutInstance[]|null) => {
+    //Visual elements
+    const workout_list = (data:Workout[]|null) => {
         if (data){
             let mapped_workouts = data.map(workout => 
                 <div className="col-12 col-lg-3 custom-justify-content-center">
-                    <Card key={workout.id} uri='workouts' id={workout.id} title={workout.name} footer={workout.source_url} body={workout.description} />
+                    <Card key={workout.id} uri='workouts' id={workout.id} title={workout.name} footer={workout.created_at} body={workout.description} />
                 </div>
             )
             mapped_workouts.push(<div className="col-12 col-lg-3 custom-justify-content-center"><Card key={mapped_workouts.length + 2} body='Create a new workout' style="action" onClick={()=>setCreatingWorkouts(!creatingWorkout)}></Card></div>)
@@ -100,6 +106,13 @@ function Workouts(){
                             <input type="url" name="source_url" id="source_url" onChange={(e) => setNewWorkout({...newWorkout, source_url:e.target.value})}/>
                         </div>
                     </div>
+                    { error &&
+                        <div className="form-group">
+                            <div className="form-row">
+                                <EventMessage message={error} style="error solid"></EventMessage>
+                            </div>
+                        </div>
+                    }
                     <div className="form-group">
                         <div className="form-row">
                             <button className="btn-secondary btn-md">Create</button>
@@ -114,10 +127,10 @@ function Workouts(){
                 <div className="template-title">Workouts</div>
             </div>
             <div className="row justify-content-center g-4">
-                {workout_list(data)}
+                {workout_list(workouts)}
             </div>
             {creatingWorkout &&
-                <Popup title="New workout" onClose={()=> setCreatingWorkouts(!creatingWorkout)}>
+                <Popup title="New workout" onClose={()=> {setCreatingWorkouts(!creatingWorkout); setError(null)}}>
                     {workout_form(handleWorkoutSubmit)}
                 </Popup>
             }

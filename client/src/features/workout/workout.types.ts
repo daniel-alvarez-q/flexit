@@ -1,18 +1,21 @@
-export type WorkoutSessionInstance = {
+export type WorkoutSession = {
     id:number;
     workout:number;
     workout_name?:string;
-    exercise_logs:ExerciseSessionLogInstance[];
+    exercise_logs:ExerciseLog[];
     user:number;
     start_time:string;
     end_time:string;
     workout_data?: object;
 }
 
-export type ExerciseSessionLogInstance = {
+export type WorkoutSessionCreate = Partial<Omit<WorkoutSession, 'id'>>
+
+export type ExerciseLog = {
     session:number;
     exercise:number;
     exercise_name?:string;
+    exercise_category?:string;
     series?:number;
     repetitions?:number;
     weight?: number;

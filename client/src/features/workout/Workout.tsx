@@ -1,11 +1,11 @@
 import { AxiosError } from "axios"
 import { useEffect, useState, type FormEvent } from "react"
 import { useParams } from "react-router-dom"
-import type { WorkoutInstance } from "../workouts/workouts.types"
-import type { ExerciseInstance } from "../exercises/exercises.types"
-import type { WorkoutSessionInstance } from "./workout.types"
+import type { Workout } from "../workouts/workouts.types"
+import type { Exercise, ExerciseCreate } from "../exercises/exercises.types"
+import type { WorkoutSession } from "./workout.types"
 import type { columnConfig } from "../../shared/components/Table/table.types"
-import type { ExerciseSessionLogInstance } from "./workout.types"
+import type { ExerciseLog } from "./workout.types"
 import axios_instance from "../../request_interceptor"
 import ContentSection from "../../shared/components/ContentSection"
 import EventMessage from "../../shared/components/EventMessage"
@@ -16,13 +16,13 @@ import Table from "../../shared/components/Table"
 
 function Workout(){
     // Data-bounded states
-    const [workout,setWorkout] = useState<WorkoutInstance|null>(null)
-    const [exercises, setExercises] = useState<Record<number,ExerciseInstance>>({})
-    const [exercise, setExercise] = useState<Partial<ExerciseInstance>>({})
-    const [sessions, setSessions] = useState<Partial<WorkoutSessionInstance>[]>([])
-    const [activeSession, setActiveSession] = useState<WorkoutSessionInstance|null>(null)
-    const [exerciseLogs, setExerciseLogs] = useState<Record<number,Partial<ExerciseSessionLogInstance>[]>>([])
-    const [exerciseLog, setExerciseLog] = useState<Partial<ExerciseSessionLogInstance>>({})
+    const [workout,setWorkout] = useState<Workout|null>(null)
+    const [exercises, setExercises] = useState<Record<number,Exercise>>({})
+    const [exercise, setExercise] = useState<ExerciseCreate>({})
+    const [sessions, setSessions] = useState<WorkoutSession[]>([])
+    const [activeSession, setActiveSession] = useState<WorkoutSession|null>(null)
+    const [exerciseLogs, setExerciseLogs] = useState<Record<number,Partial<ExerciseLog>[]>>({})
+    const [exerciseLog, setExerciseLog] = useState<Partial<ExerciseLog>>({})
     // Component behavior states
     const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
     const [creatingLog, setCreatingLog] = useState<boolean>(false)
@@ -30,24 +30,23 @@ function Workout(){
     const params = useParams()
 
     // Other
-    const session_columns: columnConfig<WorkoutSessionInstance>[]=[
+    const session_columns: columnConfig<WorkoutSession>[]=[
         {key: 'id', header:'Id'},
         {key: 'start_time', header:"Start Time"},
         {key: 'end_time', header:"End Time"}
     ]
 
-    const exercise_log_columns: columnConfig<Partial<ExerciseSessionLogInstance>>[] = [
-        {key: 'exercise', header:'Exercise'},
-        {key: 'notes', 'header':'Notes'},
+    const exercise_log_columns: columnConfig<Partial<ExerciseLog>>[] = [
+        {key: 'exercise_name', header:'Exercise'},
+        {key: 'exercise_category', header:'Category'},
         {key: 'log_time', header:'Log time'}
     ]
 
     // Effects for initial data load
-
     const fetch_exercises = async (id:number) =>{
         setError(null)
         await axios_instance.get(`api/workout/${id}/exercises`).then(response => {
-            const exercise_map = response.data.reduce((acc:Record<number,ExerciseInstance>,exercise:ExerciseInstance) =>{
+            const exercise_map = response.data.reduce((acc:Record<number,Exercise>,exercise:Exercise) =>{
                 acc[exercise.id] = exercise
                 return acc
             }, {})
@@ -97,7 +96,7 @@ function Workout(){
         })
     }
 
-    const update_session = async(id:number, data:Partial<WorkoutSessionInstance>) => {
+    const update_session = async(id:number, data:Partial<WorkoutSession>) => {
         setError(null)
         await axios_instance.patch(`api/workoutsession/${id}`,data).then(response =>{
             console.log(response)
@@ -107,7 +106,7 @@ function Workout(){
         })
     }
 
-    const create_exercise_log = async(data:Partial<ExerciseSessionLogInstance>) =>{
+    const create_exercise_log = async(data:Partial<ExerciseLog>) =>{
         setError(null)
         try{
             await axios_instance.post('api/exerciselogs', data=data)
@@ -138,28 +137,27 @@ function Workout(){
     },[params.workoutId])
 
     useEffect(()=>{
-        let test: Record<number, Partial<ExerciseSessionLogInstance>[]> = {}
+        let processed_logs: Record<number, Partial<ExerciseLog>[]> = {}
         
         if (sessions){
-            sessions.map((session)=> {
-                if (session.exercise_logs){
+            // console.log(`Sessions ${sessions}`)
+            sessions.forEach((session)=> {
+                if (session.exercise_logs && session.exercise_logs.length && Object.keys(exercises).length){
                     let logs = session.exercise_logs.map((log)=>{
-                    return exercises[log.exercise]
+                        return {...log, exercise_name:exercises[log.exercise].name, exercise_category:exercises[log.exercise].category}
                     })
-
-                
-                test[session.id] = session.exercise_logs
+                    processed_logs[session.id] = logs
                 }
                 
             })
-            setExerciseLogs(test)
-            console.log(test)
+            setExerciseLogs(processed_logs)
+        }else{
+            setExerciseLogs({})
         }
         
-    }, [sessions, exercises])
+    }, [exercises, sessions])
 
     //Event handlers
-
     const handleExerciseSubmit = (e:FormEvent)=>{
         e.preventDefault()
         setError(null)
@@ -167,18 +165,9 @@ function Workout(){
             axios_instance.post('api/exercises', {...exercise, workouts: [workout.id]}).then(response => {
             console.log(response)
             setCreatingExercise(!creatingExercise)
-            setExercise({
-                'workouts':[],
-                'name':'',
-                'description':'',
-                'difficulty': '',
-                'category':'',
-                'series':0,
-                'repetitions':0,
-                'duration':0,
-                'distance':0,
-            })
+            setExercise({})
             fetch_workout()
+            fetch_exercises(Number(params.workoutId))
         }).catch(error =>{
             setError(error.message)
             console.log(error)
@@ -192,13 +181,13 @@ function Workout(){
         setError(null)
         console.log(activeSession?.end_time)
         if(activeSession){
-            const session_termination_data:Partial<WorkoutSessionInstance> = {
+            const session_termination_data:Partial<WorkoutSession> = {
                 'end_time': new Date().toISOString()
             }
             await update_session(activeSession.id, session_termination_data)
             await fetch_sessions(Number(params.workoutId))
         }else{
-            const session_init_data:Partial<WorkoutSessionInstance> = {
+            const session_init_data:Partial<WorkoutSession> = {
                 'workout':Number(params.workoutId),
                 'start_time': new Date().toISOString(),
             }
@@ -219,8 +208,7 @@ function Workout(){
     }
 
     // Visual elements
-
-     const workout_details = (workout: WorkoutInstance)=>{
+     const workout_details = (workout: Workout)=>{
         return(
             <div className="workout-detail">
                 <div className="workout-attribute">
@@ -238,7 +226,7 @@ function Workout(){
         )
     }
 
-    const exercise_list = (exercises:Record<number, ExerciseInstance>|null) => {
+    const exercise_list = (exercises:Record<number, Exercise>|null) => {
         return(
             <div className="workout-exercises">
                 {!exercises ?
@@ -354,7 +342,7 @@ function Workout(){
                 : exercise.category === 'flx'
                 }
                 {error &&
-                    <EventMessage message={error} style="error solid"></EventMessage>
+                    <EventMessage message={error} style="error solid compact"></EventMessage>
                 }
                 <div className="form-group">
                     <div className="form-row">
@@ -365,7 +353,7 @@ function Workout(){
         )
     }
 
-    const session_exercise_form = (exercises:Record<number,ExerciseInstance>) =>{
+    const session_exercise_form = (exercises:Record<number,Exercise>) =>{
 
         return(
             <form action="" className="workout-sessions-form" onSubmit={e=> handleExerciseLogSubmit(e)}>
@@ -379,47 +367,54 @@ function Workout(){
                         </select>
                     </div>
                     {
-                        exerciseLog.exercise ?
+                    exerciseLog.exercise ?
+                    <>
+                    {exercises[exerciseLog.exercise].category === 'str' ?
                         <>
-                        {exercises[exerciseLog.exercise].category === 'str' ?
-                            <>
-                                <div className="col-6 col-md-3">
-                                    <label htmlFor="series">Series</label>
-                                    <input type="number" id="series" name="series" min="0" onChange={e => setExerciseLog({...exerciseLog, 'series':Number(e.target.value)})}/>
-                                </div>
-                                <div className="col-6 col-md-3">
-                                    <label htmlFor="reps">Repetitions</label>
-                                    <input type="number" name="reps" id="reps" min="0" onChange={e => setExerciseLog({...exerciseLog, 'repetitions':Number(e.target.value)})}/>
-                                </div>
-                                <div className="col-6 col-md-3">
-                                    <label htmlFor="weight">Weight</label>
-                                    <input type="number" name="weight" id="weight" min="0" step="0.1" onChange={e => setExerciseLog({...exerciseLog, 'weight':Number(e.target.value)})}/>
-                                </div>
-                            </>
-                            : 
-                            exercises[exerciseLog.exercise].category === 'car' ?
-                            <>
-                                <div className="col-6 col-md-3">
-                                    <label htmlFor="distance">Distance</label>
-                                    <input type="number" id="distance" name="distance" onChange={e => setExerciseLog({...exerciseLog, 'distance':Number(e.target.value)})}/>
-                                </div>
-                                <div className="col-6 col-md-3">
-                                    <label htmlFor="duration">Duration</label>
-                                    <input type="number" id="duration" name="duration" onChange={e => setExerciseLog({...exerciseLog, 'duration':Number(e.target.value)})}/>
-                                </div>                            
-                            </>
-                            : null}
-                            <div className="col-12 col-md-6">
-                                <label htmlFor="notes">Notes</label>
-                                <input type="text" id="notes" name="notes" onChange={e => setExerciseLog({...exerciseLog, 'notes':e.target.value})}/>
-                            </div>  
+                            <div className="col-6 col-md-3">
+                                <label htmlFor="series">Series</label>
+                                <input type="number" id="series" name="series" min="0" onChange={e => setExerciseLog({...exerciseLog, 'series':Number(e.target.value)})}/>
+                            </div>
+                            <div className="col-6 col-md-3">
+                                <label htmlFor="reps">Repetitions</label>
+                                <input type="number" name="reps" id="reps" min="0" onChange={e => setExerciseLog({...exerciseLog, 'repetitions':Number(e.target.value)})}/>
+                            </div>
+                            <div className="col-6 col-md-3">
+                                <label htmlFor="weight">Weight</label>
+                                <input type="number" name="weight" id="weight" min="0" step="0.1" onChange={e => setExerciseLog({...exerciseLog, 'weight':Number(e.target.value)})}/>
+                            </div>
                         </>
-                            : null
+                        : 
+                        exercises[exerciseLog.exercise].category === 'car' ?
+                        <>
+                            <div className="col-6 col-md-3">
+                                <label htmlFor="distance">Distance (km)</label>
+                                <input type="number" id="distance" name="distance" onChange={e => setExerciseLog({...exerciseLog, 'distance':Number(e.target.value)})}/>
+                            </div>
+                            <div className="col-6 col-md-3">
+                                <label htmlFor="duration">Duration (minutes)</label>
+                                <input type="number" id="duration" name="duration" onChange={e => setExerciseLog({...exerciseLog, 'duration':Number(e.target.value)})}/>
+                            </div>                            
+                        </>
+                        : null}
+                        <div className="col-12 col-md-6">
+                            <label htmlFor="notes">Notes</label>
+                            <textarea id="notes" name="notes" onChange={e => setExerciseLog({...exerciseLog, 'notes':e.target.value})}></textarea>
+                        </div>  
+                    </>
+                    : null
                     }
                 </div>
+                {error &&
+                <div className="row">
+                    <div className="col-12">
+                        <EventMessage message={error} style="error compact"></EventMessage>
+                    </div>
+                </div>
+                }
                 <div className="row">
                     <div className="col-6 justify-content-center">
-                        <button className="btn-md">Create</button>
+                        <button className="btn-md">Log</button>
                     </div>
                 </div>
             </form>
@@ -447,7 +442,7 @@ function Workout(){
                                     {activeSession && activeSession.exercise_logs.length === 0 ?
                                         <EventMessage style="warning" message="No exercises have been logged"></EventMessage>    
                                     :activeSession && activeSession?.exercise_logs.length > 0 &&
-                                        <Table<Partial<ExerciseSessionLogInstance>> data={exerciseLogs[activeSession?.id]} columns={exercise_log_columns}></Table>
+                                        <Table<Partial<ExerciseLog>> data={exerciseLogs[activeSession.id] || []} columns={exercise_log_columns}></Table>
                                     }
                                     <div className="row g-3">
                                         {activeSession &&
@@ -467,7 +462,7 @@ function Workout(){
                         <div className="col-12">
                             <ContentSection title="Past sessions">
                                 <div className="workout-sessions-table">
-                                    <Table<WorkoutSessionInstance> data={sessions} columns={session_columns}></Table>
+                                    <Table<WorkoutSession> data={sessions} columns={session_columns}></Table>
                                 </div>
                             </ContentSection>
                         </div>
@@ -490,7 +485,7 @@ function Workout(){
             </Popup>
         }
         {activeSession && exercises && creatingLog &&
-            <Popup title="Log exercise" onClose={()=> setCreatingLog(!creatingLog)}>{session_exercise_form(exercises)}</Popup>
+            <Popup title="Log exercise" onClose={()=> {setCreatingLog(!creatingLog); setError(null); setExercise({})}}>{session_exercise_form(exercises)}</Popup>
         }
         </>
     )

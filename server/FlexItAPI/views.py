@@ -27,7 +27,6 @@ def query_search(model:Type[Model], serializer:Type[serializers.Serializer], ins
 
 def query_save(serializer, **kwargs):
     user = kwargs.get('user')
-    print(serializer)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     if user:   

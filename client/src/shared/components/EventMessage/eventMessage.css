@@ -36,6 +36,14 @@
     font-size: 1rem;
 }
 
+/* Compact/form-height variant for warning messages */
+.message.compact {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    height: auto;
+    min-height: calc(1rem + 1rem + 4px); /* font-size + padding + border */
+}
+
 .message.success {
     background-color: rgba(52, 199, 89, 0.1);
     color: var(--font-color);
