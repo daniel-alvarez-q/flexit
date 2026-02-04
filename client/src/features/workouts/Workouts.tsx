@@ -47,9 +47,17 @@ function Workouts(){
             });
             fetchWorkouts();
         }catch(error){
-            console.log(`Error! ${error}`);
-            setError(`${error}`)
+            console.log(`Error! ${error.response.data}`);
+            setError(JSON.stringify(error.response.data))
         }
+    }
+
+    const handleFormState = () =>{
+        let state:boolean = false
+        if(!newWorkout.name.length || !newWorkout.difficulty.length){
+            state=true
+        }
+        return state
     }
 
     //Visual elements
@@ -109,13 +117,13 @@ function Workouts(){
                     { error &&
                         <div className="form-group">
                             <div className="form-row">
-                                <EventMessage message={error} style="error solid"></EventMessage>
+                                <EventMessage message={error} style="error compact"></EventMessage>
                             </div>
                         </div>
                     }
                     <div className="form-group">
                         <div className="form-row">
-                            <button className="btn-secondary btn-md">Create</button>
+                            <button className="btn-full" disabled={handleFormState()}>Create</button>
                         </div>
                     </div>
                 </form>

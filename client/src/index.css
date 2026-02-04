@@ -150,6 +150,8 @@ form {
     flex-direction: column;
     width: 100%;
     gap: 10px;
+    justify-content: left;
+    text-align: left;
 }
 
 input,
