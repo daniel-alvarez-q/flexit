@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import type { UserCreate } from "./singup.types"
+import { useAuth } from "../../context/AuthContext"
 import EventMessage from "../../shared/components/EventMessage"
 
 
@@ -11,7 +12,7 @@ function Signup(){
         return {'username':'', 'password':'', 'email':''}
     }
     const navigate = useNavigate()
-    const BASE_URL:string = `${import.meta.env.VITE_BACKEND_URL}`
+    const {API_URL} = useAuth()!
 
     //State
     const [creating, setCreating] = useState<boolean>(false)
@@ -25,13 +26,17 @@ function Signup(){
         setCreating(true)
 
         try{
-            const response = await axios.post(`${BASE_URL}/api/users`, userForm)
+            const response = await axios.post(`${API_URL}/api/users`, userForm)
             console.log(`Response ${response}`)
             setUserForm(createEmptyUser())
             navigate('/signin')
         }catch(error){
             console.log(error)
-            setError(String(JSON.stringify(error.response.data)))
+            if (axios.isAxiosError(error)) {
+                setError(String(JSON.stringify(error.response?.data)))
+            } else {
+                setError('An unexpected error occurred')
+            }
             setCreating(false)
         }
     }

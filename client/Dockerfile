@@ -53,23 +53,30 @@ FROM base AS final
 # Use production node environment by default.
 ENV NODE_ENV=production
 
+# Set default port (Azure Container Apps will override this)
+ENV PORT=3000
+
 # Run the application as a non-root user.
 USER node
 
 # Copy package.json so that package manager commands can be used.
-COPY package.json .
+COPY --chown=node package.json .
 
 # Copy the production dependencies from the deps stage and also
 # the built application from the build stage into the image.
 
 # COPY --from=deps /usr/src/app/node_modules ./node_modules
 
-COPY --from=build /usr/src/app/node_modules ./node_modules
-COPY --from=build /usr/src/app/dist ./dist
+COPY --chown=node --from=build /usr/src/app/node_modules ./node_modules
+COPY --chown=node --from=build /usr/src/app/dist ./dist
 
+# add entrypoint
+COPY --chown=node:node entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
 # Expose the port that the application listens on.
 EXPOSE 3000
 
 # Run the application.
-CMD ["npm", "run", "preview"]
+# CMD ["npm", "run", "preview"]
+CMD ["./entrypoint.sh"]

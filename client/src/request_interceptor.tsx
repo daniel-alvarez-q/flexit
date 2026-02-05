@@ -1,7 +1,10 @@
 import axios from 'axios'
+import { useAuth } from './context/AuthContext';
+
+const { API_URL } = useAuth()!
 
 const axios_instance = axios.create({
-    baseURL: `${import.meta.env.VITE_BACKEND_URL}`,
+    baseURL: API_URL,
 });
 
 axios_instance.interceptors.request.use(

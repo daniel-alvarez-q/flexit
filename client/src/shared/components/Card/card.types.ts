@@ -1,4 +1,4 @@
-import type { MouseEventHandler, ReactEventHandler } from "react";
+import type { MouseEventHandler } from "react";
 
 export type CardType = {
     id?: number;

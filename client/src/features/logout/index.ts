@@ -1,2 +1,2 @@
-export * from './logout'
-export {default} from './logout'
+export * from './Logout'
+export {default} from './Logout'

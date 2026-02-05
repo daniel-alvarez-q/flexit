@@ -7,7 +7,7 @@ import NotFound from "../shared/components/NotFound";
 import Signup from "../features/signup";
 import Exercises from "../features/exercises";
 import Logout from "../features/logout";
-import Workout from "../features/workout";
+import WorkoutDetails from "../features/workout";
 
 export const routes: RouteObject[] = [
     {
@@ -18,7 +18,7 @@ export const routes: RouteObject[] = [
             {'path': '/signin', element: <Signin />},
             {'path': '/logout', element: <Logout />},
             {'path': '/workouts', element: <Workouts />},
-            {'path': '/workouts/:workoutId', element: <Workout/>},
+            {'path': '/workouts/:workoutId', element: <WorkoutDetails/>},
             {'path':'/exercises', element: <Exercises />},
             {'path': '*', element: <NotFound />}
         ],

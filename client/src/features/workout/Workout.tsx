@@ -1,12 +1,12 @@
 import { AxiosError } from "axios"
 import { useEffect, useState, type FormEvent } from "react"
+import { useAuth } from "../../context/AuthContext"
 import { useParams } from "react-router-dom"
 import type { Workout } from "../workouts/workouts.types"
 import type { Exercise, ExerciseCreate } from "../exercises/exercises.types"
 import type { WorkoutSession } from "./workout.types"
 import type { columnConfig } from "../../shared/components/Table/table.types"
 import type { ExerciseLog } from "./workout.types"
-import axios_instance from "../../request_interceptor"
 import ContentSection from "../../shared/components/ContentSection"
 import EventMessage from "../../shared/components/EventMessage"
 import HorizontalCard from "../../shared/components/HorizontalCard"
@@ -14,7 +14,7 @@ import Popup from "../../shared/components/Popup"
 import './workout.css'
 import Table from "../../shared/components/Table"
 
-function Workout(){
+function WorkoutDetails(){
     // Data-bounded states
     const [workout,setWorkout] = useState<Workout|null>(null)
     const [exercises, setExercises] = useState<Record<number,Exercise>>({})
@@ -27,6 +27,7 @@ function Workout(){
     const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
     const [creatingLog, setCreatingLog] = useState<boolean>(false)
     const [error, setError] = useState<string|null>(null)
+    const {axios_instance} = useAuth()!
     const params = useParams()
 
     // Other
@@ -263,7 +264,7 @@ function Workout(){
                         <label htmlFor="description">Description</label>
                     </div>
                     <div className="form-row">
-                        <input type="text" name="description" id="description" onChange={(e)=> setExercise({...exercise, 'description':e.target.value})}/>
+                        <textarea name="description" id="description" onChange={(e)=> setExercise({...exercise, 'description':e.target.value})}></textarea>
                     </div>
                 </div>
                 <div className="form-group">
@@ -363,7 +364,7 @@ function Workout(){
                         <label htmlFor="exercise">Exercise</label>
                         <select name="exercise" id="exercise" onChange={e => setExerciseLog({...exerciseLog, exercise:Number(e.target.value)})}>
                             {Object.values(exercises)?.map(exercise =>
-                                <option value={exercise.id}>{exercise.name}</option>
+                                <option key={exercise.id} value={exercise.id}>{exercise.name}</option>
                             )}
                         </select>
                     </div>
@@ -492,4 +493,4 @@ function Workout(){
     )
 }
 
-export default Workout
+export default WorkoutDetails

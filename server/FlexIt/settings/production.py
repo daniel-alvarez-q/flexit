@@ -8,6 +8,10 @@ DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.victoriousstone-49dcb6b1\.westeurope\.azurecontainerapps\.io$",
+]
+
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE'),

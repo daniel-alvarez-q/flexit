@@ -1,6 +1,7 @@
 import { useState, useEffect, type ReactEventHandler} from "react"
 import type { Workout, WorkoutCreate } from "./workouts.types"
-import axios_instance from "../../request_interceptor"
+import axios from "axios"
+import { useAuth } from "../../context/AuthContext"
 import Card from "../../shared/components/Card"
 import EventMessage from "../../shared/components/EventMessage"
 import Popup from "../../shared/components/Popup"
@@ -17,6 +18,7 @@ function Workouts(){
         }
     )
     const [creatingWorkout, setCreatingWorkouts] = useState<boolean>(false)
+    const {axios_instance} = useAuth()!
 
     //Effects and data load
     const fetchWorkouts = ()=>{
@@ -47,8 +49,12 @@ function Workouts(){
             });
             fetchWorkouts();
         }catch(error){
-            console.log(`Error! ${error.response.data}`);
-            setError(JSON.stringify(error.response.data))
+            if (axios.isAxiosError(error)){
+                console.log(`Error! ${error.response?.data}`);
+                setError(JSON.stringify(error.response?.data))
+            }else{
+                setError(`Error: ${error}`)
+            }
         }
     }
 
@@ -64,11 +70,11 @@ function Workouts(){
     const workout_list = (data:Workout[]|null) => {
         if (data){
             let mapped_workouts = data.map(workout => 
-                <div className="col-12 col-lg-3 custom-justify-content-center">
-                    <Card key={workout.id} uri='workouts' id={workout.id} title={workout.name} footer={workout.created_at} body={workout.description} />
+                <div key={workout.id} className="col-12 col-lg-3 custom-justify-content-center">
+                    <Card uri='workouts' id={workout.id} title={workout.name} footer={workout.created_at} body={workout.description} />
                 </div>
             )
-            mapped_workouts.push(<div className="col-12 col-lg-3 custom-justify-content-center"><Card key={mapped_workouts.length + 2} body='Create a new workout' style="action" onClick={()=>setCreatingWorkouts(!creatingWorkout)}></Card></div>)
+            mapped_workouts.push(<div key="create-workout" className="col-12 col-lg-3 custom-justify-content-center"><Card body='Create a new workout' style="action" onClick={()=>setCreatingWorkouts(!creatingWorkout)}></Card></div>)
             return mapped_workouts
         }else{
             return <EventMessage style="loading"></EventMessage>
@@ -90,7 +96,7 @@ function Workouts(){
                             <label htmlFor="">Workout description</label>
                         </div>
                         <div className="form-row">
-                            <input type="text" name="description" id="description" onChange={(e) => setNewWorkout({...newWorkout, description:e.target.value})}/>
+                            <textarea  name="description" id="description" onChange={(e) => setNewWorkout({...newWorkout, description:e.target.value})}></textarea>
                         </div>
                     </div>
                     <div className="form-group">

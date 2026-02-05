@@ -6,16 +6,12 @@ export default defineConfig({
   base: "/",
   plugins: [react()],
   preview:{
+    host:true,
     port:3000,
-    strictPort: true,
   },
   server: {
+    host:true,
     port:3000,
     strictPort: true,
-    // proxy: {
-    //   '/api': 'http://localhost:8000',
-    //   '/login': 'http://localhost:8000',
-    //   '/logout': 'http://localhost:8000'
-    // }
   }
 })
