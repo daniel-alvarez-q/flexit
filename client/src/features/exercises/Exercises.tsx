@@ -28,7 +28,7 @@ function Exercises(){
                 <div className="template-title">Exercises</div>
             </div>
             <div className="row justify-content-center g-4">
-                { Array.isArray(exercises) && exercises.length ? exercises.map(exercise =>
+                { Array.isArray(exercises) ? exercises.length ? exercises.map(exercise =>
                     <div className="col-12 col-lg-3 custom-justify-content-center" key={exercise.id}>
                         <Card 
                         id={exercise.id} 
@@ -37,7 +37,9 @@ function Exercises(){
                         footer={`Last updated: ${exercise.updated_at}`} 
                         style="exercise"></Card>
                     </div>
-                ):<EventMessage style="loading"></EventMessage>}
+                )
+                :<EventMessage style="warning" message="You have not defined any exercises, create one through an existing workout."></EventMessage>
+                :<EventMessage style="loading"></EventMessage>}
             </div>
         </>
     )

@@ -73,10 +73,11 @@ function Home(){
                             {
                             error ?
                             <EventMessage message={error} style='full-width-error'></EventMessage>
-                            : workoutSessions && workoutSessions.length > 0 ?
+                            : workoutSessions ? workoutSessions.length ?
                             <ContentSection title="Latest workout sessions">
                                 <Table<WorkoutSession> data={[...workoutSessions].reverse()} columns={columns}></Table>
                             </ContentSection>
+                            :<EventMessage style="warning" message="No sessions have been logged, create one through any existing workout."></EventMessage>
                             :<EventMessage style="loading"></EventMessage>
                             }
                         </div>
