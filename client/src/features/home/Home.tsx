@@ -91,7 +91,7 @@ function Home(){
                         <div className="col-12 col-md-8">
                             <ContentSection>
                                 <p><strong>FlexIt!</strong> is an experimental fitness tracker designed as a convenient companionship for those who are ready to take their daily fitness routine to the next level. 
-                                    <strong> FlexIt!</strong> helps you plan your sessions, track your performance, and detect opportunities for improving your workouts, unlocking untold levels of performance</p>
+                                    <strong> FlexIt!</strong> helps you plan your sessions, track your performance, and detect opportunities for improving your workouts, unlocking untold levels of performance.</p>
                                 <p>Feeling curious? Create a new account and start exploring the features we have to offer!</p>
                                 <button className="btn-md" onClick={() => signup_action()}>Create an account</button>
                             </ContentSection>
