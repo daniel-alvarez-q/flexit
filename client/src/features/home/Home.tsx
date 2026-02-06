@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import EventMessage from "../../shared/components/EventMessage";
 import Table from "../../shared/components/Table";
@@ -11,6 +12,7 @@ function Home(){
     const {user, axios_instance} = useAuth()!
     const [workoutSessions, setWorkoutSessions] = useState<WorkoutSession[]|null>(null)
     const [error,setError] = useState<string|null>(null)
+    const navigate = useNavigate()
     const columns: columnConfig<WorkoutSession>[]=[
         {key: 'id', header:'Id'},
         {key: 'workout_name', header:"Workout"},
@@ -19,7 +21,8 @@ function Home(){
     ]
 
     useEffect(()=>{
-        axios_instance.get('api/workoutsessions')
+        if(user){
+            axios_instance.get('api/workoutsessions')
             .then(async (response) => {
                 const sessions = response.data.slice(0,10);
                 
@@ -51,26 +54,50 @@ function Home(){
                 setError(error.message);
                 console.error(error);
             });
+        }
     },[user])
+
+    const signup_action = () =>{
+        navigate('/signup')
+    }
 
     return(
         <>
-            <div className="row">
-                {user ? <div className="template-title">Welcome, {user}</div> : <div className="template-title">Welcome!</div>}
-            </div>
-            <div className="row justify-content-center">
-                <div className="col-12">
-                    {
-                    error ?
-                    <EventMessage message={error} style='full-width-error'></EventMessage>
-                    : workoutSessions && workoutSessions.length > 0 ?
-                    <ContentSection title="Latest workout sessions">
-                        <Table<WorkoutSession> data={[...workoutSessions].reverse()} columns={columns}></Table>
-                    </ContentSection>
-                    :<EventMessage style="loading"></EventMessage>
-                    }
-                </div>
-            </div>
+            {user ?
+                <>
+                    <div className="row">
+                        <div className="template-title">Welcome, {user}</div>
+                    </div>
+                    <div className="row justify-content-center">
+                        <div className="col-12">
+                            {
+                            error ?
+                            <EventMessage message={error} style='full-width-error'></EventMessage>
+                            : workoutSessions && workoutSessions.length > 0 ?
+                            <ContentSection title="Latest workout sessions">
+                                <Table<WorkoutSession> data={[...workoutSessions].reverse()} columns={columns}></Table>
+                            </ContentSection>
+                            :<EventMessage style="loading"></EventMessage>
+                            }
+                        </div>
+                    </div>
+                </>
+                :<>
+                    <div className="row">
+                        <div className="template-title">Welcome to FlexIt!</div>
+                    </div>
+                    <div className="row justify-content-center">
+                        <div className="col-12 col-md-8">
+                            <ContentSection>
+                                <p><strong>FlexIt!</strong> is an experimental fitness tracker designed as a convenient companionship for those who are ready to take their daily fitness routine to the next level. 
+                                    <strong> FlexIt!</strong> helps you plan your sessions, track your performance, and detect opportunities for improving your workouts, unlocking untold levels of performance</p>
+                                <p>Feeling curious? Create a new account and start exploring the features we have to offer!</p>
+                                <button className="btn-md" onClick={() => signup_action()}>Create an account</button>
+                            </ContentSection>
+                        </div>
+                    </div>
+                </>
+            }
         </>
     )
 }
