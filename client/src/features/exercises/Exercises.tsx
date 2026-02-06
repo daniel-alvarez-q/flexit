@@ -7,7 +7,7 @@ import EventMessage from "../../shared/components/EventMessage"
 function Exercises(){
 
     const {axios_instance} = useAuth()!
-    const [exercises,setExercises] = useState<Exercise[]>([])
+    const [exercises,setExercises] = useState<Exercise[]|null>(null)
 
     useEffect(()=>{
         axios_instance.get('api/exercises').then(response => {
@@ -28,7 +28,7 @@ function Exercises(){
                 <div className="template-title">Exercises</div>
             </div>
             <div className="row justify-content-center g-4">
-                { Array.isArray(exercises) ? exercises.length ? exercises.map(exercise =>
+                { exercises ? exercises.length ? exercises.map(exercise =>
                     <div className="col-12 col-lg-3 custom-justify-content-center" key={exercise.id}>
                         <Card 
                         id={exercise.id} 
@@ -39,7 +39,9 @@ function Exercises(){
                     </div>
                 )
                 :<EventMessage style="warning" message="You have not defined any exercises, create one through an existing workout."></EventMessage>
-                :<EventMessage style="loading"></EventMessage>}
+                :<div className="col-12">
+                    <EventMessage style="loading"></EventMessage>
+                </div>}
             </div>
         </>
     )

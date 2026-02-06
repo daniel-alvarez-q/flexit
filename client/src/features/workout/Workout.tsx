@@ -480,7 +480,11 @@ function WorkoutDetails(){
             </div>
         </>
         :
-        <EventMessage style="loading"></EventMessage>}
+        <div className="row">
+            <div className="col-12">
+                <EventMessage style="loading"></EventMessage>
+            </div>
+        </div>}
         {creatingExercise &&
             <Popup title="New exercise" onClose={()=> {setCreatingExercise(!creatingExercise); setError(null);}}>
                 {exercise_form()}
