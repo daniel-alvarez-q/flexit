@@ -1,6 +1,7 @@
 export type columnConfig<Type> = {
     key:keyof Type;
-    header:string;   
+    header:string;
+    uri?:string;   
 }
 
 export type tableProps<Type> = {

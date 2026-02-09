@@ -15,7 +15,7 @@ function Home(){
     const navigate = useNavigate()
     const columns: columnConfig<WorkoutSession>[]=[
         {key: 'id', header:'Id'},
-        {key: 'workout_name', header:"Workout"},
+        {key: 'workout_name', header:"Workout", uri:'/workouts'},
         {key: 'start_time', header:"Start Time"},
         {key: 'end_time', header:"End Time"}
     ]
