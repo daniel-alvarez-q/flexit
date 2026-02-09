@@ -9,7 +9,7 @@ import Popup from "../../shared/components/Popup"
 function Workouts(){
     //Data-bounded states
     const [error, setError] = useState<string|null>(null)
-    const [workouts, setWorkouts] = useState<Workout[]>([])
+    const [workouts, setWorkouts] = useState<Workout[]|null>(null)
     const [newWorkout, setNewWorkout] = useState<WorkoutCreate>(
         {
             name:'',
@@ -67,8 +67,8 @@ function Workouts(){
     }
 
     //Visual elements
-    const workout_list = (data:Workout[]|null) => {
-        if (data){
+    const workout_list = (data:Workout[]) => {
+        if (data?.length){
             let mapped_workouts = data.map(workout => 
                 <div key={workout.id} className="col-12 col-lg-3 custom-justify-content-center">
                     <Card uri='workouts' id={workout.id} title={workout.name} footer={workout.created_at} body={workout.description} />
@@ -77,7 +77,11 @@ function Workouts(){
             mapped_workouts.push(<div key="create-workout" className="col-12 col-lg-3 custom-justify-content-center"><Card body='Create a new workout' style="action" onClick={()=>setCreatingWorkouts(!creatingWorkout)}></Card></div>)
             return mapped_workouts
         }else{
-            return <EventMessage style="loading"></EventMessage>
+            return  <>
+                <div className="col-12 col-lg-3 custom-justify-content-center">
+                    <Card body='Create a new workout' style="action" onClick={()=>setCreatingWorkouts(!creatingWorkout)}></Card>
+                </div>
+            </>
         }
     }
 
@@ -141,7 +145,10 @@ function Workouts(){
                 <div className="template-title">Workouts</div>
             </div>
             <div className="row justify-content-center g-4">
-                {workout_list(workouts)}
+            { workouts ?              
+                workout_list(workouts)
+                :<EventMessage style="error" message="Workouts could not be retrieved. Check your connection and try again."></EventMessage>
+            }
             </div>
             {creatingWorkout &&
                 <Popup title="New workout" onClose={()=> {setCreatingWorkouts(!creatingWorkout); setError(null)}}>

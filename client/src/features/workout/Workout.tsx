@@ -482,6 +482,7 @@ function WorkoutDetails(){
         :
         <div className="row">
             <div className="col-12">
+                <br />
                 <EventMessage style="loading"></EventMessage>
             </div>
         </div>}

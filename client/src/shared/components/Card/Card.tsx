@@ -34,7 +34,6 @@ function Card({id, title, subtitle, body, footer, style='default', uri=null, onC
                 </div>
                 </>
             }
-
         </div>
     )
 }

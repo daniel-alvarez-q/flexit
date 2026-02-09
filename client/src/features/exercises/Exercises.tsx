@@ -39,8 +39,8 @@ function Exercises(){
                     </div>
                 )
                 :<EventMessage style="warning" message="You have not defined any exercises, create one through an existing workout."></EventMessage>
-                :<div className="col-12">
-                    <EventMessage style="loading"></EventMessage>
+                :<div className="col-12 col-lg-3 custom-justify-content-center">
+                    <Card style="loading"></Card>
                 </div>}
             </div>
         </>
