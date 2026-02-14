@@ -15,7 +15,7 @@ function Home(){
     const navigate = useNavigate()
     const columns: columnConfig<WorkoutSession>[]=[
         {key: 'id', header:'Id'},
-        {key: 'workout_name', header:"Workout", uri:'/workouts'},
+        {key: 'workout_name', header:"Workout"},
         {key: 'start_time', header:"Start Time"},
         {key: 'end_time', header:"End Time"}
     ]
@@ -75,7 +75,7 @@ function Home(){
                             <EventMessage message={error} style='full-width-error'></EventMessage>
                             : workoutSessions ? workoutSessions.length ?
                             <ContentSection title="Latest workout sessions">
-                                <Table<WorkoutSession> data={[...workoutSessions].reverse()} columns={columns}></Table>
+                                <Table<WorkoutSession> data={[...workoutSessions]} columns={columns}></Table>
                             </ContentSection>
                             :<EventMessage style="warning" message="No sessions have been logged, create one through any existing workout."></EventMessage>
                             :<EventMessage style="loading"></EventMessage>

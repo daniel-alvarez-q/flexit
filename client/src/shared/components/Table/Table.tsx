@@ -18,7 +18,7 @@ function Table<Type>({data, columns, rowKey = 'id' as keyof Type}:tableProps<Typ
                 {data.map(row=>
                     <tr key={String(row[rowKey])}>
                         {columns.map((column, idx)=>
-                            <td key={idx}> {column.uri ? <NavLink to={`${column.uri}/${idx}`}>{String(row[column.key])}</NavLink>:String(row[column.key])}</td>
+                            <td key={idx}> {column.uri ? <NavLink to={`${column.uri}/${row[rowKey]}`}>{String(row[column.key])}</NavLink>:String(row[column.key])}</td>
                         )}
                     </tr>
                 )}
