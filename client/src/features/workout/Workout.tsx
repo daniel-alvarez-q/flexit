@@ -15,10 +15,17 @@ import './workout.css'
 import Table from "../../shared/components/Table"
 
 function WorkoutDetails(){
+
+    //helpers
+
+    const set_exercise = ()=>{
+        return {category:'str', difficulty:'ext'}
+    }
+    
     // Data-bounded states
     const [workout,setWorkout] = useState<Workout|null>(null)
     const [exercises, setExercises] = useState<Record<number,Exercise>>({})
-    const [exercise, setExercise] = useState<ExerciseCreate>({category:'str', difficulty:'ext'})
+    const [exercise, setExercise] = useState<ExerciseCreate>(set_exercise())
     const [sessions, setSessions] = useState<WorkoutSession[]>([])
     const [activeSession, setActiveSession] = useState<WorkoutSession|null>(null)
     const [exerciseLogs, setExerciseLogs] = useState<Record<number,Partial<ExerciseLog>[]>>({})
@@ -75,10 +82,10 @@ function WorkoutDetails(){
         })
     }
 
-    const fetch_workout = () => {
+    const fetch_workout = async () => {
         console.log(`ENV: ${import.meta.env.VITE_BACKEND_URL}`)
         setError(null)
-        axios_instance.get(`api/workout/${params.workoutId}`).then(async response =>{
+        await axios_instance.get(`api/workout/${params.workoutId}`).then(async response =>{
             setWorkout(response.data)
         }).catch(error=>{
             setError(error.message)
@@ -167,7 +174,7 @@ function WorkoutDetails(){
             axios_instance.post('api/exercises', {...exercise, workouts: [workout.id]}).then(response => {
             console.log(response)
             setCreatingExercise(!creatingExercise)
-            setExercise({})
+            setExercise(set_exercise())
             fetch_workout()
             fetch_exercises(Number(params.workoutId))
         }).catch(error =>{

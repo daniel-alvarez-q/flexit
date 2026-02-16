@@ -2,6 +2,7 @@ import { useState, useEffect, type ReactEventHandler} from "react"
 import type { Workout, WorkoutCreate } from "./workouts.types"
 import axios from "axios"
 import { useAuth } from "../../context/AuthContext"
+import WorkoutList from "./views/WorkoutList"
 import Card from "../../shared/components/Card"
 import EventMessage from "../../shared/components/EventMessage"
 import Popup from "../../shared/components/Popup"
@@ -9,7 +10,7 @@ import Popup from "../../shared/components/Popup"
 function Workouts(){
     //Data-bounded states
     const [error, setError] = useState<string|null>(null)
-    const [workouts, setWorkouts] = useState<Workout[]|null>(null)
+    // const [workouts, setWorkouts] = useState<Workout[]|null>(null)
     const [newWorkout, setNewWorkout] = useState<WorkoutCreate>(
         {
             name:'',
@@ -21,18 +22,18 @@ function Workouts(){
     const {axios_instance} = useAuth()!
 
     //Effects and data load
-    const fetchWorkouts = ()=>{
-        setError(null)
-        axios_instance.get('api/workouts')
-        .then(response => {
-            setWorkouts(response.data);
-        })
-        .catch(error => {
-            console.error('Error feching data: ', error);
-        });
-    }
+    // const fetchWorkouts = ()=>{
+    //     setError(null)
+    //     axios_instance.get('api/workouts')
+    //     .then(response => {
+    //         setWorkouts(response.data);
+    //     })
+    //     .catch(error => {
+    //         console.error('Error feching data: ', error);
+    //     });
+    // }
     
-    useEffect(() => {fetchWorkouts()},[])
+    // useEffect(() => {fetchWorkouts()},[])
 
     //Event handlers 
     const handleWorkoutSubmit = async (e:React.FormEvent)=>{
@@ -47,7 +48,7 @@ function Workouts(){
                 description:'',
                 difficulty:''
             });
-            fetchWorkouts();
+            // fetchWorkouts();
         }catch(error){
             if (axios.isAxiosError(error)){
                 console.log(`Error! ${error.response?.data}`);
@@ -67,23 +68,23 @@ function Workouts(){
     }
 
     //Visual elements
-    const workout_list = (data:Workout[]) => {
-        if (data?.length){
-            let mapped_workouts = data.map(workout => 
-                <div key={workout.id} className="col-12 col-lg-3 custom-justify-content-center">
-                    <Card uri='workouts' id={workout.id} title={workout.name} footer={workout.created_at} body={workout.description} />
-                </div>
-            )
-            mapped_workouts.push(<div key="create-workout" className="col-12 col-lg-3 custom-justify-content-center"><Card body='Create a new workout' style="action" onClick={()=>setCreatingWorkouts(!creatingWorkout)}></Card></div>)
-            return mapped_workouts
-        }else{
-            return  <>
-                <div className="col-12 col-lg-3 custom-justify-content-center">
-                    <Card body='Create a new workout' style="action" onClick={()=>setCreatingWorkouts(!creatingWorkout)}></Card>
-                </div>
-            </>
-        }
-    }
+    // const workout_list = (data:Workout[]) => {
+    //     if (data?.length){
+    //         let mapped_workouts = data.map(workout => 
+    //             <div key={workout.id} className="col-12 col-lg-3 custom-justify-content-center">
+    //                 <Card uri='workouts' id={workout.id} title={workout.name} footer={workout.created_at} body={workout.description} />
+    //             </div>
+    //         )
+    //         mapped_workouts.push(<div key="create-workout" className="col-12 col-lg-3 custom-justify-content-center"><Card body='Create a new workout' style="action" onClick={()=>setCreatingWorkouts(!creatingWorkout)}></Card></div>)
+    //         return mapped_workouts
+    //     }else{
+    //         return  <>
+    //             <div className="col-12 col-lg-3 custom-justify-content-center">
+    //                 <Card body='Create a new workout' style="action" onClick={()=>setCreatingWorkouts(!creatingWorkout)}></Card>
+    //             </div>
+    //         </>
+    //     }
+    // }
 
     const workout_form = (handler:ReactEventHandler) =>{
         return <form onSubmit={handler}>
@@ -145,10 +146,10 @@ function Workouts(){
                 <div className="template-title">Workouts</div>
             </div>
             <div className="row justify-content-center g-4">
-            { workouts ?              
-                workout_list(workouts)
-                :<EventMessage style="error" message="Workouts could not be retrieved. Check your connection and try again."></EventMessage>
-            }
+                <WorkoutList />
+                <div className="col-12 col-lg-3 custom-justify-content-center">
+                    <Card body='Create a new workout' style="action" onClick={()=>setCreatingWorkouts(!creatingWorkout)}></Card>
+                </div>
             </div>
             {creatingWorkout &&
                 <Popup title="New workout" onClose={()=> {setCreatingWorkouts(!creatingWorkout); setError(null)}}>
