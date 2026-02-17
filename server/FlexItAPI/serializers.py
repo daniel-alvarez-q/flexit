@@ -112,7 +112,7 @@ class ExerciseLogSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ExerciseLog
-        fields = ['session','exercise','series','repetitions','weight','duration','distance','notes','log_time']
+        fields = ['id', 'session','exercise','series','repetitions','weight','duration','distance','notes','log_time']
         
 class WorkoutSessionSerializer(serializers.ModelSerializer):
     workout=serializers.PrimaryKeyRelatedField(

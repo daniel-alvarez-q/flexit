@@ -202,6 +202,17 @@ class ExerciseDetails(APIView):
     def delete(self,request, id):
         return query_delete(Exercise, id, request)
     
+class ExerciseExerciseLogs(APIView):
+    serializer_class = ExerciseLogSerializer
+    
+    def get(self, request, id):
+        try:
+            exercise = Exercise.objects.get(user=request.user, pk=id)
+            logs = exercise.exerciselog_set.all()
+            return Response(self.serializer_class(logs, many=True).data)
+        except Exception as e:
+            return Response({'Error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+    
 ###### WorkoutSession views #######
 
 class WorkoutSessionListCreate(APIView):

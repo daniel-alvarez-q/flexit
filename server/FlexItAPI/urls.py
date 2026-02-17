@@ -16,7 +16,8 @@ urlpatterns = [
     path(r'workout/<int:id>/sessions', views.WorkoutSessions.as_view(), name='workoutsessions'),
     path(r'exercises', views.ExerciseListCreate.as_view(), name='exercises'),
     path(r'exercise/<int:id>', views.ExerciseDetails.as_view(), name='exercise-detail'),
+    path(r'exercise/<int:id>/logs', views.ExerciseExerciseLogs.as_view(), name='exerciseexerciselogs'),
     path(r'workoutsessions', views.WorkoutSessionListCreate.as_view(), name='sessions'),
     path(r'workoutsession/<int:id>', views.WorkoutSessionDetails.as_view(), name='session-detail'),
-    path(r'exerciselogs', views.ExerciseLogListCreate.as_view(), name="exericselogs")
+    path(r'exerciselogs', views.ExerciseLogListCreate.as_view(), name="exerciselogs")
 ]

@@ -11,8 +11,9 @@ import ContentSection from "../../shared/components/ContentSection"
 import EventMessage from "../../shared/components/EventMessage"
 import HorizontalCard from "../../shared/components/HorizontalCard"
 import Popup from "../../shared/components/Popup"
-import './workout.css'
 import Table from "../../shared/components/Table"
+import ExercisePreview from "./views/ExercisePreview"
+import './workout.css'
 
 function WorkoutDetails(){
 
@@ -33,6 +34,10 @@ function WorkoutDetails(){
     // Component behavior states
     const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
     const [creatingLog, setCreatingLog] = useState<boolean>(false)
+
+    const [previewingExercise, setPreviewingExercise] = useState<boolean>(false)
+    const [selectedExercise, setSelectedExercise] = useState<number|null>(null)
+
     const [error, setError] = useState<string|null>(null)
     const {axios_instance} = useAuth()!
     const params = useParams()
@@ -244,7 +249,7 @@ function WorkoutDetails(){
                 <EventMessage style="warning" message="No exercises have been created for this workout"></EventMessage> 
                 :<div className="workout-exercise-list">
                     {Object.values(exercises).map(exercise => 
-                        <HorizontalCard key={exercise.id} id={exercise.id} title={exercise.name} subtitle={exercise.category} body={exercise.description} uri="/exercise"></HorizontalCard>
+                        <HorizontalCard key={exercise.id} id={exercise.id} title={exercise.name} subtitle={exercise.category} body={exercise.description} uri="/exercise" onClick={() => {setSelectedExercise(exercise.id); setPreviewingExercise(true)}}></HorizontalCard>
                     )}
                 </div>
                 }
@@ -500,6 +505,9 @@ function WorkoutDetails(){
         }
         {activeSession && exercises && creatingLog &&
             <Popup title="Log exercise" onClose={()=> {setCreatingLog(!creatingLog); setError(null);}}>{session_exercise_form(exercises)}</Popup>
+        }
+        {exercises && previewingExercise && selectedExercise &&
+            <ExercisePreview id={selectedExercise} displayFlagHandler={setPreviewingExercise} errorHandler={setError}/>
         }
         </>
     )

@@ -1,0 +1,14 @@
+.preview-detail{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    gap:1rem
+}
+
+.preview-attribute{
+    flex-basis: auto;
+    text-align: left;
+    font-size: clamp(0.9rem, 3vw, 1.0rem);
+    overflow:hidden
+}

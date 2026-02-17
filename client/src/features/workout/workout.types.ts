@@ -12,6 +12,7 @@ export type WorkoutSession = {
 export type WorkoutSessionCreate = Partial<Omit<WorkoutSession, 'id'>>
 
 export type ExerciseLog = {
+    id:number;
     session:number;
     exercise:number;
     exercise_name?:string;
