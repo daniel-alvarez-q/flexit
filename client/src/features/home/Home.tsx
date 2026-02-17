@@ -24,7 +24,7 @@ function Home(){
         if(user){
             axios_instance.get('api/workoutsessions')
             .then(async (response) => {
-                const sessions = response.data.slice(0,10);
+                let sessions:WorkoutSession[] = response.data.slice(0,10);
                 
                 // Fetch workout details for each session
                 const sessionsWithWorkouts = await Promise.all(
@@ -34,21 +34,24 @@ function Home(){
                             return {
                                 ...session,
                                 workout_name: workoutResponse.data.name,
-                                workout_data: workoutResponse.data
+                                workout_data: workoutResponse.data,
+                                start_time: new Date(session.start_time).toLocaleString(),
+                                end_time: new Date(session.end_time).toLocaleString()
                             };
                         } catch (err) {
                             console.error(`Failed to fetch workout ${session.workout}:`, err);
                             return {
                                 ...session,
                                 workout_name: 'Unknown',
-                                workout_data: {}
+                                workout_data: {},
+                                start_time: new Date(session.start_time).toLocaleString(),
+                                end_time: new Date(session.end_time).toLocaleString()
                             };
                         }
                     })
                 );
                 
                 setWorkoutSessions(sessionsWithWorkouts);
-                console.log(sessionsWithWorkouts)
             })
             .catch(error => {
                 setError(error.message);
@@ -75,7 +78,7 @@ function Home(){
                             <EventMessage message={error} style='full-width-error'></EventMessage>
                             : workoutSessions ? workoutSessions.length ?
                             <ContentSection title="Latest workout sessions">
-                                <Table<WorkoutSession> data={[...workoutSessions]} columns={columns}></Table>
+                                <Table<WorkoutSession> data={workoutSessions} columns={columns}></Table>
                             </ContentSection>
                             :<EventMessage style="warning" message="No sessions have been logged, create one through any existing workout."></EventMessage>
                             :<EventMessage style="loading"></EventMessage>

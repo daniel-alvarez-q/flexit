@@ -11,8 +11,11 @@ function WorkoutList(){
     const {isPending, isError, error, data:workouts} = useQuery({
         queryKey:['workouts'],
         queryFn: async():Promise<Array<Workout>>=>{
-            const response = await axios_instance.get('api/workouts')
-            return response.data
+            let response = await axios_instance.get('api/workouts')
+            return response.data.map((w:Workout) =>{
+                return {...w, created_at:new Date(w.created_at).toLocaleString()}
+            })
+            
         }
     })
 

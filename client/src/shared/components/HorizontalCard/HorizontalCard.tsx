@@ -1,4 +1,3 @@
-import { NavLink } from 'react-router-dom';
 import './horizontalCard.css'
 
 type HorizontalCardType = {
@@ -10,7 +9,7 @@ type HorizontalCardType = {
     onClick?: ()=>void
 }
 
-function HorizontalCard({id, title, subtitle=null, body, uri=null, onClick}: HorizontalCardType){
+function HorizontalCard({id, title, subtitle=null, body, onClick}: HorizontalCardType){
     return(
         <div className="horizontal-card">
             <div className="header">
