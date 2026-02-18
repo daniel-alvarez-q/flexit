@@ -3,6 +3,7 @@ export type WorkoutSession = {
     workout:number;
     workout_name?:string;
     exercise_logs:ExerciseLog[];
+    exercise_instances:number;
     user:number;
     start_time:string;
     end_time:string;
