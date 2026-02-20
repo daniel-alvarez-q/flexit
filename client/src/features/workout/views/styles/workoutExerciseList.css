@@ -1,0 +1,17 @@
+.workout-exercises{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    gap:1rem
+}
+
+.workout-exercise-list{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    gap:1rem;
+    max-height: 450px;
+    overflow: scroll;
+}

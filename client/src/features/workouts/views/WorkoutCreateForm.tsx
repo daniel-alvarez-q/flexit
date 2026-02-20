@@ -34,7 +34,7 @@ function WorkoutCreateForm ({error, errorHandler, displayFlagHandler}:WorkoutCre
 
     const workout_mutation = useMutation({
             mutationFn: create_workout,
-            onSettled:(data)=>{
+            onSuccess:(data)=>{
                 console.log(data)
                 queryClient.invalidateQueries({queryKey:['workouts']})
                 displayFlagHandler(false)

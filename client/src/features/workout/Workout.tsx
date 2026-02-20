@@ -3,30 +3,24 @@ import { useEffect, useState, type FormEvent } from "react"
 import { useAuth } from "../../context/AuthContext"
 import { useParams } from "react-router-dom"
 import type { Workout } from "../workouts/workouts.types"
-import type { Exercise, ExerciseCreate } from "../exercises/exercises.types"
+import type { Exercise } from "../exercises/exercises.types"
 import type { WorkoutSession } from "./workout.types"
 import type { columnConfig } from "../../shared/components/Table/table.types"
 import type { ExerciseLog } from "./workout.types"
 import ContentSection from "../../shared/components/ContentSection"
 import EventMessage from "../../shared/components/EventMessage"
-import HorizontalCard from "../../shared/components/HorizontalCard"
 import Popup from "../../shared/components/Popup"
 import Table from "../../shared/components/Table"
+import WorkoutExerciseList from "./views/WorkoutExerciseList"
 import ExercisePreview from "./views/ExercisePreview"
+import ExerciseCreatePopup from "./views/ExerciseCreatePopup"
 import './workout.css'
 
 function WorkoutDetails(){
-
-    //helpers
-
-    const set_exercise = ()=>{
-        return {category:'str', difficulty:'ext'}
-    }
     
     // Data-bounded states
     const [workout,setWorkout] = useState<Workout|null>(null)
     const [exercises, setExercises] = useState<Record<number,Exercise>>({})
-    const [exercise, setExercise] = useState<ExerciseCreate>(set_exercise())
     const [sessions, setSessions] = useState<WorkoutSession[]>([])
     const [activeSession, setActiveSession] = useState<WorkoutSession|null>(null)
     const [exerciseLogs, setExerciseLogs] = useState<Record<number,Partial<ExerciseLog>[]>>({})
@@ -35,7 +29,6 @@ function WorkoutDetails(){
     const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
     const [creatingLog, setCreatingLog] = useState<boolean>(false)
 
-    const [previewingExercise, setPreviewingExercise] = useState<boolean>(false)
     const [selectedExercise, setSelectedExercise] = useState<number|null>(null)
 
     const [error, setError] = useState<string|null>(null)
@@ -56,19 +49,6 @@ function WorkoutDetails(){
     ]
 
     // Effects for initial data load
-    const fetch_exercises = async (id:number) =>{
-        setError(null)
-        await axios_instance.get(`api/workout/${id}/exercises`).then(response => {
-            const exercise_map = response.data.reduce((acc:Record<number,Exercise>,exercise:Exercise) =>{
-                acc[exercise.id] = exercise
-                return acc
-            }, {})
-            setExercises(exercise_map)
-        }).catch(error =>{
-            console.log(error)
-            setError(error.message)
-        })
-    }
 
     const fetch_sessions = async(id:number) =>{
         setError(null)
@@ -141,8 +121,6 @@ function WorkoutDetails(){
         const load = async()=>{
         //workout
         await fetch_workout()
-        //Workout exercises
-        await fetch_exercises(Number(params.workoutId))
         //Workout sessions
         await fetch_sessions(Number(params.workoutId))
         }
@@ -172,25 +150,6 @@ function WorkoutDetails(){
     }, [exercises, sessions])
 
     //Event handlers
-    const handleExerciseSubmit = (e:FormEvent)=>{
-        e.preventDefault()
-        setError(null)
-        if(workout){
-            axios_instance.post('api/exercises', {...exercise, workouts: [workout.id]}).then(response => {
-            console.log(response)
-            setCreatingExercise(!creatingExercise)
-            setExercise(set_exercise())
-            fetch_workout()
-            fetch_exercises(Number(params.workoutId))
-        }).catch(error =>{
-            setError(error.message)
-            console.log(error)
-        })
-        }else{
-            setError('No workout data is available!')
-        }
-    }
-
     const handleSessionAction = async () =>{
         setError(null)
         console.log(activeSession?.end_time)
@@ -240,135 +199,7 @@ function WorkoutDetails(){
         )
     }
 
-    const exercise_list = (exercises:Record<number, Exercise>|null) => {
-        return(
-            <div className="workout-exercises">
-                {!exercises ?
-                <EventMessage style="loading"></EventMessage>
-                : Object.keys(exercises).length < 1 ?
-                <EventMessage style="warning" message="No exercises have been created for this workout"></EventMessage> 
-                :<div className="workout-exercise-list">
-                    {Object.values(exercises).map(exercise => 
-                        <HorizontalCard key={exercise.id} id={exercise.id} title={exercise.name} subtitle={exercise.category} body={exercise.description} uri="/exercise" onClick={() => {setSelectedExercise(exercise.id); setPreviewingExercise(true)}}></HorizontalCard>
-                    )}
-                </div>
-                }
-                <div>
-                    <button className="btn-lg" onClick={() => setCreatingExercise(!creatingExercise)}>Add new exercise</button>
-                </div>
-            </div>
-        )
-    }
-
-    const exercise_form = () => {
-        return(
-            <form onSubmit={(e) => handleExerciseSubmit(e)}>
-                <div className="form-group">
-                    <div className="form-row">
-                        <label htmlFor="name">Name</label>
-                    </div>
-                    <div className="form-row">
-                        <input type="text" name="name" id="name" onChange={(e) => setExercise({...exercise, 'name':e.target.value})}/>
-                    </div>
-                </div>
-                <div className="form-group">
-                    <div className="form-row">
-                        <label htmlFor="description">Description</label>
-                    </div>
-                    <div className="form-row">
-                        <textarea name="description" id="description" onChange={(e)=> setExercise({...exercise, 'description':e.target.value})}></textarea>
-                    </div>
-                </div>
-                <div className="form-group">
-                    <div className="form-row">
-                        <label htmlFor="difficulty">Difficulty</label>
-                    </div>
-                    <div className="form-row">
-                        <select name="difficulty" id="difficulty" onChange={(e) => setExercise({...exercise, 'difficulty':e.target.value})}>
-                            <option value="ext">Extreme</option>
-                            <option value="hig">High</option>
-                            <option value="med">Medium</option>
-                            <option value="low">Low</option>
-
-                        </select>
-                    </div>
-                </div>
-                <div className="form-group">
-                    <div className="form-row">
-                        <label htmlFor="category">Category</label>
-                    </div>
-                    <div className="form-row">
-                        <select name="category" id="category" value={exercise.category} onChange={(e) => setExercise({...exercise, 'category':e.target.value})}>
-                            <option value="str">Strength</option>
-                            <option value="oth">Other</option>
-                            <option value="car">Cardio</option>
-                            <option value="flx">Flexibility</option>
-                            <option value="res">Resistance</option>
-                        </select>
-                    </div>
-                </div>
-                {exercise.category === 'str' ?
-                    <>
-                        <div className="form-group">
-                            <div className="form-row">
-                                <label htmlFor="series">Series</label>
-                            </div>
-                            <div className="form-row">
-                                <input type="number" name="series" id="series" onChange={(e) => setExercise({...exercise, 'series': Number(e.target.value)})}/>
-                            </div>
-                        </div>
-                        <div className="form-group">
-                            <div className="form-row">
-                                <label htmlFor="repetitions">Repetitions</label>
-                            </div>
-                            <div className="form-row">
-                                <input type="number" name="repetitions" id="repetitions" onChange={(e) => setExercise({...exercise, 'repetitions': Number(e.target.value)})}/>
-                            </div>
-                        </div>
-                        <div className="form-group">
-                            <div className="form-row">
-                                <label htmlFor="weight">Weight</label>
-                            </div>
-                            <div className="form-row">
-                                <input type="number" name="weight" id="weight" onChange={(e) => setExercise({...exercise, 'weight': Number(e.target.value)})}/>
-                            </div>
-                        </div>
-                    </>
-                : exercise.category === 'car' ?
-                    <>
-                    <div className="form-group">
-                        <div className="form-row">
-                            <label htmlFor="distance">Distance (km)</label>
-                        </div>
-                        <div className="form-row">
-                            <input type="number" name="distance" id="distance" onChange={(e) => setExercise({...exercise, 'distance': Number(e.target.value)})}/>
-                        </div>
-                    </div>      
-                    <div className="form-group">
-                        <div className="form-row">
-                            <label htmlFor="duratin">Duration (minutes)</label>
-                        </div>
-                        <div className="form-row">
-                            <input type="number" name="duration" id="duration" onChange={(e) => setExercise({...exercise, 'duration': Number(e.target.value)})}/>
-                        </div>
-                    </div>              
-                    </>
-                : exercise.category === 'flx'
-                }
-                {error &&
-                    <EventMessage message={error} style="error compact"></EventMessage>
-                }
-                <div className="form-group">
-                    <div className="form-row">
-                        <button className="btn-md">Create</button>
-                    </div>
-                </div>
-            </form>
-        )
-    }
-
     const session_exercise_form = (exercises:Record<number,Exercise>) =>{
-
         return(
             <form action="" className="workout-sessions-form" onSubmit={e=> handleExerciseLogSubmit(e)}>
                 <div className="row g-2">
@@ -485,7 +316,12 @@ function WorkoutDetails(){
                 <div className="col-12 col-sm-7">
                     {exercises &&
                         <ContentSection title="Exercises">
-                            {exercise_list(exercises)}
+                            <WorkoutExerciseList 
+                                workoutId={workout.id} 
+                                exercisesHandler={setExercises}
+                                exerciseCreateFlagHandler={setCreatingExercise}
+                                exercisePreviewFlagHandler={setSelectedExercise}
+                            />
                         </ContentSection>
                     }
                 </div>
@@ -498,16 +334,14 @@ function WorkoutDetails(){
                 <EventMessage style="loading"></EventMessage>
             </div>
         </div>}
-        {creatingExercise &&
-            <Popup title="New exercise" onClose={()=> {setCreatingExercise(!creatingExercise); setError(null);}}>
-                {exercise_form()}
-            </Popup>
+        {workout && creatingExercise &&
+            <ExerciseCreatePopup displayHandler={setCreatingExercise} errorHandler={setError} workoutId={workout.id}/>
         }
         {activeSession && exercises && creatingLog &&
             <Popup title="Log exercise" onClose={()=> {setCreatingLog(!creatingLog); setError(null);}}>{session_exercise_form(exercises)}</Popup>
         }
-        {exercises && previewingExercise && selectedExercise &&
-            <ExercisePreview id={selectedExercise} displayFlagHandler={setPreviewingExercise} errorHandler={setError}/>
+        {exercises && selectedExercise &&
+            <ExercisePreview id={selectedExercise} displayFlagHandler={setSelectedExercise} errorHandler={setError}/>
         }
         </>
     )
