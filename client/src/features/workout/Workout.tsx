@@ -2,6 +2,7 @@ import { AxiosError } from "axios"
 import { useEffect, useState, type FormEvent } from "react"
 import { useAuth } from "../../context/AuthContext"
 import { useParams } from "react-router-dom"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import type { Workout } from "../workouts/workouts.types"
 import type { Exercise } from "../exercises/exercises.types"
 import type { WorkoutSession } from "./workout.types"
@@ -14,69 +15,69 @@ import Table from "../../shared/components/Table"
 import WorkoutExerciseList from "./views/WorkoutExerciseList"
 import ExercisePreview from "./views/ExercisePreview"
 import ExerciseCreatePopup from "./views/ExerciseCreatePopup"
+import WorkoutSessionList from "./views/WorkoutSessionList"
+import CurrentSessionPanel from "./views/CurrentSessionPanel"
+import { getDifficultyLabel } from "../../shared/utils/constants/difficulty"
 import './workout.css'
 
 function WorkoutDetails(){
     
     // Data-bounded states
-    const [workout,setWorkout] = useState<Workout|null>(null)
     const [exercises, setExercises] = useState<Record<number,Exercise>>({})
-    const [sessions, setSessions] = useState<WorkoutSession[]>([])
     const [activeSession, setActiveSession] = useState<WorkoutSession|null>(null)
     const [exerciseLogs, setExerciseLogs] = useState<Record<number,Partial<ExerciseLog>[]>>({})
     const [exerciseLog, setExerciseLog] = useState<Partial<ExerciseLog>>({})
     // Component behavior states
     const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
     const [creatingLog, setCreatingLog] = useState<boolean>(false)
-
     const [selectedExercise, setSelectedExercise] = useState<number|null>(null)
-
     const [error, setError] = useState<string|null>(null)
     const {axios_instance} = useAuth()!
     const params = useParams()
+    const queryClient = useQueryClient()
 
-    // Other
-    const session_columns: columnConfig<WorkoutSession>[]=[
-        {key: 'id', header:'Id'},
-        {key: 'start_time', header:"Start Time"},
-        {key: 'end_time', header:"End Time"}
-    ]
-
-    const exercise_log_columns: columnConfig<Partial<ExerciseLog>>[] = [
-        {key: 'exercise_name', header:'Exercise'},
-        {key: 'exercise_category', header:'Category'},
-        {key: 'log_time', header:'Log time'}
-    ]
-
-    // Effects for initial data load
-
-    const fetch_sessions = async(id:number) =>{
-        setError(null)
-        await axios_instance.get(`api/workout/${id}/sessions`).then(response =>{
-            setSessions(response.data)
-            if(response.data && response.data.length > 0) {
-                if (!response.data[0].end_time){
-                setActiveSession(response.data[0])
-                }else{
-                    setActiveSession(null)
-                }
-            }
-        }).catch(error => {
-            console.log(error)
-            setError(error.message)
-        })
-    }
-
+    // Fetch queries initial data load
     const fetch_workout = async () => {
-        console.log(`ENV: ${import.meta.env.VITE_BACKEND_URL}`)
-        setError(null)
-        await axios_instance.get(`api/workout/${params.workoutId}`).then(async response =>{
-            setWorkout(response.data)
-        }).catch(error=>{
-            setError(error.message)
-            console.error(error)
+        return await axios_instance.get(`api/workout/${params.workoutId}`).then((r) => {
+            const w:Workout = r.data
+            return {...w, difficulty:getDifficultyLabel(w.difficulty)}
         })
     }
+
+    const fetch_exercises = async()=>{
+        return await axios_instance.get(`api/workout/${params.workoutId}/exercises`).then(r=>r.data)
+    }
+
+    const fetch_sessions = async():Promise<WorkoutSession[]> => {
+        return await axios_instance.get(`api/workout/${params.workoutId}/sessions`).then(r=>{
+            const data = r.data
+            if(data.length){
+                const sessions:WorkoutSession[] = data.map((session:WorkoutSession) =>{
+                    const start = new Date(session.start_time)
+                    let end = null
+                    if(session.end_time){
+                        end = new Date(session.end_time).toLocaleString()  
+                    }
+                    return {...session, 
+                        start_time: start.toLocaleString(), 
+                        end_time: end, 
+                        exercise_instances:session.exercise_logs.length
+                    }
+                })
+
+                const active = sessions.find(s=>!s.end_time)
+
+                if(active){
+                    setActiveSession(active)
+                }
+                return sessions
+            }else{
+                const sessions:WorkoutSession[] = []
+                return sessions
+            }
+        })
+    }
+
 
     const create_session = async(data:object) => {
         setError(null)
@@ -117,22 +118,32 @@ function WorkoutDetails(){
         }
     }
 
-    useEffect(()=>{
-        const load = async()=>{
-        //workout
-        await fetch_workout()
-        //Workout sessions
-        await fetch_sessions(Number(params.workoutId))
-        }
+    //Data fetch
+    const {isError, isPending, error:tanstackError ,data:workout} = useQuery({
+        queryKey:['workout', params.workoutId],
+        queryFn: fetch_workout,
+    })
 
-        load()
-    },[params.workoutId])
+    const workoutId = workout?.id
+
+    const {data:tanstackExercises} = useQuery({
+        queryKey:['workout',workoutId,'exercises'],
+        queryFn: fetch_exercises,
+        enabled:!!workoutId
+    })
+
+    const {isError:isErrorSessions, isPending:isPendingSessions, error:errorSessions, data:sessions} = useQuery<WorkoutSession[]>({
+        queryKey:['workout', workoutId, 'sessions'],
+        queryFn: fetch_sessions,
+        enabled:!!workoutId,
+    })
 
     useEffect(()=>{
         let processed_logs: Record<number, Partial<ExerciseLog>[]> = {}
-        
+
+        console.log(`Session within logs: ${JSON.stringify(sessions?.map(s=>s.exercise_logs).slice(0,4)[0])}`)
+
         if (sessions){
-            // console.log(`Sessions ${sessions}`)
             sessions.forEach((session)=> {
                 if (session.exercise_logs && session.exercise_logs.length && Object.keys(exercises).length){
                     let logs = session.exercise_logs.map((log)=>{
@@ -158,14 +169,21 @@ function WorkoutDetails(){
                 'end_time': new Date().toISOString()
             }
             await update_session(activeSession.id, session_termination_data)
-            await fetch_sessions(Number(params.workoutId))
+            queryClient.invalidateQueries({
+                queryKey:['workout', params.workoutId, 'sessions']
+            })
+            setActiveSession(null)
         }else{
+            console.log('here')
             const session_init_data:Partial<WorkoutSession> = {
                 'workout':Number(params.workoutId),
                 'start_time': new Date().toISOString(),
             }
-            await create_session(session_init_data)
-            await fetch_sessions(Number(params.workoutId))
+            const new_session = await create_session(session_init_data)
+            setActiveSession(new_session)
+            queryClient.invalidateQueries({
+                queryKey:['workout', params.workoutId, 'sessions']
+            })
         }
     }
 
@@ -173,10 +191,12 @@ function WorkoutDetails(){
         e.preventDefault()
         const payload = {...exerciseLog, 'session': Number(activeSession?.id), log_time:(new Date()).toISOString()}
         console.log(payload)
-        if (await create_exercise_log(payload)){
+        if(await create_exercise_log(payload)){
             await setCreatingLog(false)
             await setExerciseLog({})
-            await fetch_sessions(Number(params.workoutId))
+            queryClient.invalidateQueries({
+                queryKey:['workout', params.workoutId, 'sessions']
+            })
         }
     }
 
@@ -265,6 +285,28 @@ function WorkoutDetails(){
             </form>
         )
     }
+
+    if(isPending){
+        return(
+            <div className="row">
+                <div className="col-12">
+                    <br />
+                    <EventMessage style="loading" />
+                </div>
+            </div>
+        )
+    }
+
+    if(isError){
+        return(
+            <div className="row">
+            <div className="col-12">
+                <br />
+                <EventMessage style="error" message={tanstackError.message}/>
+            </div>
+        </div>
+        )
+    }
     
     return(
         <>
@@ -284,11 +326,7 @@ function WorkoutDetails(){
                         <div className="col-12">
                             <ContentSection title="Current session">
                                 <div className="workout-sessions">
-                                    {activeSession && activeSession.exercise_logs.length === 0 ?
-                                        <EventMessage style="warning" message="No exercises have been logged"></EventMessage>    
-                                    :activeSession && activeSession?.exercise_logs.length > 0 &&
-                                        <Table<Partial<ExerciseLog>> data={exerciseLogs[activeSession.id] || []} columns={exercise_log_columns}></Table>
-                                    }
+                                    <CurrentSessionPanel session={activeSession!} exercises={tanstackExercises!}/>
                                     <div className="row g-3">
                                         {activeSession &&
                                             <div className="col-6">
@@ -307,7 +345,7 @@ function WorkoutDetails(){
                         <div className="col-12">
                             <ContentSection title="Past sessions">
                                 <div className="workout-sessions-table">
-                                    <Table<WorkoutSession> data={sessions} columns={session_columns}></Table>
+                                    <WorkoutSessionList sessions={sessions!} isError={isErrorSessions} isPending={isPendingSessions} error={errorSessions!}/>
                                 </div>
                             </ContentSection>
                         </div>

@@ -56,7 +56,16 @@
 
 .workout-sessions-table{
     max-height: 400px;
-    overflow-y: scroll;
+    overflow-y: scroll; 
+}
+
+.workout-sessions-table::-webkit-scrollbar {
+    display: none;
+}
+
+.workout-sessions-table {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 .workout-sessions-form{

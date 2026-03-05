@@ -24,8 +24,6 @@ function WorkoutExerciseList({workoutId, exercisesHandler, exerciseCreateFlagHan
                 const response = await axios_instance.get(`/api/workout/${workoutId}/exercises`).then(r=>r)
                 // const workoutExercises:Exercise[] = response.data.map((e:Exercise)=>{
                 //     return {...e, category_full:exerciseCategories[e.category]}
-
-                console.log(response)
                 const workoutExercises = response.data.reduce((acc:Record<number,Exercise>,exercise:Exercise) =>{
                     acc[exercise.id] = exercise
                     return acc
