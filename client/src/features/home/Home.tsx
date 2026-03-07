@@ -13,7 +13,7 @@ function Home(){
     const navigate = useNavigate()
     const columns: columnConfig<WorkoutSession>[]=[
         {key: 'workout_name', header:"Workout"},
-        {key: 'exercise_instances', header:'# of Exercises'},
+        {key: 'exercise_instances', header:'Exercises'},
         {key: 'start_time', header:"Start Time"},
         {key: 'end_time', header:"End Time"}
     ]
@@ -25,7 +25,6 @@ function Home(){
                 if(r.data.length){
                     const s = await Promise.all(r.data.slice(0,10).map(async(s:WorkoutSession)=>{
                         const w:Workout = await axios_instance.get(`api/workout/${s.workout}`).then(r=>r.data)
-                        console.log(s)
                         return {...s, workout_name:[w.name], exercise_instances:[s.exercise_logs.length],start_time:new Date(s.start_time).toLocaleString(),end_time:new Date(s.end_time).toLocaleString()}
                     }))
                     return s

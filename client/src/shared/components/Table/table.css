@@ -8,7 +8,7 @@ table.table-custom{
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     font-size: 0.95rem;
     line-height: 1.5;
-    table-layout: auto;
+    table-layout: fixed;
 }
 
 .table-custom thead{
@@ -42,11 +42,11 @@ table.table-custom{
 .table-custom td{
     padding: 12px 16px;
     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     vertical-align: middle;
     color: var(--font-color);
     font-size: 0.8rem;
-    word-wrap: break-word;
-    max-width: 0;
 }
 
 @media (max-width: 768px){

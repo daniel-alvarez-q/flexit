@@ -35,11 +35,20 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
                 console.log(response)
                 return response
             },
-            onSuccess:()=>{
+            onSuccess: async ()=>{
                 setExercise(set_exercise())
-                queryClient.invalidateQueries({
-                    queryKey:['workoutExercises']
-                })
+                await Promise.all([
+                    queryClient.invalidateQueries({
+                        queryKey:['workout', workoutId, 'exercises']
+                    }),
+                    queryClient.invalidateQueries({
+                        queryKey:['workout', workoutId, 'sessions']
+                    }),
+                    //To be deleted!! This dependency derives from loading exercises within the exerciseList component.
+                    queryClient.invalidateQueries({
+                        queryKey:['workoutExercises']
+                    })
+                ])
                 displayHandler(false)
             },
             onError: (error)=>{

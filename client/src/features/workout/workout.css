@@ -54,12 +54,14 @@
     display: none;
 }
 
-.workout-sessions-table{
+.workout-table{
     max-height: 400px;
-    overflow-y: scroll; 
+    overflow-y: scroll;
+    overflow-x: auto;
+    width: 100%;
 }
 
-.workout-sessions-table::-webkit-scrollbar {
+.workout-table::-webkit-scrollbar {
     display: none;
 }
 
