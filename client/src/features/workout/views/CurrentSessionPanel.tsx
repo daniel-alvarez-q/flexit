@@ -56,6 +56,7 @@ function CurrentSessionPanel({workoutId,exercises,session,logPopupDisplayHandler
     useEffect(() => {
         if(sessionMutation.isError){
             setSessionError(sessionMutation.error.message)
+            console.log(sessionError) //To be improved, the error message needs to be displayed correctly
         }
     }, [sessionMutation.isError, sessionMutation.error])
 
@@ -75,13 +76,11 @@ function CurrentSessionPanel({workoutId,exercises,session,logPopupDisplayHandler
                 const date = new Date(log.log_time).toLocaleString()
                 return({...log,exercise_name:exercise?.name, exercise_category:getCategoryLabel(exercise?.category), log_time:date})
             })
-            console.log(`CONVERTED LOGS: ${JSON.stringify(processedLogs)} | ${processedLogs.length}`)
             setLogs(processedLogs)
         } else {
             setLogs([])
         }
     }, [session, exercises])
-    
 
     const handleSessionAction = ()=>{
         if(session){
@@ -93,13 +92,10 @@ function CurrentSessionPanel({workoutId,exercises,session,logPopupDisplayHandler
 
 
     //Rendering
-    
-    
     return <>
         <ContentSection title="Current session">
             <div className="workout-table">
                 {!session? <EventMessage style="info" message="Start your workout session to begin logging exercises"></EventMessage>:
-                
                 !logs.length ?
                     <EventMessage style="warning" message="No exercises have been logged"></EventMessage> 
                     :<Table<Partial<ExerciseLog>> data={logs} columns={exercise_log_columns}/>

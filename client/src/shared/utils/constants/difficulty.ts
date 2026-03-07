@@ -1,5 +1,5 @@
 export const difficulty_map:Record<string,string> = {
-    'ext':'extrene',
+    'ext':'extreme',
     'hig':'high',
     'med':'medium',
     'low':'low'

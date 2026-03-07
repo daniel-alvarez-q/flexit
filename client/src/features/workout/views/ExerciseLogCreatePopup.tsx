@@ -6,20 +6,26 @@ import type { WorkoutSession, ExerciseLog } from "../workout.types";
 import Popup from "../../../shared/components/Popup";
 import EventMessage from "../../../shared/components/EventMessage";
 
-type SessionCreatePopupProps = {
+type exerciseLogCreatePopupProps = {
     workoutId:number;
     exercises:Exercise[];
     session:WorkoutSession;
     popupHandler:React.Dispatch<boolean>
 }
 
-function SessionCreatePopup({workoutId,exercises,session,popupHandler}:SessionCreatePopupProps){
+function ExerciseLogCreatePopup({workoutId,exercises,session,popupHandler}:exerciseLogCreatePopupProps){
 
     const [formError, setFormError] = useState<string|null>(null)
     const [newLog, setNewLog] = useState<Partial<ExerciseLog>>({})
 
     const {axios_instance} = useAuth()!
     const queryClient = useQueryClient()
+
+    //May not be needed! Check if it can be replaced by using "find" method on default array
+    const processed_exercises:Record<number,Exercise> = exercises.reduce((acc:Record<number,Exercise>,exercise:Exercise) =>{
+        acc[exercise.id] = exercise
+        return acc
+    },{})
 
     const create_exercise_log = async(log:Partial<ExerciseLog>) =>{
         setFormError(null)
@@ -64,7 +70,7 @@ function SessionCreatePopup({workoutId,exercises,session,popupHandler}:SessionCr
                     <div className="col-12 col-lg-3">
                         <label htmlFor="exercise">Exercise</label>
                         <select name="exercise" id="exercise" onChange={e => setNewLog({...newLog, exercise:Number(e.target.value)})}>
-                            {Object.values(exercises)?.map(exercise =>
+                            {Object.values(processed_exercises)?.map(exercise =>
                                 <option key={exercise.id} value={exercise.id}>{exercise.name}</option>
                             )}
                         </select>
@@ -124,7 +130,7 @@ function SessionCreatePopup({workoutId,exercises,session,popupHandler}:SessionCr
         )
     }
 
-    return <Popup title="Log exercise" onClose={()=> {popupHandler(false); setFormError(null);}}>{session_exercise_form(exercises)}</Popup>
+    return <Popup title="Log exercise" onClose={()=> {popupHandler(false); setFormError(null);}}>{session_exercise_form(processed_exercises)}</Popup>
 }
 
-export default SessionCreatePopup
+export default ExerciseLogCreatePopup

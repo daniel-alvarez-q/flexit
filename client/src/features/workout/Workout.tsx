@@ -1,23 +1,20 @@
-import { AxiosError } from "axios"
-import { useEffect, useState, type FormEvent } from "react"
+import { useEffect, useState } from "react"
 import { useAuth } from "../../context/AuthContext"
 import { useParams } from "react-router-dom"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import type { Workout } from "../workouts/workouts.types"
 import type { Exercise } from "../exercises/exercises.types"
 import type { WorkoutSession } from "./workout.types"
-import type { ExerciseLog } from "./workout.types"
 import ContentSection from "../../shared/components/ContentSection"
 import EventMessage from "../../shared/components/EventMessage"
-import Popup from "../../shared/components/Popup"
 import WorkoutExerciseList from "./views/WorkoutExerciseList"
 import ExercisePreview from "./views/ExercisePreview"
 import ExerciseCreatePopup from "./views/ExerciseCreatePopup"
+import ExerciseLogCreatePopup from "./views/ExerciseLogCreatePopup"
 import WorkoutSessionList from "./views/WorkoutSessionList"
 import CurrentSessionPanel from "./views/CurrentSessionPanel"
 import { getDifficultyLabel } from "../../shared/utils/constants/difficulty"
 import './workout.css'
-import SessionCreatePopup from "./views/SessionCreatePopup"
 
 function WorkoutDetails(){
     
@@ -199,7 +196,7 @@ function WorkoutDetails(){
             <ExercisePreview id={selectedExercise} displayFlagHandler={setSelectedExercise} errorHandler={setError}/>
         }
         {exercises && activeSession && creatingLog &&
-            <SessionCreatePopup workoutId={workoutId} session={activeSession} exercises={exercises} popupHandler={setCreatingLog}/>    
+            <ExerciseLogCreatePopup workoutId={workoutId} session={activeSession} exercises={tanstackExercises} popupHandler={setCreatingLog}/>    
         }
         </>
     )
