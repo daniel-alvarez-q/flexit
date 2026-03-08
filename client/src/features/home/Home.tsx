@@ -14,8 +14,8 @@ function Home(){
     const columns: columnConfig<WorkoutSession>[]=[
         {key: 'workout_name', header:"Workout"},
         {key: 'exercise_instances', header:'Exercises'},
-        {key: 'start_time', header:"Start Time"},
-        {key: 'end_time', header:"End Time"}
+        {key: 'duration', header:'Duration (mins)'},
+        {key: 'start_time', header:"Date"},
     ]
 
     const {isPending, isError ,error, data:sessions} = useQuery({
@@ -25,7 +25,20 @@ function Home(){
                 if(r.data.length){
                     const s = await Promise.all(r.data.slice(0,10).map(async(s:WorkoutSession)=>{
                         const w:Workout = await axios_instance.get(`api/workout/${s.workout}`).then(r=>r.data)
-                        return {...s, workout_name:[w.name], exercise_instances:[s.exercise_logs.length],start_time:new Date(s.start_time).toLocaleString(),end_time:new Date(s.end_time).toLocaleString()}
+                        const start_time = new Date(s.start_time)
+                        let end_time = null
+                        let duration = 0
+                        if(s.end_time){
+                            end_time = new Date(s.end_time)
+                            duration = Number(((end_time.getTime() - start_time.getTime())/60000).toFixed(2))  
+                        }
+                        return {...s, 
+                            workout_name:[w.name], 
+                            start_time: start_time.toLocaleString(), 
+                            end_time: end_time?.toLocaleString(), 
+                            exercise_instances:s.exercise_logs.length,
+                            duration:duration
+                        }
                     }))
                     return s
                 }else{

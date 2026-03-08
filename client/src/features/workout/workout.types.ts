@@ -7,6 +7,7 @@ export type WorkoutSession = {
     user:number;
     start_time:string;
     end_time:string;
+    duration?:number;
     workout_data?: object;
 }
 

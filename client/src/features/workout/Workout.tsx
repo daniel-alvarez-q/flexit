@@ -7,20 +7,19 @@ import type { Exercise } from "../exercises/exercises.types"
 import type { WorkoutSession } from "./workout.types"
 import ContentSection from "../../shared/components/ContentSection"
 import EventMessage from "../../shared/components/EventMessage"
-import WorkoutExerciseList from "./views/WorkoutExerciseList"
 import ExercisePreview from "./views/ExercisePreview"
 import ExerciseCreatePopup from "./views/ExerciseCreatePopup"
 import ExerciseLogCreatePopup from "./views/ExerciseLogCreatePopup"
 import WorkoutSessionList from "./views/WorkoutSessionList"
 import CurrentSessionPanel from "./views/CurrentSessionPanel"
 import { getDifficultyLabel } from "../../shared/utils/constants/difficulty"
+import { getCategoryLabel } from "../../shared/utils/constants/category"
+import ExerciseListPanel from "./views/ExerciseListPanel"
 import './workout.css'
+
 
 function WorkoutDetails(){
     
-    // Data-bounded states
-    const [exercises, setExercises] = useState<Record<number,Exercise>>({})
-
     // Component behavior states
     const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
     const [activeSession, setActiveSession] = useState<WorkoutSession|null>(null)
@@ -31,15 +30,21 @@ function WorkoutDetails(){
     const params = useParams()
 
     // Fetch queries initial data load
-    const fetch_workout = async () => {
+    const fetch_workout = async():Promise<Workout> => {
         return await axios_instance.get(`api/workout/${params.workoutId}`).then((r) => {
             const w:Workout = r.data
             return {...w, difficulty:getDifficultyLabel(w.difficulty)}
         })
     }
 
-    const fetch_exercises = async()=>{
-        return await axios_instance.get(`api/workout/${params.workoutId}/exercises`).then(r=>r.data)
+    const fetch_exercises = async():Promise<Exercise[]>=>{
+        return await axios_instance.get(`api/workout/${params.workoutId}/exercises`).then(r=>{
+            const data:Exercise[] = r.data
+            const e:Exercise[] = data.map(e=>{
+                return {...e, category_full:getCategoryLabel(e.category)}
+            })
+            return e
+        })
     }
 
     const fetch_sessions = async():Promise<WorkoutSession[]> => {
@@ -47,15 +52,18 @@ function WorkoutDetails(){
             const data = r.data
             if(data.length){
                 const sessions:WorkoutSession[] = data.map((session:WorkoutSession) =>{
-                    const start = new Date(session.start_time)
-                    let end = null
+                    const start_time = new Date(session.start_time)
+                    let end_time = null
+                    let duration = 0
                     if(session.end_time){
-                        end = new Date(session.end_time).toLocaleString()  
+                        end_time = new Date(session.end_time)
+                        duration = Number(((end_time.getTime() - start_time.getTime())/60000).toFixed(2))  
                     }
                     return {...session, 
-                        start_time: start.toLocaleString(), 
-                        end_time: end, 
-                        exercise_instances:session.exercise_logs.length
+                        start_time: start_time.toLocaleString(), 
+                        end_time: end_time?.toLocaleString(), 
+                        exercise_instances:session.exercise_logs.length,
+                        duration:duration
                     }
                 })
 
@@ -83,7 +91,7 @@ function WorkoutDetails(){
 
     const workoutId = Number(params.workoutId)
 
-    const {data:tanstackExercises} = useQuery({
+    const {isError:isErrorExercises, isPending:isPendingExercises, error:errorExercises, data:tanstackExercises} = useQuery({
         queryKey:['workout',workoutId,'exercises'],
         queryFn: fetch_exercises,
         enabled:!!workoutId
@@ -160,24 +168,21 @@ function WorkoutDetails(){
                             <CurrentSessionPanel session={activeSession!} exercises={tanstackExercises!} workoutId={Number(params.workoutId)} logPopupDisplayHandler={setCreatingLog}/>
                         </div>
                         <div className="col-12">
-                            <ContentSection title="Past sessions">
-                                <div className="workout-table">
-                                    <WorkoutSessionList sessions={sessions!} isError={isErrorSessions} isPending={isPendingSessions} error={errorSessions!}/>
-                                </div>
-                            </ContentSection>
+                            <WorkoutSessionList sessions={sessions!} isError={isErrorSessions} isPending={isPendingSessions} error={errorSessions!}/>
                         </div>
                     </div>
                 </div>
                 <div className="col-12 col-sm-7">
-                    {exercises &&
-                        <ContentSection title="Exercises">
-                            <WorkoutExerciseList 
-                                workoutId={workout.id} 
-                                exercisesHandler={setExercises}
-                                exerciseCreateFlagHandler={setCreatingExercise}
-                                exercisePreviewFlagHandler={setSelectedExercise}
-                            />
-                        </ContentSection>
+                    {tanstackExercises &&
+                        <ExerciseListPanel 
+                             
+                            exercises={tanstackExercises}
+                            isPending={isPendingExercises}
+                            isError={isErrorExercises}
+                            error={errorExercises}
+                            exerciseCreateFlagHandler={setCreatingExercise}
+                            exercisePreviewFlagHandler={setSelectedExercise}
+                        />
                     }
                 </div>
             </div>
@@ -192,10 +197,10 @@ function WorkoutDetails(){
         {workout && creatingExercise &&
             <ExerciseCreatePopup displayHandler={setCreatingExercise} errorHandler={setError} workoutId={workout.id}/>
         }
-        {exercises && selectedExercise &&
+        {tanstackExercises && selectedExercise &&
             <ExercisePreview id={selectedExercise} displayFlagHandler={setSelectedExercise} errorHandler={setError}/>
         }
-        {exercises && activeSession && creatingLog &&
+        {tanstackExercises && activeSession && creatingLog &&
             <ExerciseLogCreatePopup workoutId={workoutId} session={activeSession} exercises={tanstackExercises} popupHandler={setCreatingLog}/>    
         }
         </>
