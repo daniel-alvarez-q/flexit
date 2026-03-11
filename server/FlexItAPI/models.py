@@ -12,6 +12,15 @@ EXERCISE_CATEGORIES = [
     ('oth','other')
 ]
 
+MUSCLE_FOCUS_CATEGORY = [
+    ('bac', 'back'),
+    ('cht', 'chest'),
+    ('arm', 'arms'),
+    ('leg', 'legs'),
+    ('shd', 'shoulder'),
+    ('oth', 'other')
+]
+
 DIFICULTY_CATEGORIES = [
     ('ext', 'extreme'),
     ('hig', 'high'),
@@ -40,6 +49,7 @@ class Exercise(models.Model):
     name = models.CharField(max_length=100, blank=False)
     description = models.TextField(max_length=2000)
     difficulty = models.CharField(max_length=3, choices=DIFICULTY_CATEGORIES, default='med')
+    focus_area = models.CharField(max_length=3, choices=MUSCLE_FOCUS_CATEGORY, blank=True)
     series = models.IntegerField(default=0, blank=True)
     repetitions = models.IntegerField(default=0, blank=True)
     weight = models.FloatField(default=0, blank=True)
