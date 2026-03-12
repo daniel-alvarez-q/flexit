@@ -1,4 +1,4 @@
-import json
+import datetime
 from typing import Type
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -161,14 +161,15 @@ class UserMetrics(APIView):
     serializer_class = UserMetricsSerializer
 
     def get(self, request):
-        serializer = self.serializer_class()
+        user = request.user
+        serializer = self.serializer_class
         try:
-            workouts = Workout.objects.filter(user=request.user)
-            exercises = Exercise.objects.filter(user=request.user).annotate(
-                Count("exerciselog")
-            )
-            sessions = WorkoutSession.objects.filter(user=request.user)
-            logs = ExerciseLog.objects.filter(session__user=request.user)
+            # workouts = Workout.objects.filter(user=user)
+            # exercises = Exercise.objects.filter(user=user).annotate(
+            #     Count("exerciselog")
+            # )
+            sessions = WorkoutSession.objects.filter(user=user)
+            logs = ExerciseLog.objects.filter(session__user=user)
         except Exception as e:
             return Response(
                 {"Error fetching data: ": f"{e}"},
@@ -176,23 +177,21 @@ class UserMetrics(APIView):
             )
 
         payload: dict = {}
+        account_lifecycle:float = (datetime.datetime.now(datetime.timezone.utc) - user.date_joined).total_seconds() / 86400
         # Session metrics
-        payload["sessions_count"] = len(sessions)
-        sessions_dates = [s.start_time for s in sessions]
-        payload["delta_days_first_last_session"] = (
-            sessions_dates[-1] - sessions_dates[0]
-        ).total_seconds() / 86400
+        payload["total_sessions"] = len(sessions)
+        payload["sessions_per_day_ratio"] = len(sessions) / account_lifecycle
 
         # Exercise metrics
-        payload["logged_exercises_count"] = len(logs)
-        payload["logs_per_exercise"] = Counter((l.exercise.pk, l.exercise.name) for l in logs)
-        payload["logs_per_category"] = Counter(l.exercise.category for l in logs)
-        log_dates = [l.log_time for l in logs]
-        payload["delta_days_first_last_log"] = (
-            log_dates[-1] - log_dates[0]
-        ).total_seconds() / 86400
+        payload["total_exercise_logs"] = len(logs)
+        payload["logs_per_exercise"] = Counter(
+            (l.exercise.pk, l.exercise.name) for l in logs
+        )
+        payload["logs_per_difficulty"] = Counter(l.exercise.category for l in logs)
+        payload["logs_per_focus"] = Counter(l.exercise.focus_area for l in logs)
+        payload["logs_per_day_ratio"] = len(logs) / account_lifecycle
 
-        return Response(self.serializer_class(payload).data)
+        return Response(serializer(payload).data)
 
 
 ###### Workout views #######

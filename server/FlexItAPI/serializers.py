@@ -53,12 +53,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserMetricsSerializer(serializers.Serializer):
-    sessions_count = serializers.IntegerField(default=0)
-    delta_days_first_last_session = serializers.FloatField(default=0)
-    logged_exercises_count = serializers.IntegerField(default=0)
+    total_sessions = serializers.IntegerField(default=0)
+    sessions_per_day_ratio = serializers.FloatField(default=0)
+    total_exercise_logs = serializers.IntegerField(default=0)
+    logs_per_day_ratio = serializers.FloatField(default=0)
     logs_per_exercise = serializers.DictField(allow_empty=True)
-    logs_per_category = serializers.DictField(allow_empty=True)
-    delta_days_first_last_log = serializers.FloatField(default=0)
+    logs_per_difficulty = serializers.DictField(allow_empty=True)
+    logs_per_focus = serializers.DictField(allow_empty=True)
 
 
 class WorkoutSerializer(serializers.ModelSerializer):
@@ -134,6 +135,7 @@ class ExerciseSerializer(serializers.ModelSerializer):
         instance.name = validated_data.get("name", instance.name)
         instance.description = validated_data.get("description", instance.description)
         instance.category = validated_data.get("category", instance.category)
+        instance.focus_area = validated_data.get("focus_area", instance.focus_area)
         instance.save()
         instance.workouts.set(workouts_updated)
         return instance
