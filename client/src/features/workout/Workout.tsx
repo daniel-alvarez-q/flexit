@@ -14,6 +14,7 @@ import WorkoutSessionList from "./views/WorkoutSessionList"
 import CurrentSessionPanel from "./views/CurrentSessionPanel"
 import { getDifficultyLabel } from "../../shared/utils/constants/difficulty"
 import { getCategoryLabel } from "../../shared/utils/constants/category"
+import { getFocusLabel } from "../../shared/utils/constants/exercise_focus"
 import ExerciseListPanel from "./views/ExerciseListPanel"
 import './workout.css'
 
@@ -41,7 +42,10 @@ function WorkoutDetails(){
         return await axios_instance.get(`api/workout/${params.workoutId}/exercises`).then(r=>{
             const data:Exercise[] = r.data
             const e:Exercise[] = data.map(e=>{
-                return {...e, category_full:getCategoryLabel(e.category)}
+                return {...e, 
+                    category_full:getCategoryLabel(e.category),
+                    focus_area_full:getFocusLabel(e.focus_area || '')
+                }
             })
             return e
         })

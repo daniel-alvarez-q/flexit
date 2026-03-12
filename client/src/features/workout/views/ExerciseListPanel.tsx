@@ -30,7 +30,7 @@ function ExerciseListPanel({exercises, isError, isPending, error, exerciseCreate
                         key={exercise.id} 
                         id={exercise.id} 
                         title={exercise.name} 
-                        subtitle={exercise.category_full} 
+                        subtitle={exercise.focus_area_full ? exercise.category_full + ' | ' + exercise.focus_area_full : exercise.category_full} 
                         body={exercise.description} 
                         uri="/exercise" 
                         onClick={() => {exercisePreviewFlagHandler(exercise.id);}} />

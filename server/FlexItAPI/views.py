@@ -96,14 +96,17 @@ class LoginView(KnoxLoginView):
                 status=status.HTTP_401_UNAUTHORIZED,
             )
         request.user = user
-        response = super().post(request)
-        response.data["user"] = {
-            "username": user.username,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "email": user.email,
-            "is_staff": user.is_staff,
-        }
+        response: Response = super().post(request)
+        if response.data is None:
+            response.data = {}
+        if isinstance(response.data, dict):
+            response.data["user"] = {
+                "username": user.username,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email,
+                "is_staff": user.is_staff,
+            }
         return response
 
 
@@ -171,16 +174,34 @@ class UserMetrics(APIView):
             sessions = WorkoutSession.objects.filter(user=user)
             logs = ExerciseLog.objects.filter(session__user=user)
         except Exception as e:
-            return Response(
-                {"Error fetching data: ": f"{e}"},
-                status=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
-            )
+            return Response(serializer({}).data)
 
         payload: dict = {}
-        account_lifecycle:float = (datetime.datetime.now(datetime.timezone.utc) - user.date_joined).total_seconds() / 86400
+        account_lifecycle: float = (
+            datetime.datetime.now(datetime.timezone.utc) - user.date_joined
+        ).total_seconds() / 86400
+        seven_days_delta: datetime.datetime = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(days=7)
         # Session metrics
         payload["total_sessions"] = len(sessions)
         payload["sessions_per_day_ratio"] = len(sessions) / account_lifecycle
+
+        sessions_current_week: list[WorkoutSession] = [
+            s
+            for s in sessions
+            if s.start_time > seven_days_delta and s.end_time is not None
+        ]
+
+        payload["session_count_current_week"] = len([s for s in sessions_current_week])
+
+        payload["session_minutes_current_week"] = sum(
+            [
+                (s.end_time - s.start_time).total_seconds() / 60
+                for s in sessions_current_week
+                if s.end_time is not None
+            ]
+        )
 
         # Exercise metrics
         payload["total_exercise_logs"] = len(logs)
@@ -238,7 +259,7 @@ class WorkoutExercises(APIView):
     def get(self, request, id):
         try:
             workout_instance = Workout.objects.get(pk=id, user=request.user)
-            exercises = workout_instance.exercises.all()
+            exercises = Exercise.objects.filter(workouts=workout_instance)
             return Response(self.serializer_class(exercises, many=True).data)
         except Exception as e:
             return Response(
@@ -252,7 +273,9 @@ class WorkoutSessions(APIView):
     def get(self, request, id):
         try:
             workout_instance = Workout.objects.get(pk=id, user=request.user)
-            workout_sessions = workout_instance.workoutsession_set.all().order_by(
+            workout_sessions = WorkoutSession.objects.filter(
+                workout=workout_instance
+            ).order_by(
                 "-start_time"
             )  # Note it is set in descending order!
             return Response(self.serializer_class(workout_sessions, many=True).data)
@@ -308,7 +331,8 @@ class ExerciseExerciseLogs(APIView):
     def get(self, request, id):
         try:
             exercise = Exercise.objects.get(user=request.user, pk=id)
-            logs = exercise.exerciselog_set.all()
+            # logs = exercise.exerciselog_set.all()
+            logs = ExerciseLog.objects.filter(exercise=exercise)
             return Response(self.serializer_class(logs, many=True).data)
         except Exception as e:
             return Response({"Error": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)

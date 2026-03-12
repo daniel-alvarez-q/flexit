@@ -43,9 +43,7 @@ function WorkoutList(){
                     <Card uri='workouts' id={workout.id} title={workout.name} footer={workout.created_at} body={workout.description} />
                 </div>
             )
-        :<div className="col-12">
-            <EventMessage style='warning' message='No workouts have been created.'/>
-        </div>
+        :null
         }
         </>
     )

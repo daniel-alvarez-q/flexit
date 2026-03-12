@@ -5,6 +5,8 @@ export type Exercise ={
     difficulty:string;
     category:string;
     category_full?:string;
+    focus_area?:string;
+    focus_area_full?:string;
     series?:number;
     repetitions?:number;
     weight?:number;
