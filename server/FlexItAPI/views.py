@@ -183,6 +183,7 @@ class UserMetrics(APIView):
         seven_days_delta: datetime.datetime = datetime.datetime.now(
             datetime.timezone.utc
         ) - datetime.timedelta(days=7)
+
         # Session metrics
         payload["total_sessions"] = len(sessions)
         payload["sessions_per_day_ratio"] = len(sessions) / account_lifecycle
@@ -207,6 +208,13 @@ class UserMetrics(APIView):
         payload["total_exercise_logs"] = len(logs)
         payload["logs_per_exercise"] = Counter(
             (l.exercise.pk, l.exercise.name) for l in logs
+        )
+        payload['total_volume_current_week'] = sum(
+            [
+                l.series * l.repetitions * l.weight
+                for l in logs
+                if l.exercise.category == "str" and l.log_time > seven_days_delta
+            ]
         )
         payload["logs_per_difficulty"] = Counter(l.exercise.category for l in logs)
         payload["logs_per_focus"] = Counter(l.exercise.focus_area for l in logs)

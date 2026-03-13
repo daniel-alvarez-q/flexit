@@ -58,6 +58,7 @@ class UserMetricsSerializer(serializers.Serializer):
     session_count_current_week = serializers.IntegerField(default=0)
     session_minutes_current_week = serializers.FloatField(default=0)
     total_exercise_logs = serializers.IntegerField(default=0)
+    total_volume_current_week = serializers.FloatField(default=0)
     logs_per_day_ratio = serializers.FloatField(default=0)
     logs_per_exercise = serializers.DictField(allow_empty=True)
     logs_per_difficulty = serializers.DictField(allow_empty=True)

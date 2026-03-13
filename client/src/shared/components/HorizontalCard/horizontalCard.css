@@ -82,12 +82,13 @@ a.horizontal-card:hover{
 }
 
 .horizontal-card > .header > .subtitle{
-    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    font-size: clamp(0.70rem, 2vw, 0.95rem);
     font-weight: 400;
     height: 20px;
     overflow: hidden;
     opacity: 0.85;
     line-height: 1.2;
+    text-align: left;
 }
 
 .horizontal-card > .body{

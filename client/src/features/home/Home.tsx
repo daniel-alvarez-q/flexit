@@ -7,6 +7,7 @@ import type { columnConfig } from "../../shared/components/Table/table.types";
 import type { WorkoutSession } from "../workout/workout.types";
 import type { Workout } from "../workouts/workouts.types";
 import ContentSection from "../../shared/components/ContentSection";
+import './home.css'
 
 function Home(){
     const {user, axios_instance} = useAuth()!
@@ -39,13 +40,30 @@ function Home(){
                             exercise_instances:s.exercise_logs.length,
                             duration:duration
                         }
-                    }))
+                        })
+                )
                     return s
                 }else{
                     return []
                 }
             })
             return response
+        }
+    })
+
+    const {data:kpis} = useQuery({
+        queryKey:['userKpis'],
+        queryFn: async () => {
+            const data = await axios_instance.get('api/user/metrics').then(r=>r.data)
+            // console.log(`${JSON.stringify(data)}`)
+            const kpis = {
+                'Total completed sessions':data['total_sessions'],
+                'Completed sessions (7 days)':data['session_count_current_week'],
+                'Active minutes (7 days)':data['session_minutes_current_week'],
+                'Total completed exercises' : data['total_exercise_logs'],
+                'Total volume (7 days)': data['total_volume_current_week']
+            }
+            return kpis
         }
     })
 
@@ -78,10 +96,10 @@ function Home(){
     if(user && isPending){
         return (
         <>
-        <div className="row">
+        <div className="row mb-3">
             <div className="template-title">Welcome, {user}</div>
         </div>
-            <div className="row">
+            <div className="row mb-3">
                 <div className="col-12">
                     <EventMessage style="loading"></EventMessage>
                 </div>
@@ -93,10 +111,10 @@ function Home(){
     if(user && isError){
         return(
         <>
-        <div className="row">
+        <div className="row mb-3">
             <div className="template-title">Welcome, {user}</div>
         </div>
-        <div className="row">
+        <div className="row mb-3">
             <div className="col-12">
                 <EventMessage message={error.message} style='full-width-error'></EventMessage>
             </div>
@@ -108,11 +126,28 @@ function Home(){
     return(
         <>
             <>
-                <div className="row">
+                <div className="row mb-3">
                     <div className="template-title">Welcome, {user}</div>
                 </div>
-                <div className="row justify-content-center">
-                    <div className="col-12">
+                <div className="row mb-3 gy-3 justify-content-center">
+                    <div className="col-12 col-sm-4">
+                        {kpis &&
+                            <ContentSection title="Your stats">
+                                <div className="row g-2">
+                                    {Object.entries(kpis).map(((k,i) => 
+                                    <div className="col-6" key={i}>
+                                    <article className="kpi-card">
+                                        <div className="kpi-label">{k[0]}</div>
+                                        <div className="kpi-value">{k[1]}</div>
+                                        <div className="kpi-subtext">Placeholder!</div>
+                                    </article>
+                                    </div>
+                                    ))}
+                                </div>
+                            </ContentSection>
+                        }
+                    </div>
+                    <div className="col-12 col-sm-8">
                         {sessions!.length ?
                         <ContentSection title="Latest workout sessions">
                             <Table<WorkoutSession> data={sessions!} columns={columns}></Table>

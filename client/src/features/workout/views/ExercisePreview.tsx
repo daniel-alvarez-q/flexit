@@ -5,8 +5,10 @@ import type { ExerciseLog } from "../workout.types";
 import type { columnConfig } from "../../../shared/components/Table/table.types";
 import Popup from "../../../shared/components/Popup";
 import Table from "../../../shared/components/Table";
-import './styles/exercisePreview.css'
 import EventMessage from "../../../shared/components/EventMessage";
+import { getFocusLabel } from "../../../shared/utils/constants/exercise_focus";
+import './styles/exercisePreview.css'
+
 
 type ExercisePreviewParams = {
     id:number;
@@ -34,7 +36,10 @@ function ExercisePreview({id, errorHandler, displayFlagHandler}:ExercisePreviewP
         queryKey:['exercise', id],
         queryFn: async ():Promise<QueryResponse> =>{
             const [exerciseResponse, logResponse] = await Promise.all(
-                [( axios_instance.get(`api/exercise/${id}`).then(r=>r)),
+                [( axios_instance.get(`api/exercise/${id}`).then(r=>{
+                    let e:Exercise = r.data
+                    return {...e, focus_area_full: getFocusLabel(e.focus_area || '')}
+                })),
                 axios_instance.get(`api/exercise/${id}/logs`).then(r=>{
                     if(r.data.length){ 
                         return r.data.reverse().slice(0,5).map((log:ExerciseLog) => { 
@@ -47,7 +52,7 @@ function ExercisePreview({id, errorHandler, displayFlagHandler}:ExercisePreviewP
                 })]
             )
             return {
-                exercise: exerciseResponse.data,
+                exercise: exerciseResponse,
                 logs: logResponse
             }
         },
@@ -82,6 +87,9 @@ function ExercisePreview({id, errorHandler, displayFlagHandler}:ExercisePreviewP
                 </div>
                 {data.exercise.category === 'str' ?
                     <>
+                        <div className="preview-attribute">
+                            <strong>Focus area: </strong> {data.exercise.focus_area_full || 'N/A'} 
+                        </div>
                         <div className="preview-attribute">
                             <strong>Recommended series: </strong> {data.exercise.series || 'N/A'}
                         </div>
