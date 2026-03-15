@@ -63,6 +63,14 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
        mutate(exercise)
     }
 
+    const handleFormStatus = ()=>{
+        let status = true
+        if(exercise.name && exercise.description && exercise.category){
+            status = false
+        }
+        return status
+    }
+
     return(
         <Popup title="New exercise" onClose={()=> {displayHandler(false); errorHandler(null);}}>
             <form onSubmit={(e) => submitHander(e)}>
@@ -114,12 +122,12 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
                     <>
                         <div className="form-group">
                             <div className="form-row">
-                                <label htmlFor="category">Focus area</label>
+                                <label htmlFor="focus_area">Focus area</label>
                             </div>
                             <div className="form-row">
-                                <select name="category" id="category" value={exercise.category} onChange={(e) => setExercise({...exercise, focus_area:e.target.value})}>
+                                <select name="focus_area" id="focus_area" value={exercise.focus_area} onChange={(e) => setExercise({...exercise, focus_area:e.target.value})}>
                                     <option value="arm">Arms</option>
-                                    <option value="bac">Bac</option>
+                                    <option value="bac">Back</option>
                                     <option value="cht">Chest</option>
                                     <option value="leg">Legs</option>
                                     <option value="shd">Shoulder</option>
@@ -156,7 +164,7 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
                     <>
                     <div className="form-group">
                         <div className="form-row">
-                            <label htmlFor="distance">Distance (km)</label>
+                            <label htmlFor="distance">Recommended distance (km)</label>
                         </div>
                         <div className="form-row">
                             <input type="number" name="distance" id="distance" onChange={(e) => setExercise({...exercise, distance: Number(e.target.value)})}/>
@@ -164,7 +172,7 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
                     </div>      
                     <div className="form-group">
                         <div className="form-row">
-                            <label htmlFor="duratin">Duration (minutes)</label>
+                            <label htmlFor="duratin">Recommended duration (minutes)</label>
                         </div>
                         <div className="form-row">
                             <input type="number" name="duration" id="duration" onChange={(e) => setExercise({...exercise, duration: Number(e.target.value)})}/>
@@ -178,7 +186,7 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
                 }
                 <div className="form-group">
                     <div className="form-row">
-                        <button className="btn-md" disabled={isPending}>Create</button>
+                        <button className="btn-md" disabled={isPending || handleFormStatus()}>Create</button>
                     </div>
                 </div>
             </form>

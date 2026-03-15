@@ -52,7 +52,15 @@ function ExerciseLogCreatePopup({workoutId,exercises,session,popupHandler}:exerc
         }
     },[logMutation.isError, queryClient, workoutId])
 
-    //Log creation logic
+    //Handlers
+    const handleFormStatus = ()=>{
+        let state = true
+        if(newLog.exercise){
+            state = false
+        }
+        return state
+    }
+
     const handleExerciseLogSubmit = async(e:FormEvent) =>{
         e.preventDefault()
         const logPayload: Partial<ExerciseLog> = {
@@ -123,7 +131,7 @@ function ExerciseLogCreatePopup({workoutId,exercises,session,popupHandler}:exerc
                 }
                 <div className="row">
                     <div className="col-6 justify-content-center">
-                        <button className="btn-md">Log</button>
+                        <button className="btn-md" disabled={handleFormStatus()}>Log</button>
                     </div>
                 </div>
             </form>

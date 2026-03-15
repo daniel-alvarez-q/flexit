@@ -1,4 +1,4 @@
-:root {
+/* :root {
   --bg: #0b0b0c;
   --panel: rgba(28, 28, 30, 0.82);
   --panel-border: rgba(255, 255, 255, 0.08);
@@ -17,7 +17,7 @@ body {
     radial-gradient(circle at top center, rgba(255,255,255,0.05), transparent 35%),
     linear-gradient(180deg, #111114 0%, #0b0b0c 100%);
   color: var(--text);
-}
+} */
 
 .stats-section {
   max-width: 1100px;
@@ -41,7 +41,7 @@ body {
 
 .kpi-card {
   position: relative;
-  min-height: 190px;
+  min-height: 170px;
   padding: 22px 22px 20px;
   border-radius: var(--radius);
   background: linear-gradient(
@@ -72,17 +72,23 @@ body {
 } */
 
 .kpi-label {
-  font-size: 0.85rem;
+  font-size: 0.7rem;
+  line-height: 1.3;
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 18px;
+  /* Reserve exactly 2 lines so all cards stay proportionally identical */
+  height: 2.6em; /* 2 × line-height 1.3 */
   overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .kpi-value {
-  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-size: clamp(2rem, 5vw, 3rem);
   line-height: 0.95;
   font-weight: 700;
   letter-spacing: -0.05em;

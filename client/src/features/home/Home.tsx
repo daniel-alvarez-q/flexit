@@ -57,10 +57,10 @@ function Home(){
             const data = await axios_instance.get('api/user/metrics').then(r=>r.data)
             // console.log(`${JSON.stringify(data)}`)
             const kpis = {
-                'Total completed sessions':data['total_sessions'],
+                'Completed sessions':data['total_sessions'],
                 'Completed sessions (7 days)':data['session_count_current_week'],
                 'Active minutes (7 days)':data['session_minutes_current_week'],
-                'Total completed exercises' : data['total_exercise_logs'],
+                'Completed exercises' : data['total_exercise_logs'],
                 'Total volume (7 days)': data['total_volume_current_week']
             }
             return kpis
@@ -130,7 +130,7 @@ function Home(){
                     <div className="template-title">Welcome, {user}</div>
                 </div>
                 <div className="row mb-3 gy-3 justify-content-center">
-                    <div className="col-12 col-sm-4">
+                    <div className="col-12 col-lg-4">
                         {kpis &&
                             <ContentSection title="Your stats">
                                 <div className="row g-2">
@@ -147,7 +147,7 @@ function Home(){
                             </ContentSection>
                         }
                     </div>
-                    <div className="col-12 col-sm-8">
+                    <div className="col-12 col-lg-8">
                         {sessions!.length ?
                         <ContentSection title="Latest workout sessions">
                             <Table<WorkoutSession> data={sessions!} columns={columns}></Table>

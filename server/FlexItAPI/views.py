@@ -196,12 +196,15 @@ class UserMetrics(APIView):
 
         payload["session_count_current_week"] = len([s for s in sessions_current_week])
 
-        payload["session_minutes_current_week"] = sum(
-            [
-                (s.end_time - s.start_time).total_seconds() / 60
-                for s in sessions_current_week
-                if s.end_time is not None
-            ]
+        payload["session_minutes_current_week"] = round(
+            sum(
+                [
+                    (s.end_time - s.start_time).total_seconds() / 60
+                    for s in sessions_current_week
+                    if s.end_time is not None
+                ]
+            ),
+            2,
         )
 
         # Exercise metrics
@@ -209,12 +212,15 @@ class UserMetrics(APIView):
         payload["logs_per_exercise"] = Counter(
             (l.exercise.pk, l.exercise.name) for l in logs
         )
-        payload['total_volume_current_week'] = sum(
-            [
-                l.series * l.repetitions * l.weight
-                for l in logs
-                if l.exercise.category == "str" and l.log_time > seven_days_delta
-            ]
+        payload["total_volume_current_week"] = round(
+            sum(
+                [
+                    l.series * l.repetitions * l.weight
+                    for l in logs
+                    if l.exercise.category == "str" and l.log_time > seven_days_delta
+                ]
+            ),
+            2,
         )
         payload["logs_per_difficulty"] = Counter(l.exercise.category for l in logs)
         payload["logs_per_focus"] = Counter(l.exercise.focus_area for l in logs)
