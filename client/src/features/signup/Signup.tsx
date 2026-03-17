@@ -52,7 +52,7 @@ function Signup(){
     // Visual elements
     const signup_form = () => {
         return(
-            <div className="col-12 col-sm-6">
+            <div className="col-12 col-sm-5">
                 <form onSubmit={(e) => handleSubmit(e)}>
                     <div className="row g-3">
                         <div className="col-12">

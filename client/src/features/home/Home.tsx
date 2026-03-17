@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import EventMessage from "../../shared/components/EventMessage";
-import Table from "../../shared/components/Table";
 import type { columnConfig } from "../../shared/components/Table/table.types";
 import type { WorkoutSession } from "../workout/workout.types";
 import type { Workout } from "../workouts/workouts.types";
 import ContentSection from "../../shared/components/ContentSection";
+import EventMessage from "../../shared/components/EventMessage";
+import Table from "../../shared/components/Table";
+import KpiCard from "../../shared/components/KpiCard";
 import './home.css'
 
 function Home(){
@@ -57,11 +58,12 @@ function Home(){
             const data = await axios_instance.get('api/user/metrics').then(r=>r.data)
             // console.log(`${JSON.stringify(data)}`)
             const kpis = {
-                'Completed sessions':data['total_sessions'],
-                'Completed sessions (7 days)':data['session_count_current_week'],
-                'Active minutes (7 days)':data['session_minutes_current_week'],
-                'Completed exercises' : data['total_exercise_logs'],
-                'Total volume (7 days)': data['total_volume_current_week']
+                'Completed sessions':[data['total_sessions'], 0],
+                'Completed exercises' : [data['total_exercise_logs'],0],
+                'Completed sessions (7 days)':[data['session_count_current_week'], data['session_count_last_week']],
+                'Completed exercises (7 days)': [data['logs_current_week'], data['logs_last_week']],
+                'Active minutes (7 days)':[data['session_minutes_current_week'], data['session_minutes_last_week']],
+                'Total volume (7 days)': [data['total_volume_current_week'], data['total_volume_last_week']]
             }
             return kpis
         }
@@ -126,7 +128,7 @@ function Home(){
     return(
         <>
             <>
-                <div className="row mb-3">
+                <div className="row">
                     <div className="template-title">Welcome, {user}</div>
                 </div>
                 <div className="row mb-3 gy-3 justify-content-center">
@@ -136,11 +138,7 @@ function Home(){
                                 <div className="row g-2">
                                     {Object.entries(kpis).map(((k,i) => 
                                     <div className="col-6" key={i}>
-                                    <article className="kpi-card">
-                                        <div className="kpi-label">{k[0]}</div>
-                                        <div className="kpi-value">{k[1]}</div>
-                                        <div className="kpi-subtext">Placeholder!</div>
-                                    </article>
+                                        <KpiCard label={k[0]} value={k[1][0]} delta_reference={k[1][1]}/>
                                     </div>
                                     ))}
                                 </div>

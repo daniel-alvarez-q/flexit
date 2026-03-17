@@ -180,22 +180,31 @@ class UserMetrics(APIView):
         account_lifecycle: float = (
             datetime.datetime.now(datetime.timezone.utc) - user.date_joined
         ).total_seconds() / 86400
-        seven_days_delta: datetime.datetime = datetime.datetime.now(
-            datetime.timezone.utc
-        ) - datetime.timedelta(days=7)
+        now: datetime.datetime = datetime.datetime.now(datetime.timezone.utc)
+        seven_days_delta: datetime.datetime = now - datetime.timedelta(days=7)
+        fourteen_days_delta: datetime.datetime = seven_days_delta - datetime.timedelta(
+            days=7
+        )
 
         # Session metrics
         payload["total_sessions"] = len(sessions)
-        payload["sessions_per_day_ratio"] = len(sessions) / account_lifecycle
+        payload["sessions_per_week_ratio"] = len(sessions) / (account_lifecycle / 7)
 
         sessions_current_week: list[WorkoutSession] = [
             s
             for s in sessions
-            if s.start_time > seven_days_delta and s.end_time is not None
+            if s.start_time >= seven_days_delta and s.end_time is not None
+        ]
+
+        sessions_last_week: list[WorkoutSession] = [
+            s
+            for s in sessions
+            if fourteen_days_delta <= s.start_time < seven_days_delta
+            and s.end_time is not None
         ]
 
         payload["session_count_current_week"] = len([s for s in sessions_current_week])
-
+        payload["session_count_last_week"] = len([s for s in sessions_last_week])
         payload["session_minutes_current_week"] = round(
             sum(
                 [
@@ -207,24 +216,56 @@ class UserMetrics(APIView):
             2,
         )
 
+        payload["session_minutes_last_week"] = round(
+            sum(
+                [
+                    (s.end_time - s.start_time).total_seconds() / 60
+                    for s in sessions_last_week
+                    if s.end_time is not None
+                ]
+            ),
+            2,
+        )
+
         # Exercise metrics
         payload["total_exercise_logs"] = len(logs)
         payload["logs_per_exercise"] = Counter(
             (l.exercise.pk, l.exercise.name) for l in logs
         )
+
+        logs_current_week:list[ExerciseLog] = [
+            l for l in logs if l.log_time <= seven_days_delta
+        ]
+        logs_last_week:list[ExerciseLog] = [
+            l for l in logs if fourteen_days_delta <= l.log_time < seven_days_delta
+        ]
+        
+        payload["logs_current_week"] = len(logs_current_week)
+        payload["logs_last_week"] = len(logs_last_week)
         payload["total_volume_current_week"] = round(
             sum(
                 [
                     l.series * l.repetitions * l.weight
-                    for l in logs
-                    if l.exercise.category == "str" and l.log_time > seven_days_delta
+                    for l in logs_current_week
+                    if l.exercise.category == "str"
+                ]
+            ),
+            2,
+        )
+
+        payload["total_volume_last_week"] = round(
+            sum(
+                [
+                    l.series * l.repetitions * l.weight
+                    for l in logs_last_week
+                    if l.exercise.category == "str"
                 ]
             ),
             2,
         )
         payload["logs_per_difficulty"] = Counter(l.exercise.category for l in logs)
         payload["logs_per_focus"] = Counter(l.exercise.focus_area for l in logs)
-        payload["logs_per_day_ratio"] = len(logs) / account_lifecycle
+        payload["logs_per_week_ratio"] = len(logs) / (account_lifecycle / 7)
 
         return Response(serializer(payload).data)
 

@@ -268,7 +268,7 @@ textarea.input-md {
    Typography & Text Utilities
    ============================================ */
 .template-title {
-  font-size: 4rem;
+  font-size: clamp(2.4rem, 5vw, 3rem);
   font-weight: 700;
   padding-top: 0;
   text-align: center;
@@ -325,10 +325,10 @@ button.btn-alert:hover:not(:disabled) {
     gap: 1rem;
   }
 
-  .template-title {
+  /* .template-title {
     font-size: 3rem;
     text-align: center;
-  }
+  } */
 }
 
 /* ============================================
