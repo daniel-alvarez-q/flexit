@@ -233,13 +233,13 @@ class UserMetrics(APIView):
             (l.exercise.pk, l.exercise.name) for l in logs
         )
 
-        logs_current_week:list[ExerciseLog] = [
-            l for l in logs if l.log_time <= seven_days_delta
+        logs_current_week: list[ExerciseLog] = [
+            l for l in logs if l.log_time >= seven_days_delta
         ]
-        logs_last_week:list[ExerciseLog] = [
+        logs_last_week: list[ExerciseLog] = [
             l for l in logs if fourteen_days_delta <= l.log_time < seven_days_delta
         ]
-        
+
         payload["logs_current_week"] = len(logs_current_week)
         payload["logs_last_week"] = len(logs_last_week)
         payload["total_volume_current_week"] = round(
