@@ -161,7 +161,7 @@ function WorkoutDetails(){
                 <div className="template-title">{`${workout.name}`}</div>
             </div>
             <div className="row g-3">
-                <div className="col-12 col-sm-5">
+                <div className="col-12 col-lg-5">
                     <div className="row g-3">
                         <div className="col-12">
                             <ContentSection title="Workout details">
@@ -176,7 +176,7 @@ function WorkoutDetails(){
                         </div>
                     </div>
                 </div>
-                <div className="col-12 col-sm-7">
+                <div className="col-12 col-lg-7">
                     {tanstackExercises &&
                         <ExerciseListPanel 
                              

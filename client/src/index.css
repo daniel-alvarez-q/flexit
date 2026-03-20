@@ -5,6 +5,7 @@
   --background-all: #1a1a1a;
   --background-section: #000000;
   --background-card: #292929;
+  --black:#000000;
 
   --navbar-color: #000000;
   
@@ -101,13 +102,12 @@ button {
 button:hover:not(:disabled) {
   background-color: var(--secondary-color);
   color: var(--font-color);
-  border-color: var(--warning-color);
 }
 
-button:focus,
+/* button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
+} */
 
 button:disabled {
   background-color: var(--background-section);
