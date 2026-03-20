@@ -185,8 +185,10 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
                     <EventMessage message={error.message} style="error compact"></EventMessage>
                 }
                 <div className="form-group">
-                    <div className="form-row">
-                        <button className="btn-md" disabled={isPending || handleFormStatus()}>Create</button>
+                    <div className="row justify-content-center">
+                        <div className="col-8">
+                            <button className="btn-full" disabled={isPending || handleFormStatus()}>Create</button>
+                        </div>
                     </div>
                 </div>
             </form>

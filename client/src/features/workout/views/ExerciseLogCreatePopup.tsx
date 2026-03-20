@@ -129,9 +129,9 @@ function ExerciseLogCreatePopup({workoutId,exercises,session,popupHandler}:exerc
                     </div>
                 </div>
                 }
-                <div className="row">
-                    <div className="col-6 justify-content-center">
-                        <button className="btn-md" disabled={handleFormStatus()}>Log</button>
+                <div className="row justify-content-center">
+                    <div className="col-6">
+                        <button className="btn-full" disabled={handleFormStatus()}>Log</button>
                     </div>
                 </div>
             </form>
