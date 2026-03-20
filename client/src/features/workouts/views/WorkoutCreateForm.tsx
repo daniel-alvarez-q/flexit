@@ -62,27 +62,17 @@ function WorkoutCreateForm ({error, errorHandler, displayFlagHandler}:WorkoutCre
 
     return <Popup title="New workout" onClose={()=> {displayFlagHandler(false); errorHandler(null)}}>   
                 <form onSubmit={handleWorkoutSubmit}>
-                    <div className="form-group">
-                        <div className="form-row">
+                    <div className="row g-3 justify-content-center">
+                        <div className="col-12">
                             <label htmlFor="name">Workout title</label>
-                        </div>
-                        <div className="form-row">
                             <input type="text" name="name" id="name" onChange={(e) => setNewWorkout({...newWorkout, name:e.target.value})}/>
                         </div>
-                    </div>
-                    <div className="form-group">
-                        <div className="form-row">
+                        <div className="col-12">
                             <label htmlFor="">Workout description</label>
-                        </div>
-                        <div className="form-row">
                             <textarea  name="description" id="description" onChange={(e) => setNewWorkout({...newWorkout, description:e.target.value})}></textarea>
                         </div>
-                    </div>
-                    <div className="form-group">
-                        <div className="form-row">
+                        <div className="col-12">
                             <label htmlFor="difficulty">Difficulty</label>
-                        </div>
-                        <div className="form-row">
                             <select name="difficulty" id="difficulty" onChange={(e) => setNewWorkout({...newWorkout, difficulty:e.target.value})}>
                                 <option value="ext">Extreme</option>
                                 <option value="hig">High</option>
@@ -90,24 +80,16 @@ function WorkoutCreateForm ({error, errorHandler, displayFlagHandler}:WorkoutCre
                                 <option value="low">Low</option>
                             </select>
                         </div>
-                    </div>
-                    <div className="form-group">
-                        <div className="form-row">
+                        <div className="col-12">
                             <label htmlFor="source_url">Source url</label>
-                        </div>
-                        <div className="form-row">
                             <input type="url" name="source_url" id="source_url" onChange={(e) => setNewWorkout({...newWorkout, source_url:e.target.value})}/>
                         </div>
-                    </div>
-                    { error &&
-                        <div className="form-group">
-                            <div className="form-row">
-                                <EventMessage message={error} style="error compact"></EventMessage>
-                            </div>
+                        { error &&
+                        <div className="col-12">
+                            <EventMessage message={error} style="error compact"></EventMessage>
                         </div>
-                    }
-                    <div className="form-group">
-                        <div className="form-row">
+                        }
+                        <div className="col-8">
                             <button className="btn-full" disabled={handleFormState()}>Create</button>
                         </div>
                     </div>

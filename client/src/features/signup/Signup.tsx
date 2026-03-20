@@ -54,7 +54,7 @@ function Signup(){
         return(
             <div className="col-12 col-sm-5">
                 <form onSubmit={(e) => handleSubmit(e)}>
-                    <div className="row g-3">
+                    <div className="row g-3 justify-content-center">
                         <div className="col-12">
                             <label htmlFor="username">Username</label>
                             <input type="text" name="username" id="username" onChange={(e) => setUserForm({...userForm, 'username':e.target.value})}/>
@@ -80,7 +80,7 @@ function Signup(){
                                 <EventMessage message={error} style="error compact"></EventMessage>
                             </div>
                         }
-                        <div className="col-12">
+                        <div className="col-8">
                             <button className="btn-full" disabled={handleFormState()}>Submit</button>
                         </div>
                     </div>

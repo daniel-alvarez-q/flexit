@@ -101,15 +101,15 @@ function CurrentSessionPanel({workoutId,exercises,session,logPopupDisplayHandler
                     :<Table<Partial<ExerciseLog>> data={logs} columns={exercise_log_columns}/>
                 }
                 <br />
-                <div className="row g-3 w-100 mx-0">
+                <div className="row g-2 w-100 mx-0 justify-content-center">
                     {session &&
                         <div className="col-6">
-                            <button className="btn-md btn-full" onClick={()=> logPopupDisplayHandler(true)}>Log exercise</button>
+                            <button className="btn-full" onClick={()=> logPopupDisplayHandler(true)}>Log exercise</button>
                         </div>
                     }
                     {exercises &&
-                    <div className={session ? "col-6" : "col-12"}>
-                        <button className={session ? "btn-md btn-full btn-alert" : "btn-md btn-full"} disabled={Object.keys(exercises).length === 0} onClick={()=> handleSessionAction()}>{!session ? 'Start a new session' : 'End session'}</button>
+                    <div className={session ? "col-6" : "col-8"}>
+                        <button className={session ? "btn-full btn-alert" : "btn-full"} disabled={Object.keys(exercises).length === 0} onClick={()=> handleSessionAction()}>{!session ? 'Start a new session' : 'End session'}</button>
                     </div>
                     }
                 </div>
