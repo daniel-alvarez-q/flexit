@@ -8,6 +8,7 @@ import Signup from "../features/signup";
 import Exercises from "../features/exercises";
 import Logout from "../features/logout";
 import WorkoutDetails from "../features/workout";
+import ExerciseDetail from "../features/exercise";
 
 export const routes: RouteObject[] = [
     {
@@ -20,6 +21,7 @@ export const routes: RouteObject[] = [
             {'path': '/workouts', element: <Workouts />},
             {'path': '/workouts/:workoutId', element: <WorkoutDetails/>},
             {'path':'/exercises', element: <Exercises />},
+            {'path': '/exercises/:exerciseId', element: <ExerciseDetail/>},
             {'path': '*', element: <NotFound />}
         ],
     },

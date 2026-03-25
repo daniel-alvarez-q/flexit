@@ -9,22 +9,22 @@ function Card({id, title, subtitle, body, footer, style='default', uri=null, onC
                 <>
                     <div className="card-header">
                         <div className="card-title">
-                            <span className="card-title-text">
+                            <div className="card-title-text">
                                 {uri ? (<NavLink to={`/${uri}/${id}`}>{title}</NavLink>): title}
-                            </span>
+                            </div>
                         </div>
                         {subtitle && (
                             <div className="card-subtitle">
-                                <span className="card-subtitle-text">{subtitle}</span>
+                                <div className="card-subtitle-text">{subtitle}</div>
                             </div>
                         )}
                     </div>
                     <div className="card-body">
-                        <span className="card-body-content">{body}</span>
+                        <div className="card-body-content">{body}</div>
                     </div>
                     {footer && (
                         <div className="card-footer">
-                            <span className="card-footer-text">{footer}</span>
+                            <div className="card-footer-text">{footer}</div>
                         </div>
                     )}
                 </>:

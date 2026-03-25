@@ -33,7 +33,6 @@
 
 .main-card.exercise a{
     color: var(--font-color);
-    background-color: var(--main-color);
 }
 
 .main-card.workout{
@@ -43,7 +42,6 @@
 
 .main-card.workout a{
     color:var(--background-all);
-    background-color: var(--tertiary-color);
 }
 
 /*  =============================================
@@ -139,12 +137,17 @@
 
 .card-header > .card-title {
     display: flex;
-    font-size: clamp(1.1rem, 3vw, 1.3rem);
-    font-weight: 700;
+    font-size: 1.3rem;
+    font-weight: 800;
+    text-transform: uppercase;
     justify-content: center;
     align-items: center;
-    margin-bottom: 4px;
-    line-height: 1.3;
+    line-height: 1;
+    height: 2em;
+}
+
+.card-title-text > a{
+    font-weight: 800;
 }
 
 .card-title-text {
@@ -191,37 +194,62 @@
 
 .main-card > .card-body {
     flex: 1;
-    font-size: clamp(0.95rem, 2.5vw, 1.05rem);
-    line-height: 1.6;
     padding: 16px 20px;
-    overflow-y: auto;
+    overflow-y: hidden;
     display: flex;
     align-items: flex-start;
-    justify-content: center;
-    -webkit-overflow-scrolling: touch;
+    justify-content: left;
 }
 
 .card-body-content {
+    font-size: 1.1rem;
+    line-height: 1.6;
     display: block;
     width: 100%;
     text-align: center;
+    overflow-y: scroll;
+    height: 100%;
+    -webkit-overflow-scrolling: touch;
 }
 
-.card-body::-webkit-scrollbar {
+.card-body-content::-webkit-scrollbar {
     width: 4px;
 }
 
-.card-body::-webkit-scrollbar-track {
+.card-body-content::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.card-body::-webkit-scrollbar-thumb {
+.card-body-content::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
 }
 
-.card-body::-webkit-scrollbar-thumb:hover {
+.card-body-content::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
+}
+
+.main-card > .card-footer {
+    display: flex;
+    min-height: 40px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.05);
+    opacity: 0.9;
+    overflow: hidden;
+}
+
+.card-footer-text {
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    min-width: 0;
 }
 
 /* Mobile - hide scrollbar for cleaner look */
@@ -253,27 +281,6 @@
     align-items: center;
     font-size: 1.3rem;
     overflow: hidden;
-}
-
-.main-card > .card-footer {
-    font-size: clamp(0.75rem, 2vw, 0.85rem);
-    display: flex;
-    min-height: 40px;
-    justify-content: center;
-    align-items: center;
-    padding: 10px 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.05);
-    opacity: 0.9;
-    overflow: hidden;
-}
-
-.card-footer-text {
-    display: block;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    min-width: 0;
 }
 
 @media (max-width: 768px) {

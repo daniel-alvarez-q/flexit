@@ -40,7 +40,13 @@ function WorkoutList(){
         {workouts.length ?
             workouts.map(workout =>
                 <div key={workout.id} className="col-12 col-lg-3 custom-justify-content-center">
-                    <Card uri='workouts' id={workout.id} title={workout.name} footer={workout.created_at} body={workout.description} />
+                    <Card 
+                    style="workout"
+                    uri="workouts" 
+                    id={workout.id} 
+                    title={workout.name} 
+                    footer={workout.created_at} 
+                    body={workout.description} />
                 </div>
             )
         :null
