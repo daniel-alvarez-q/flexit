@@ -2,13 +2,13 @@ import datetime
 from typing import Type
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from django.db.models import Model, Count
+from django.db.models import Model
 from collections import Counter
 from rest_framework import permissions, serializers, status
+from rest_framework.utils.serializer_helpers import ReturnList, ReturnDict
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
-from rest_framework.decorators import permission_classes as permission_decorator
 from knox.views import LoginView as KnoxLoginView
 from FlexItAPI.serializers import (
     LoginSerializer,
@@ -360,8 +360,40 @@ class ExerciseListCreate(APIView):
 class ExerciseDetails(APIView):
     serializer_class = ExerciseSerializer
 
-    def get(self, request, id):
-        return query_search(Exercise, self.serializer_class, id, user=request.user)
+    def get(self, request: Request, id):
+        include: list | None = (
+            request.query_params.get("include", "").lower().split(",")
+        )
+        user: User | None = request.user
+        exercise: Exercise = Exercise()
+        exercise_serialized: ReturnDict | ReturnList | None = None
+        try:
+            if user:
+                if not user.is_superuser:
+                    exercise = Exercise.objects.get(pk=id, user=user)
+                else:
+                    exercise = Exercise.objects.get(pk=id)
+        except Exercise.DoesNotExist as e:
+            return Response(f"{e}", status=status.HTTP_404_NOT_FOUND)
+
+        if include:
+            context: dict = {}
+            logs: list[ExerciseLog] = list(
+                ExerciseLog.objects.filter(exercise=exercise)
+            )
+
+            if "logs" in include:
+                logs_serialized: ReturnList | ReturnDict = ExerciseLogSerializer(
+                    logs, many=True
+                ).data
+                context["logs"] = logs_serialized
+
+            exercise_serialized = self.serializer_class(exercise, context=context).data
+
+        else:
+            exercise_serialized = self.serializer_class(exercise).data
+
+        return Response(exercise_serialized)
 
     def patch(self, request, id):
         try:

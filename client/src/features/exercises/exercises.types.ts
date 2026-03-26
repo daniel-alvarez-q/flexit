@@ -1,3 +1,5 @@
+import type { ExerciseLog } from "../workout/workout.types";
+
 export type Exercise ={
     id:number;
     name:string;
@@ -14,6 +16,7 @@ export type Exercise ={
     distance?:number;
     user:number;
     workouts:number[];
+    logs:ExerciseLog[];
     created_at:string;
     updated_at:string
 }

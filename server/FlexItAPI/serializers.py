@@ -107,6 +107,9 @@ class ExerciseSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
+    logs = serializers.SerializerMethodField()
+    metrics = serializers.SerializerMethodField()
+
     class Meta:
         model = Exercise
         fields = [
@@ -123,6 +126,8 @@ class ExerciseSerializer(serializers.ModelSerializer):
             "distance",
             "category",
             "user",
+            "metrics",
+            "logs",
             "created_at",
             "updated_at",
         ]
@@ -147,6 +152,18 @@ class ExerciseSerializer(serializers.ModelSerializer):
         instance.save()
         instance.workouts.set(workouts_updated)
         return instance
+
+    def get_logs(self, obj):
+        logs: list | None = self.context.get("logs")
+        if isinstance(logs, list):
+            return logs
+        return None
+
+    def get_metrics(self, obj):
+        metrics: dict | None = self.context.get("metrics")
+        if isinstance(metrics, dict):
+            return metrics
+        return None
 
 
 class ExerciseLogSerializer(serializers.ModelSerializer):
