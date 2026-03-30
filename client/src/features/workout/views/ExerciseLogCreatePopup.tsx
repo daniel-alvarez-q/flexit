@@ -75,7 +75,7 @@ function ExerciseLogCreatePopup({workoutId,exercises,session,popupHandler}:exerc
         return(
             <form action="" className="workout-sessions-form" onSubmit={e=> handleExerciseLogSubmit(e)}>
                 <div className="row g-2">
-                    <div className="col-12 col-lg-3">
+                    <div className="col-12 col-lg-6">
                         <label htmlFor="exercise">Exercise</label>
                         <select name="exercise" id="exercise" onChange={e => setNewLog({...newLog, exercise:Number(e.target.value)})}>
                             {Object.values(processed_exercises)?.map(exercise =>
@@ -88,33 +88,33 @@ function ExerciseLogCreatePopup({workoutId,exercises,session,popupHandler}:exerc
                     <>
                     {exercises[newLog.exercise].category === 'str' ?
                         <>
-                            <div className="col-6 col-lg-3">
-                                <label htmlFor="series">Series</label>
+                            <div className="col-6">
+                                <label htmlFor="series">Series (units)</label>
                                 <input type="number" id="series" name="series" min="0" onChange={e => setNewLog({...newLog, 'series':Number(e.target.value)})}/>
                             </div>
-                            <div className="col-6 col-lg-3">
-                                <label htmlFor="reps">Repetitions</label>
+                            <div className="col-6">
+                                <label htmlFor="reps">Repetitions (units)</label>
                                 <input type="number" name="reps" id="reps" min="0" onChange={e => setNewLog({...newLog, 'repetitions':Number(e.target.value)})}/>
                             </div>
-                            <div className="col-6 col-lg-3">
-                                <label htmlFor="weight">Weight</label>
+                            <div className="col-6">
+                                <label htmlFor="weight">Weight (kg)</label>
                                 <input type="number" name="weight" id="weight" min="0" step="0.1" onChange={e => setNewLog({...newLog, 'weight':Number(e.target.value)})}/>
                             </div>
                         </>
                         : 
                         exercises[newLog.exercise].category === 'car' ?
                         <>
-                            <div className="col-6 col-lg-3">
+                            <div className="col-6">
                                 <label htmlFor="distance">Distance (km)</label>
                                 <input type="number" id="distance" name="distance" onChange={e => setNewLog({...newLog, 'distance':Number(e.target.value)})}/>
                             </div>
-                            <div className="col-6 col-lg-3">
+                            <div className="col-6">
                                 <label htmlFor="duration">Duration (minutes)</label>
                                 <input type="number" id="duration" name="duration" onChange={e => setNewLog({...newLog, 'duration':Number(e.target.value)})}/>
                             </div>                            
                         </>
                         : null}
-                        <div className="col-12 col-lg-6">
+                        <div className="col-12">
                             <label htmlFor="notes">Notes</label>
                             <textarea id="notes" name="notes" onChange={e => setNewLog({...newLog, 'notes':e.target.value})}></textarea>
                         </div>  

@@ -108,7 +108,8 @@ class ExerciseSerializer(serializers.ModelSerializer):
     )
 
     logs = serializers.SerializerMethodField()
-    metrics = serializers.SerializerMethodField()
+    kpis = serializers.SerializerMethodField()
+    workouts_full = serializers.SerializerMethodField()
 
     class Meta:
         model = Exercise
@@ -126,8 +127,9 @@ class ExerciseSerializer(serializers.ModelSerializer):
             "distance",
             "category",
             "user",
-            "metrics",
+            "workouts_full",
             "logs",
+            "kpis",
             "created_at",
             "updated_at",
         ]
@@ -139,7 +141,7 @@ class ExerciseSerializer(serializers.ModelSerializer):
             instance.workouts.set(workout_instances)
         return instance
 
-    def update(self, instance, validated_data):
+    def update(self, instance: Exercise, validated_data):
         workout_instances = validated_data.pop("workouts", [])
         workouts_updated = Workout.objects.filter(
             pk__in=[x.id for x in instance.workouts.all()]
@@ -153,16 +155,22 @@ class ExerciseSerializer(serializers.ModelSerializer):
         instance.workouts.set(workouts_updated)
         return instance
 
-    def get_logs(self, obj):
+    def get_logs(self, obj: Exercise):
         logs: list | None = self.context.get("logs")
         if isinstance(logs, list):
             return logs
         return None
 
-    def get_metrics(self, obj):
-        metrics: dict | None = self.context.get("metrics")
-        if isinstance(metrics, dict):
-            return metrics
+    def get_workouts_full(self, obj: Exercise):
+        workouts_full: bool | None = self.context.get("workouts_full")
+        if workouts_full:
+            return WorkoutSerializer(obj.workouts.all(), many=True).data
+        return None
+
+    def get_kpis(self, obj: Exercise):
+        kpis: dict | None = self.context.get("kpis")
+        if isinstance(kpis, dict):
+            return kpis
         return None
 
 

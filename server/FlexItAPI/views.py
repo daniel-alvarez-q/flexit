@@ -377,6 +377,14 @@ class ExerciseDetails(APIView):
             return Response(f"{e}", status=status.HTTP_404_NOT_FOUND)
 
         if include:
+            current_date: datetime.datetime = datetime.datetime.now(
+                datetime.timezone.utc
+            )
+            cutout_month: datetime.datetime = (
+                current_date - datetime.timedelta(days=(current_date.day - 1))
+            ).replace(hour=0, minute=0, second=0, microsecond=1)
+            print(cutout_month)
+
             context: dict = {}
             logs: list[ExerciseLog] = list(
                 ExerciseLog.objects.filter(exercise=exercise)
@@ -387,6 +395,18 @@ class ExerciseDetails(APIView):
                     logs, many=True
                 ).data
                 context["logs"] = logs_serialized
+
+            if "workouts_full" in include:
+                context["workouts_full"] = True
+
+            if "kpis" in include:
+                kpis: dict = {}
+                kpis["associated_workouts"] = len(exercise.workouts.all())
+                kpis["total_logs"] = len(logs)
+                kpis["logs_current_month"] = len(
+                    [l for l in logs if l.log_time >= cutout_month]
+                )
+                context["kpis"] = kpis
 
             exercise_serialized = self.serializer_class(exercise, context=context).data
 

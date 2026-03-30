@@ -137,7 +137,7 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
                         </div>
                         <div className="form-group">
                             <div className="form-row">
-                                <label htmlFor="series">Recommended series</label>
+                                <label htmlFor="series">Series (units)</label>
                             </div>
                             <div className="form-row">
                                 <input type="number" name="series" id="series" onChange={(e) => setExercise({...exercise, series: Number(e.target.value)})}/>
@@ -145,18 +145,10 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
                         </div>
                         <div className="form-group">
                             <div className="form-row">
-                                <label htmlFor="repetitions">Recommended reps</label>
+                                <label htmlFor="repetitions">Repetitions (units)</label>
                             </div>
                             <div className="form-row">
                                 <input type="number" name="repetitions" id="repetitions" onChange={(e) => setExercise({...exercise, repetitions: Number(e.target.value)})}/>
-                            </div>
-                        </div>
-                        <div className="form-group">
-                            <div className="form-row">
-                                <label htmlFor="weight">Recommended weight</label>
-                            </div>
-                            <div className="form-row">
-                                <input type="number" name="weight" id="weight" onChange={(e) => setExercise({...exercise, weight: Number(e.target.value)})}/>
                             </div>
                         </div>
                     </>
