@@ -15,9 +15,9 @@ function Home(){
     const navigate = useNavigate()
     const columns: columnConfig<WorkoutSession>[]=[
         {key: 'workout_name', header:"Workout"},
+        {key: 'start_time', header:"Date"},
         {key: 'exercise_instances', header:'Exercises'},
         {key: 'duration', header:'Duration (mins)'},
-        {key: 'start_time', header:"Date"},
     ]
 
     const {isPending, isError ,error, data:sessions} = useQuery({
@@ -36,8 +36,8 @@ function Home(){
                         }
                         return {...s, 
                             workout_name:[w.name], 
-                            start_time: start_time.toLocaleString(), 
-                            end_time: end_time?.toLocaleString(), 
+                            start_time: start_time.toLocaleDateString(), 
+                            end_time: end_time?.toLocaleDateString(), 
                             exercise_instances:s.exercise_logs.length,
                             duration:duration
                         }

@@ -107,9 +107,11 @@ class ExerciseSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
+    workouts_full = serializers.SerializerMethodField()
     logs = serializers.SerializerMethodField()
     kpis = serializers.SerializerMethodField()
-    workouts_full = serializers.SerializerMethodField()
+    timeseries = serializers.SerializerMethodField()
+    
 
     class Meta:
         model = Exercise
@@ -130,6 +132,7 @@ class ExerciseSerializer(serializers.ModelSerializer):
             "workouts_full",
             "logs",
             "kpis",
+            "timeseries",
             "created_at",
             "updated_at",
         ]
@@ -171,6 +174,12 @@ class ExerciseSerializer(serializers.ModelSerializer):
         kpis: dict | None = self.context.get("kpis")
         if isinstance(kpis, dict):
             return kpis
+        return None
+    
+    def get_timeseries(self, obj:Exercise):
+        timeseries:dict|None = self.context.get("timeseries")
+        if timeseries:
+            return timeseries
         return None
 
 

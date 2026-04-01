@@ -3,6 +3,7 @@ import { useAuth } from "../../../context/AuthContext";
 import type { Exercise } from "../../exercises/exercises.types";
 import type { ExerciseLog } from "../workout.types";
 import type { columnConfig } from "../../../shared/components/Table/table.types";
+import { NavLink } from "react-router-dom";
 import Popup from "../../../shared/components/Popup";
 import Table from "../../../shared/components/Table";
 import EventMessage from "../../../shared/components/EventMessage";
@@ -26,9 +27,9 @@ function ExercisePreview({id, errorHandler, displayFlagHandler}:ExercisePreviewP
     // const queryClient = useQueryClient()
 
     const log_columns:columnConfig<ExerciseLog>[] = [
-        {key:'log_time', header:'Log time'},
+        {key:'log_time', header:'Date'},
         {key:'series', header:'Series'},
-        {key:'repetitions', header:'Repetitions'},
+        {key:'repetitions', header:'Reps'},
         {key:'weight', header:'Weight'}
     ]
 
@@ -80,7 +81,7 @@ function ExercisePreview({id, errorHandler, displayFlagHandler}:ExercisePreviewP
         <Popup title="Exercise preview" onClose={()=> displayFlagHandler(null)}>
             <div className="preview-detail">
                 <div className="preview-attribute">
-                    <strong>Title: </strong>{data.exercise.name}
+                    <strong>Title: </strong><NavLink to={`/exercises/${data.exercise.id}`}>{data.exercise.name}</NavLink>
                 </div>
                 <div className="preview-attribute">
                     <strong>Description: </strong> {data.exercise.description}

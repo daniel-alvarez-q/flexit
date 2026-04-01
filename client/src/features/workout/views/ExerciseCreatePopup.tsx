@@ -145,7 +145,7 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
                         </div>
                         <div className="form-group">
                             <div className="form-row">
-                                <label htmlFor="repetitions">Repetitions (units)</label>
+                                <label htmlFor="repetitions">Reps (units)</label>
                             </div>
                             <div className="form-row">
                                 <input type="number" name="repetitions" id="repetitions" onChange={(e) => setExercise({...exercise, repetitions: Number(e.target.value)})}/>
@@ -156,7 +156,7 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
                     <>
                     <div className="form-group">
                         <div className="form-row">
-                            <label htmlFor="distance">Recommended distance (km)</label>
+                            <label htmlFor="distance">Distance (km)</label>
                         </div>
                         <div className="form-row">
                             <input type="number" name="distance" id="distance" onChange={(e) => setExercise({...exercise, distance: Number(e.target.value)})}/>
@@ -164,7 +164,7 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
                     </div>      
                     <div className="form-group">
                         <div className="form-row">
-                            <label htmlFor="duratin">Recommended duration (minutes)</label>
+                            <label htmlFor="duratin">Duration (minutes)</label>
                         </div>
                         <div className="form-row">
                             <input type="number" name="duration" id="duration" onChange={(e) => setExercise({...exercise, duration: Number(e.target.value)})}/>

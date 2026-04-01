@@ -93,7 +93,7 @@ function ExerciseLogCreatePopup({workoutId,exercises,session,popupHandler}:exerc
                                 <input type="number" id="series" name="series" min="0" onChange={e => setNewLog({...newLog, 'series':Number(e.target.value)})}/>
                             </div>
                             <div className="col-6">
-                                <label htmlFor="reps">Repetitions (units)</label>
+                                <label htmlFor="reps">Reps (units)</label>
                                 <input type="number" name="reps" id="reps" min="0" onChange={e => setNewLog({...newLog, 'repetitions':Number(e.target.value)})}/>
                             </div>
                             <div className="col-6">

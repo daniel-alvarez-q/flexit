@@ -377,6 +377,7 @@ class ExerciseDetails(APIView):
             return Response(f"{e}", status=status.HTTP_404_NOT_FOUND)
 
         if include:
+            # Auxiliary date entities
             current_date: datetime.datetime = datetime.datetime.now(
                 datetime.timezone.utc
             )
@@ -385,11 +386,16 @@ class ExerciseDetails(APIView):
             ).replace(hour=0, minute=0, second=0, microsecond=1)
             print(cutout_month)
 
+            # lifecycle_days:int = (current_date - exercise.created_at).days
+            # weeks = int(lifecycle_days/7) if lifecycle_days >= 14 else 1
+
+            # Initialization
             context: dict = {}
             logs: list[ExerciseLog] = list(
                 ExerciseLog.objects.filter(exercise=exercise)
             )
 
+            # Additional payloads
             if "logs" in include:
                 logs_serialized: ReturnList | ReturnDict = ExerciseLogSerializer(
                     logs, many=True
@@ -400,13 +406,30 @@ class ExerciseDetails(APIView):
                 context["workouts_full"] = True
 
             if "kpis" in include:
-                kpis: dict = {}
+                kpis: dict[str, int] = {}
                 kpis["associated_workouts"] = len(exercise.workouts.all())
                 kpis["total_logs"] = len(logs)
                 kpis["logs_current_month"] = len(
                     [l for l in logs if l.log_time >= cutout_month]
                 )
                 context["kpis"] = kpis
+
+            if "timeseries" in include:
+                timeseries: dict = {}
+                if exercise.category == "str":
+                    test = {
+                        l.log_time.strftime("%Y-%m-%d, %H:%M"): {
+                            "1RM": l.weight * (1 + (l.repetitions / 30)),
+                            "volume": l.weight * l.repetitions * l.series,
+                            "weight": l.weight,
+                            "reps": l.repetitions,
+                            "series": l.series,
+                        }
+                        for l in logs
+                    }
+                    timeseries = test
+
+                context["timeseries"] = timeseries
 
             exercise_serialized = self.serializer_class(exercise, context=context).data
 
