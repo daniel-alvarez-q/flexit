@@ -39,7 +39,7 @@ function ExerciseListPanel({exercises, isError, isPending, error, exerciseCreate
                 }
                 <div className="row justify-content-center">
                     <div className="col-8">
-                        <button className="btn-md btn-full" onClick={() => exerciseCreateFlagHandler(true)}>Add new exercise</button>
+                        <button className="btn-full" onClick={() => exerciseCreateFlagHandler(true)}>Add new exercise</button>
                     </div>
                 </div>
             </div>

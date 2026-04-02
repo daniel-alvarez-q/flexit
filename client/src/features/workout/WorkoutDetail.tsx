@@ -158,7 +158,9 @@ function WorkoutDetails(){
         { workout ?
         <>
             <div className="row">
-                <div className="template-title">{`${workout.name}`}</div>
+                <div className="template-header">
+                    <div className="template-title">{`${workout.name}`}</div>
+                </div>
             </div>
             <div className="row g-3">
                 <div className="col-12 col-lg-5">

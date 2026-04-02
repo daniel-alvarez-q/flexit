@@ -12,11 +12,13 @@ function Workouts(){
     return(
         <>
             <div className="row">
-                <div className="template-title">Workouts</div>
+                <div className="template-header">
+                    <div className="template-title">Workouts</div>
+                </div>
             </div>
             <div className="row justify-content-center g-4">
                 <WorkoutList />
-                <div className="col-12 col-lg-3 custom-justify-content-center">
+                <div className="col-6 col-sm-3 custom-justify-content-center">
                     <Card body='Create a new workout' style="action" onClick={()=>setCreatingWorkouts(!creatingWorkout)}></Card>
                 </div>
             </div>

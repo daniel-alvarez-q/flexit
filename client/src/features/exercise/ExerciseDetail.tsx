@@ -14,6 +14,7 @@ import ContentSection from "../../shared/components/ContentSection";
 import EventMessage from "../../shared/components/EventMessage";
 import KpiCard from "../../shared/components/KpiCard";
 import Table from "../../shared/components/Table";
+import './exerciseDetail.css'
 
 
 function ExerciseDetail(){
@@ -26,11 +27,17 @@ function ExerciseDetail(){
         'logs current month':number[];
     }
 
-    const log_columns:columnConfig<ExerciseLog>[] = [
+    const str_log_columns:columnConfig<ExerciseLog>[] = [
             {key:'log_time', header:'Log time'},
             {key:'series', header:'Series'},
             {key:'repetitions', header:'Reps'},
             {key:'weight', header:'Weight'}
+    ]
+
+    const car_log_columns:columnConfig<ExerciseLog>[] = [
+        {key:'log_time', header:'Date'},
+        {key:'distance', header:'Distance (km)'},
+        {key:'duration', header:'Duration (mins)'},
     ]
 
     const params:Readonly<Params<string>> = useParams()
@@ -108,7 +115,8 @@ function ExerciseDetail(){
             const timeseries:ExerciseTimeseries|null = exercise.timeseries
             if(timeseries){
                 const labels:string[] = (Object.keys(timeseries))
-                setChartData({
+                if(exercise.category == 'str'){
+                    setChartData({
                     labels,
                     datasets: [
                         {
@@ -129,7 +137,32 @@ function ExerciseDetail(){
                             yAxisID: 'y1'
                         },
                     ],
-                })
+                    })
+                } else if (exercise.category == 'car'){
+                    setChartData({
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Distance',
+                            data: labels.map((label:string)=> {
+                                return timeseries[label]['distance']
+                            }),
+                            borderColor: 'rgb(250 75 42)',
+                            
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Duration (mins)',
+                            data: labels.map((label:string)=> {
+                                return timeseries[label]['duration']
+                            }),
+                            borderColor: 'rgb(215 243 31)',
+                            yAxisID: 'y1'
+                        },
+                    ],
+                    })
+                }
+                
             }
         }
     },[exercise])
@@ -160,7 +193,12 @@ function ExerciseDetail(){
     return(
     <>
         <div className="row">
-            <div className="template-title">{exercise?.name}</div>
+            <div className="template-header">
+                <div className="template-title">{exercise?.name}</div>
+                <div className="template-actions">
+                    <button>Update</button>
+                </div>
+            </div>
         </div>
         <div className="row mb-4">
             <div className="col-12">
@@ -188,7 +226,7 @@ function ExerciseDetail(){
             <div className="col-12 col-lg-8">
             <ContentSection title='Logged sessions'>
                 {logs ?
-                <Table data={logs} columns={log_columns}/>
+                <Table data={logs} columns={exercise.category == 'str' ? str_log_columns : car_log_columns}/>
                 :<EventMessage style="warning" message="There are no logs for this exercise."/>}
             </ContentSection>
             </div>

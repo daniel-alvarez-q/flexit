@@ -3,10 +3,14 @@ import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import type { UserCreate } from "./singup.types"
 import { useAuth } from "../../context/AuthContext"
+import Popup from "../../shared/components/Popup"
 import EventMessage from "../../shared/components/EventMessage"
 
+type SignupParams = {
+    displayFlagHandler:React.Dispatch<boolean>;
+}
 
-function Signup(){
+function Signup({displayFlagHandler}:SignupParams){
     //Helpers
     const createEmptyUser = ()=> {
         return {'username':'', 'password':'', 'email':''}
@@ -24,11 +28,11 @@ function Signup(){
         e.preventDefault() 
         setError(null)
         setCreating(true)
-
         try{
             const response = await axios.post(`${API_URL}/api/users`, userForm)
             console.log(`Response ${response}`)
             setUserForm(createEmptyUser())
+            displayFlagHandler(false)
             navigate('/signin')
         }catch(error){
             console.log(error)
@@ -49,55 +53,41 @@ function Signup(){
         return state
     }
 
-    // Visual elements
-    const signup_form = () => {
-        return(
-            <div className="col-12 col-sm-5">
-                <form onSubmit={(e) => handleSubmit(e)}>
-                    <div className="row g-3 justify-content-center">
-                        <div className="col-12">
-                            <label htmlFor="username">Username</label>
-                            <input type="text" name="username" id="username" onChange={(e) => setUserForm({...userForm, 'username':e.target.value})}/>
-                        </div>
-                        <div className="col-12">
-                            <label htmlFor="email">Email</label>
-                            <input type="text" name="email" id="email" onChange={(e)=> setUserForm({...userForm, 'email':e.target.value})}/>
-                        </div>
-                        <div className="col-12">
-                            <label htmlFor="first_name">First name</label>
-                            <input type="text" name="first_name" id="first_name" onChange={(e)=> setUserForm({...userForm, 'first_name':e.target.value})}/>
-                        </div>
-                        <div className="col-12">
-                            <label htmlFor="last_name">Last Name</label>
-                            <input type="text" name="last_name" id="last_name" onChange={(e)=> setUserForm({...userForm, 'last_name':e.target.value})}/>
-                        </div>
-                        <div className="col-12">
-                            <label htmlFor="password">Password</label>
-                            <input type="password" name="password" id="password" onChange={(e)=> setUserForm({...userForm, 'password':e.target.value})}/>
-                        </div>
-                        {error &&
-                            <div className="col-12">
-                                <EventMessage message={error} style="error compact"></EventMessage>
-                            </div>
-                        }
-                        <div className="col-8">
-                            <button className="btn-full" disabled={handleFormState()}>Submit</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        )
-    }
-
     return(
-        <>
-            <div className="row justify-content-center">
-                <div className="template-title">Signup</div>
-            </div>
-            <div className="row justify-content-center">
-                {signup_form()}
-            </div>
-        </>
+        <Popup title="Signup" onClose={()=> displayFlagHandler(false)}>
+            <form onSubmit={(e) => handleSubmit(e)}>
+                <div className="row g-3 justify-content-center">
+                    <div className="col-12">
+                        <label htmlFor="username">Username</label>
+                        <input type="text" name="username" id="username" onChange={(e) => setUserForm({...userForm, 'username':e.target.value})}/>
+                    </div>
+                    <div className="col-12">
+                        <label htmlFor="email">Email</label>
+                        <input type="text" name="email" id="email" onChange={(e)=> setUserForm({...userForm, 'email':e.target.value})}/>
+                    </div>
+                    <div className="col-12">
+                        <label htmlFor="first_name">First name</label>
+                        <input type="text" name="first_name" id="first_name" onChange={(e)=> setUserForm({...userForm, 'first_name':e.target.value})}/>
+                    </div>
+                    <div className="col-12">
+                        <label htmlFor="last_name">Last Name</label>
+                        <input type="text" name="last_name" id="last_name" onChange={(e)=> setUserForm({...userForm, 'last_name':e.target.value})}/>
+                    </div>
+                    <div className="col-12">
+                        <label htmlFor="password">Password</label>
+                        <input type="password" name="password" id="password" onChange={(e)=> setUserForm({...userForm, 'password':e.target.value})}/>
+                    </div>
+                    {error &&
+                        <div className="col-12">
+                            <EventMessage message={error} style="error compact"></EventMessage>
+                        </div>
+                    }
+                    <div className="col-8">
+                        <button className="btn-full" disabled={handleFormState()}>Submit</button>
+                    </div>
+                </div>
+            </form>
+        </Popup>
     )
 }
 

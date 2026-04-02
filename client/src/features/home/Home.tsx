@@ -79,10 +79,12 @@ function Home(){
         return(
             <>
                 <div className="row">
-                    <div className="template-title">Welcome to FlexIt!</div>
+                    <div className="template-header">
+                        <div className="template-title">Welcome to FlexIt!</div>
+                    </div>
                 </div>
                 <div className="row justify-content-center">
-                    <div className="col-12 col-md-8">
+                    <div className="col-12">
                         <ContentSection>
                             <p><strong>FlexIt!</strong> is an experimental fitness tracker designed as a convenient companionship for those who are ready to take their daily fitness routine to the next level. 
                                 <strong> FlexIt!</strong> helps you plan your sessions, track your performance, and detect opportunities for improving your workouts, unlocking untold levels of performance.</p>
@@ -99,7 +101,9 @@ function Home(){
         return (
         <>
         <div className="row mb-3">
-            <div className="template-title">Welcome, {user}</div>
+            <div className="template-header">
+                <div className="template-title">Welcome, {user}</div>
+            </div>
         </div>
             <div className="row mb-3">
                 <div className="col-12">
@@ -114,7 +118,9 @@ function Home(){
         return(
         <>
         <div className="row mb-3">
-            <div className="template-title">Welcome, {user}</div>
+            <div className="template-header">
+                <div className="template-title">Welcome, {user}</div>
+            </div>
         </div>
         <div className="row mb-3">
             <div className="col-12">
@@ -129,7 +135,9 @@ function Home(){
         <>
             <>
                 <div className="row">
-                    <div className="template-title">Welcome, {user}</div>
+                    <div className="template-header">
+                        <div className="template-title">Welcome, {user}</div>
+                    </div>
                 </div>
                 <div className="row mb-3 gy-3 justify-content-center">
                     <div className="col-12 col-lg-4">

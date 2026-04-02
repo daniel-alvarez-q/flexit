@@ -66,6 +66,7 @@ export const AuthProvider = ({children}:AuthProviderProps) => {
                 localStorage.removeItem('username')
                 user!==null ? setUser(null) : user   
                 setLoading(true)
+                window.location.reload(); 
             }
         }
 

@@ -417,7 +417,7 @@ class ExerciseDetails(APIView):
             if "timeseries" in include:
                 timeseries: dict = {}
                 if exercise.category == "str":
-                    test = {
+                    timeseries = {
                         l.log_time.strftime("%Y-%m-%d, %H:%M"): {
                             "1RM": l.weight * (1 + (l.repetitions / 30)),
                             "volume": l.weight * l.repetitions * l.series,
@@ -427,8 +427,14 @@ class ExerciseDetails(APIView):
                         }
                         for l in logs
                     }
-                    timeseries = test
-
+                elif exercise.category == "car":
+                    timeseries = {
+                        l.log_time.strftime("%Y-%m-%d, %H:%M"): {
+                            "distance": l.distance,
+                            "duration": l.duration,
+                        }
+                        for l in logs
+                    }
                 context["timeseries"] = timeseries
 
             exercise_serialized = self.serializer_class(exercise, context=context).data

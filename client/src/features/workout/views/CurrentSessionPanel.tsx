@@ -20,7 +20,7 @@ type currentSessionPanelProps = {
 const exercise_log_columns: columnConfig<Partial<ExerciseLog>>[] = [
         {key: 'exercise_name', header:'Exercise'},
         {key: 'exercise_category', header:'Category'},
-        {key: 'log_time', header:'Log time'}
+        {key: 'log_time', header:'Time'}
     ]
 
 function CurrentSessionPanel({workoutId,exercises,session,logPopupDisplayHandler}:currentSessionPanelProps){
@@ -28,6 +28,7 @@ function CurrentSessionPanel({workoutId,exercises,session,logPopupDisplayHandler
     //State and auxiliary constants & variables
     const [sessionError, setSessionError] = useState<string|null>(null)
     const [logs, setLogs] = useState<ExerciseLog[]>([])
+    const [submitting, setSubmitting] = useState<boolean>(false)
     
     const {axios_instance} = useAuth()!
     const queryClient = useQueryClient()
@@ -55,6 +56,7 @@ function CurrentSessionPanel({workoutId,exercises,session,logPopupDisplayHandler
 
     useEffect(() => {
         if(sessionMutation.isError){
+            setSubmitting(false)
             setSessionError(sessionMutation.error.message)
             console.log(sessionError) //To be improved, the error message needs to be displayed correctly
         }
@@ -62,6 +64,7 @@ function CurrentSessionPanel({workoutId,exercises,session,logPopupDisplayHandler
 
     useEffect(() => {
         if(sessionMutation.isSuccess){
+            setSubmitting(false)
             queryClient.invalidateQueries({
                 queryKey:['workout', workoutId, 'sessions']
             })
@@ -73,7 +76,7 @@ function CurrentSessionPanel({workoutId,exercises,session,logPopupDisplayHandler
         if(session){
             const processedLogs = session.exercise_logs.map((log:ExerciseLog)=>{
                 const exercise = exercises.find(e=>e.id==log.exercise)
-                const date = new Date(log.log_time).toLocaleString()
+                const date = new Date(log.log_time).toLocaleTimeString()
                 return({...log,exercise_name:exercise?.name, exercise_category:getCategoryLabel(exercise?.category), log_time:date})
             })
             setLogs(processedLogs)
@@ -83,13 +86,13 @@ function CurrentSessionPanel({workoutId,exercises,session,logPopupDisplayHandler
     }, [session, exercises])
 
     const handleSessionAction = ()=>{
+        setSubmitting(true)
         if(session){
             sessionMutation.mutate(session)
         }else{
             sessionMutation.mutate(undefined)
         }   
     }
-
 
     //Rendering
     return <>
@@ -104,12 +107,12 @@ function CurrentSessionPanel({workoutId,exercises,session,logPopupDisplayHandler
                 <div className="row g-2 w-100 mx-0 justify-content-center">
                     {session &&
                         <div className="col-6">
-                            <button className="btn-full" onClick={()=> logPopupDisplayHandler(true)}>Log exercise</button>
+                            <button className="btn-full" disabled={submitting} onClick={()=> logPopupDisplayHandler(true)}>Log exercise</button>
                         </div>
                     }
                     {exercises &&
                     <div className={session ? "col-6" : "col-8"}>
-                        <button className={session ? "btn-full btn-alert" : "btn-full"} disabled={Object.keys(exercises).length === 0} onClick={()=> handleSessionAction()}>{!session ? 'Start a new session' : 'End session'}</button>
+                        <button className={session ? "btn-full btn-alert" : "btn-full"} disabled={Object.keys(exercises).length === 0 || submitting} onClick={()=> handleSessionAction()}>{!session ? 'Start a new session' : 'End session'}</button>
                     </div>
                     }
                 </div>

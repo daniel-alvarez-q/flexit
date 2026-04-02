@@ -39,7 +39,7 @@ function WorkoutList(){
         <>
         {workouts.length ?
             workouts.map(workout =>
-                <div key={workout.id} className="col-12 col-lg-3 custom-justify-content-center">
+                <div key={workout.id} className="col-6 col-sm-3 custom-justify-content-center">
                     <Card 
                     style="workout"
                     uri="workouts" 

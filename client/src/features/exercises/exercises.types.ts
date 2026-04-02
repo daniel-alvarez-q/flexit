@@ -12,7 +12,9 @@ export type ExerciseTimeseriesUnits = {
     volume:number;
     weight:number;
     reps:number;
-    series:number
+    series:number;
+    distance:number;
+    duration:number;
 }
 
 export type ExerciseTimeseries = Record<string,ExerciseTimeseriesUnits>

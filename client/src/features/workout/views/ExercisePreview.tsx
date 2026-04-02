@@ -26,11 +26,17 @@ function ExercisePreview({id, errorHandler, displayFlagHandler}:ExercisePreviewP
     const {axios_instance} = useAuth()!
     // const queryClient = useQueryClient()
 
-    const log_columns:columnConfig<ExerciseLog>[] = [
+    const str_log_columns:columnConfig<ExerciseLog>[] = [
         {key:'log_time', header:'Date'},
         {key:'series', header:'Series'},
         {key:'repetitions', header:'Reps'},
         {key:'weight', header:'Weight'}
+    ]
+
+    const car_log_columns:columnConfig<ExerciseLog>[] = [
+        {key:'log_time', header:'Date'},
+        {key:'distance', header:'Distance (km)'},
+        {key:'duration', header:'Duration (mins)'},
     ]
 
     const {isPending, isError, error, data} = useQuery({
@@ -111,7 +117,7 @@ function ExercisePreview({id, errorHandler, displayFlagHandler}:ExercisePreviewP
                 }
                 <div className="preview-attribute">
                     {data.logs.length ?
-                    <Table data={data.logs} columns={log_columns}/>
+                    <Table data={data.logs} columns={data.exercise.category == 'str' ? str_log_columns : car_log_columns}/>
                     :<EventMessage style="warning" message="There are no logs for this exercise."/>}
                 </div>
             </div>

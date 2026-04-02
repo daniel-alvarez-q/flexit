@@ -5,7 +5,9 @@ function Exercises(){
     return(
         <>
             <div className="row">
-                <div className="template-title">Exercises</div>
+                <div className="template-header">
+                    <div className="template-title">Exercises</div>
+                </div>
             </div>
             <div className="row justify-content-center g-4">
                 <ExerciseList />
