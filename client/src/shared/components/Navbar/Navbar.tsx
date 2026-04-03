@@ -19,7 +19,7 @@ function linkList(list: Array<NavbarLinks> | null, onClick?: () => void) {
                     const handler:React.Dispatch<boolean> = link.handler
                     return (
                         <li key={i} className="nav-item">
-                            <a onClick={() => handler(true)}>{link['descriptor']}</a>
+                            <a className='nav-link' onClick={() => handler(true)}>{link['descriptor']}</a>
                         </li>
                     )
                 }
@@ -36,8 +36,8 @@ function NavBar({ appName, signupDisplayHandler , signinDisplayHandler}: NavbarC
 
     let navLinks: Array<NavbarLinks> | null = null
     let sessionLinks: Array<NavbarLinks> = [
-        { 'handler': signinDisplayHandler, 'descriptor': 'Sign in' },
-        { 'handler': signupDisplayHandler, 'descriptor': 'Sign up' }
+        { 'handler': signinDisplayHandler, 'descriptor': 'Sign-in' },
+        { 'handler': signupDisplayHandler, 'descriptor': 'Sign-up' }
     ]
 
     if (user) {
@@ -47,8 +47,8 @@ function NavBar({ appName, signupDisplayHandler , signinDisplayHandler}: NavbarC
         ]
 
         sessionLinks = [
-            { 'uri': '/profile', 'descriptor': user },
-            { 'uri': '/logout', 'descriptor': 'logout' }
+            { 'uri': '/profile', 'descriptor': 'Profile' },
+            { 'uri': '/logout', 'descriptor': 'Logout' }
         ]
     }
 

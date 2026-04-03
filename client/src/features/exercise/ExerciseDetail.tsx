@@ -14,6 +14,7 @@ import ContentSection from "../../shared/components/ContentSection";
 import EventMessage from "../../shared/components/EventMessage";
 import KpiCard from "../../shared/components/KpiCard";
 import Table from "../../shared/components/Table";
+import ExerciseEditPopup from "./views/ExerciseEditPopup";
 import './exerciseDetail.css'
 
 
@@ -45,6 +46,7 @@ function ExerciseDetail(){
     const [logs,setLogs] = useState<Array<ExerciseLog>|null>(null)
     const [metrics, setMetrics] = useState<exerciseMetrics|null>(null)
     const [chartData, setChartData] = useState<ChartData<"line", (number | Point | null)[], unknown>|null>(null)
+    const [editingExercise, setEditingExercise] = useState<boolean>(false)
 
     // Chart configuration
     const options = {
@@ -196,7 +198,7 @@ function ExerciseDetail(){
             <div className="template-header">
                 <div className="template-title">{exercise?.name}</div>
                 <div className="template-actions">
-                    <button>Update</button>
+                    <button className="btn-template-header" onClick={()=> setEditingExercise(true)}>Update</button>
                 </div>
             </div>
         </div>
@@ -231,6 +233,9 @@ function ExerciseDetail(){
             </ContentSection>
             </div>
         </div>
+        {editingExercise &&
+            <ExerciseEditPopup displayHandler={setEditingExercise}/>
+        }
     </>
     )
 }

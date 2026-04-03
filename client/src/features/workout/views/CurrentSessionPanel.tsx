@@ -112,7 +112,7 @@ function CurrentSessionPanel({workoutId,exercises,session,logPopupDisplayHandler
                     }
                     {exercises &&
                     <div className={session ? "col-6" : "col-8"}>
-                        <button className={session ? "btn-full btn-alert" : "btn-full"} disabled={Object.keys(exercises).length === 0 || submitting} onClick={()=> handleSessionAction()}>{!session ? 'Start a new session' : 'End session'}</button>
+                        <button className={session ? "btn-full btn-alert" : "btn-full"} disabled={Object.keys(exercises).length === 0 || submitting} onClick={()=> handleSessionAction()}>{!session ? 'Start session' : 'End session'}</button>
                     </div>
                     }
                 </div>

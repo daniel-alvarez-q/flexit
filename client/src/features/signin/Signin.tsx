@@ -39,7 +39,7 @@ function Signin({displayHandler}:SigninParams){
     }  
 
     return(
-        <Popup title="Sigin" onClose={()=> displayHandler(false)}>
+        <Popup title="Sign-in" onClose={()=> displayHandler(false)}>
             <form onSubmit={(e) => handleSubmit(e)}>
                 <div className="row g-3 justify-content-center">
                     <div className="col-12">

@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import type { columnConfig } from "../../shared/components/Table/table.types";
 import type { WorkoutSession } from "../workout/workout.types";
@@ -12,7 +11,7 @@ import './home.css'
 
 function Home(){
     const {user, axios_instance} = useAuth()!
-    const navigate = useNavigate()
+    // const navigate = useNavigate()
     const columns: columnConfig<WorkoutSession>[]=[
         {key: 'workout_name', header:"Workout"},
         {key: 'start_time', header:"Date"},
@@ -70,9 +69,9 @@ function Home(){
     })
 
     //Handlers
-    const signup_action = () =>{
-        navigate('/signup')
-    }
+    // const signup_action = () =>{
+    //     navigate('/signup')
+    // }
 
     //Visuals
     if(!user){
@@ -89,7 +88,7 @@ function Home(){
                             <p><strong>FlexIt!</strong> is an experimental fitness tracker designed as a convenient companionship for those who are ready to take their daily fitness routine to the next level. 
                                 <strong> FlexIt!</strong> helps you plan your sessions, track your performance, and detect opportunities for improving your workouts, unlocking untold levels of performance.</p>
                             <p>Feeling curious? Create a new account and start exploring the features we have to offer!</p>
-                            <button className="btn-md" onClick={() => signup_action()}>Create an account</button>
+                            {/* <button className="btn-md" onClick={() => signup_action()}>Create an account</button> */}
                         </ContentSection>
                     </div>
                 </div>
@@ -102,7 +101,7 @@ function Home(){
         <>
         <div className="row mb-3">
             <div className="template-header">
-                <div className="template-title">Welcome, {user}</div>
+                <div className="template-title">Welcome, {user.first_name}</div>
             </div>
         </div>
             <div className="row mb-3">
@@ -119,7 +118,7 @@ function Home(){
         <>
         <div className="row mb-3">
             <div className="template-header">
-                <div className="template-title">Welcome, {user}</div>
+                <div className="template-title">Welcome, {user.first_name}</div>
             </div>
         </div>
         <div className="row mb-3">
@@ -136,7 +135,7 @@ function Home(){
             <>
                 <div className="row">
                     <div className="template-header">
-                        <div className="template-title">Welcome, {user}</div>
+                        <div className="template-title">Welcome, {user.first_name ? user.first_name : 'user'}</div>
                     </div>
                 </div>
                 <div className="row mb-3 gy-3 justify-content-center">

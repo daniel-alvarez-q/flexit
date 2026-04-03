@@ -9,23 +9,23 @@ import Signin from "../features/signin";
 
 
 
-function RootLayout(){
+function RootLayout() {
 
     const [signupActive, setSignupActive] = useState<boolean>(false)
     const [signinActive, setSigninActive] = useState<boolean>(false)
 
-    return(
+    return (
         <>
             <QueryClientProvider client={queryClient}>
                 <AuthProvider>
-                    <NavBar appName={'FlexIt!'} signupDisplayHandler={setSignupActive} signinDisplayHandler={setSigninActive}/>
+                    <NavBar appName={'FlexIt!'} signupDisplayHandler={setSignupActive} signinDisplayHandler={setSigninActive} />
                     <main className="container">
                         <Outlet></Outlet>
                     </main>
                     {signupActive ?
-                        <Signup displayFlagHandler={setSignupActive}/>
-                    : signinActive &&
-                        <Signin displayHandler={setSigninActive}/>
+                        <Signup displayFlagHandler={setSignupActive} />
+                        : signinActive &&
+                        <Signin displayHandler={setSigninActive} />
                     }
                 </AuthProvider>
             </QueryClientProvider>

@@ -33,7 +33,7 @@ function Signup({displayFlagHandler}:SignupParams){
             console.log(`Response ${response}`)
             setUserForm(createEmptyUser())
             displayFlagHandler(false)
-            navigate('/signin')
+            navigate('/')
         }catch(error){
             console.log(error)
             if (axios.isAxiosError(error)) {
@@ -47,27 +47,27 @@ function Signup({displayFlagHandler}:SignupParams){
 
     const handleFormState = ()=>{
         let state = false
-        if(creating || !userForm.username.length || !userForm.password.length || !userForm.email.length){
+        if(creating || !userForm.username.length || !userForm.password.length || !userForm.email.length || !userForm.first_name?.length){
             state = true
         }
         return state
     }
 
     return(
-        <Popup title="Signup" onClose={()=> displayFlagHandler(false)}>
+        <Popup title="Create your account" onClose={()=> displayFlagHandler(false)}>
             <form onSubmit={(e) => handleSubmit(e)}>
                 <div className="row g-3 justify-content-center">
                     <div className="col-12">
                         <label htmlFor="username">Username</label>
-                        <input type="text" name="username" id="username" onChange={(e) => setUserForm({...userForm, 'username':e.target.value})}/>
+                        <input type="text" name="username" id="username" required={true} onChange={(e) => setUserForm({...userForm, 'username':e.target.value})}/>
                     </div>
                     <div className="col-12">
                         <label htmlFor="email">Email</label>
-                        <input type="text" name="email" id="email" onChange={(e)=> setUserForm({...userForm, 'email':e.target.value})}/>
+                        <input type="text" name="email" id="email" required={true} onChange={(e)=> setUserForm({...userForm, 'email':e.target.value})}/>
                     </div>
                     <div className="col-12">
                         <label htmlFor="first_name">First name</label>
-                        <input type="text" name="first_name" id="first_name" onChange={(e)=> setUserForm({...userForm, 'first_name':e.target.value})}/>
+                        <input type="text" name="first_name" id="first_name" required={true} onChange={(e)=> setUserForm({...userForm, 'first_name':e.target.value})}/>
                     </div>
                     <div className="col-12">
                         <label htmlFor="last_name">Last Name</label>
@@ -75,7 +75,7 @@ function Signup({displayFlagHandler}:SignupParams){
                     </div>
                     <div className="col-12">
                         <label htmlFor="password">Password</label>
-                        <input type="password" name="password" id="password" onChange={(e)=> setUserForm({...userForm, 'password':e.target.value})}/>
+                        <input type="password" name="password" id="password" required={true} onChange={(e)=> setUserForm({...userForm, 'password':e.target.value})}/>
                     </div>
                     {error &&
                         <div className="col-12">
