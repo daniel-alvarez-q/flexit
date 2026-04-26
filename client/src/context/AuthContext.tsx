@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         const storedUserString = localStorage.getItem('user-data')
         let storedUser: UserData | null = null
         if (storedUserString) {
-            console.log(storedUserString)
+            // console.log(storedUserString)
             storedUser = JSON.parse(storedUserString);
         }
         const tokenExpiry = localStorage.getItem('access-token-expiration')

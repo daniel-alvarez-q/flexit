@@ -234,7 +234,7 @@ function ExerciseDetail(){
             </div>
         </div>
         {editingExercise &&
-            <ExerciseEditPopup displayHandler={setEditingExercise}/>
+            <ExerciseEditPopup displayHandler={setEditingExercise} exercise={exercise}/>
         }
     </>
     )

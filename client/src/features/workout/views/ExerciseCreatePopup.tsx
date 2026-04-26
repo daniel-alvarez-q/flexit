@@ -75,7 +75,6 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
         <Popup title="New exercise" onClose={()=> {displayHandler(false); errorHandler(null);}}>
             <form onSubmit={(e) => submitHander(e)}>
                 <div className="mb-1">
-  
                     <label htmlFor="name" className="form-label">Name</label>
                     <input type="text" className="form-control" name="name" id="name" onChange={(e) => setExercise({...exercise, name:e.target.value})}/>
 
