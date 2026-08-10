@@ -20,6 +20,13 @@ import './exerciseDetail.css'
 
 function ExerciseDetail(){
 
+    const params:Readonly<Params<string>> = useParams()
+    const {axios_instance} = useAuth()!
+    const [logs,setLogs] = useState<Array<ExerciseLog>|null>(null)
+    const [metrics, setMetrics] = useState<exerciseMetrics|null>(null)
+    const [chartData, setChartData] = useState<ChartData<"line", (number | Point | null)[], unknown>|null>(null)
+    const [editingExercise, setEditingExercise] = useState<boolean>(false)
+
     ChartJS.register( CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
     type exerciseMetrics = {
@@ -41,12 +48,6 @@ function ExerciseDetail(){
         {key:'duration', header:'Duration (mins)'},
     ]
 
-    const params:Readonly<Params<string>> = useParams()
-    const {axios_instance} = useAuth()!
-    const [logs,setLogs] = useState<Array<ExerciseLog>|null>(null)
-    const [metrics, setMetrics] = useState<exerciseMetrics|null>(null)
-    const [chartData, setChartData] = useState<ChartData<"line", (number | Point | null)[], unknown>|null>(null)
-    const [editingExercise, setEditingExercise] = useState<boolean>(false)
 
     // Chart configuration
     const options = {
@@ -88,8 +89,9 @@ function ExerciseDetail(){
 
     // Data fetch, with query_params 
     const {isPending, isError, error, data:exercise} = useQuery({
-        queryKey:['exercise', params.exerciseId],
-        queryFn: async ():Promise<Exercise> =>{
+        queryKey:['getExercise', params.exerciseId],
+        queryFn: async (context):Promise<Exercise> =>{
+            console.log(context.client)
             let query_params = {
                 include:'logs,workouts_full,kpis,timeseries'
             }

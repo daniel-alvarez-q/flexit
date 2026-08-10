@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../../context/AuthContext";
 import Popup from "../../../shared/components/Popup";
 import type { Exercise } from "../../exercises/exercises.types";
-import { queryClient } from "../../../context/QueryContext";
+// import { queryClient } from "../../../context/QueryContext";
 import EventMessage from "../../../shared/components/EventMessage";
 
 type ExerciseEditPopupParams = {
@@ -18,36 +18,36 @@ function ExerciseEditPopup({exercise, displayHandler}:ExerciseEditPopupParams){
 
     const {axios_instance} = useAuth()!
 
+    const queryClient = useQueryClient()
+
     const mutation = useMutation({
         mutationKey:['exerciseUpdate'],
         mutationFn: (exercise:Exercise)=>{
             const response = axios_instance.patch(`api/exercise/${exercise.id}`, exercise).then(r=>r)
             return response
         },
-        onSuccess: async()=>{
+        onSuccess: async(context, data)=>{
             await Promise.all([
-                queryClient.invalidateQueries({queryKey:['exercise', exercise.id]}),
-                queryClient.invalidateQueries({queryKey:['exercises']})
+                // queryClient.invalidateQueries({queryKey:['getExercise', exercise.id]}),
+                // queryClient.invalidateQueries({queryKey:['exercises']})
+                queryClient.setQueryData(['getExercuse', exercise.id], data)
             ])
+            displayHandler(false)
+            console.log(data)
+        },
+        onError: (error)=>{
+            setError(error.message)
+            console.log(`Error: ${error.message}`)
         }
     })
 
     function eventHandler(attr:string, event:string){
         setExerciseUpdate({...exerciseUpdate, [attr]: event})
-        console.log(exerciseUpdate)
     }
 
     function submitHander(e:FormEvent){
         e.preventDefault()
-        console.log(exerciseUpdate)
-        mutation.mutate(exerciseUpdate)
-        if(mutation.isError){
-            setError(mutation.error.message)
-        }else if(mutation.isSuccess){
-            console.log('Here!')
-            displayHandler(false)
-        }
-        
+        mutation.mutate(exerciseUpdate)        
     }
 
     return(
@@ -65,7 +65,7 @@ function ExerciseEditPopup({exercise, displayHandler}:ExerciseEditPopupParams){
                     <EventMessage message={error} style="error compact"/>
                 }
                 <div className="mb-1">
-                    <button>Upgrade</button>
+                    <button>Update</button>
                 </div>
             </form>
         </Popup>
