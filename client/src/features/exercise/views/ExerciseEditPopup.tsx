@@ -28,9 +28,8 @@ function ExerciseEditPopup({exercise, displayHandler}:ExerciseEditPopupParams){
         },
         onSuccess: async(context, data)=>{
             await Promise.all([
-                // queryClient.invalidateQueries({queryKey:['getExercise', exercise.id]}),
+                queryClient.invalidateQueries({queryKey:['exercise', String(exercise.id)]}),
                 // queryClient.invalidateQueries({queryKey:['exercises']})
-                queryClient.setQueryData(['getExercuse', exercise.id], data)
             ])
             displayHandler(false)
             console.log(data)

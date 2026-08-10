@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend} from 'chart.js';
 import { useAuth } from "../../context/AuthContext";
@@ -88,8 +88,9 @@ function ExerciseDetail(){
     };
 
     // Data fetch, with query_params 
+
     const {isPending, isError, error, data:exercise} = useQuery({
-        queryKey:['getExercise', params.exerciseId],
+        queryKey:['exercise', params.exerciseId],
         queryFn: async (context):Promise<Exercise> =>{
             console.log(context.client)
             let query_params = {
@@ -101,6 +102,7 @@ function ExerciseDetail(){
             }
         }
     })
+
 
     // Set state based on fetched data
     useEffect(()=>{
@@ -193,6 +195,7 @@ function ExerciseDetail(){
         </div>
         )
     }
+
     
     return(
     <>
