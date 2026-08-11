@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../../context/AuthContext";
 import Popup from "../../../shared/components/Popup";
 import type { Exercise } from "../../exercises/exercises.types";
-// import { queryClient } from "../../../context/QueryContext";
 import EventMessage from "../../../shared/components/EventMessage";
 
 type ExerciseEditPopupParams = {
@@ -26,10 +25,9 @@ function ExerciseEditPopup({exercise, displayHandler}:ExerciseEditPopupParams){
             const response = axios_instance.patch(`api/exercise/${exercise.id}`, exercise).then(r=>r)
             return response
         },
-        onSuccess: async(context, data)=>{
+        onSuccess: async(data)=>{
             await Promise.all([
                 queryClient.invalidateQueries({queryKey:['exercise', String(exercise.id)]}),
-                // queryClient.invalidateQueries({queryKey:['exercises']})
             ])
             displayHandler(false)
             console.log(data)
@@ -50,7 +48,7 @@ function ExerciseEditPopup({exercise, displayHandler}:ExerciseEditPopupParams){
     }
 
     return(
-        <Popup title="Exercise edit" onClose={() => displayHandler(false)}>
+        <Popup title="Update exercise details" onClose={() => displayHandler(false)}>
             <form onSubmit={(e)=>submitHander(e)}>
                 <div className="mb-1">
                     <label htmlFor="name" className="form-label">Name</label>
