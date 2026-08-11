@@ -1,3 +1,24 @@
+import type { ExerciseLog } from "../workout/workout.types";
+import type { Workout } from "../workouts/workouts.types";
+
+type ExerciseKpis = {
+    associated_workouts: number;
+    total_logs: number;
+    logs_current_month: number;
+}
+
+export type ExerciseTimeseriesUnits = {
+    '1RM':number;
+    volume:number;
+    weight:number;
+    reps:number;
+    series:number;
+    distance:number;
+    duration:number;
+}
+
+export type ExerciseTimeseries = Record<string,ExerciseTimeseriesUnits>
+
 export type Exercise ={
     id:number;
     name:string;
@@ -13,7 +34,11 @@ export type Exercise ={
     duration?:number;
     distance?:number;
     user:number;
-    workouts:number[];
+    workouts?:number[];
+    kpis:ExerciseKpis;
+    logs:ExerciseLog[];
+    workouts_full:Workout[];
+    timeseries:ExerciseTimeseries;
     created_at:string;
     updated_at:string
 }

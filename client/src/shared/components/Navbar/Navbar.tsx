@@ -1,44 +1,54 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../../context/AuthContext'
-import type {NavbarConfig, NavbarLinks} from './navbar.types'
+import type { NavbarConfig, NavbarLinks } from './navbar.types'
 import './navbar.css'
 
-function linkList(list:Array<NavbarLinks>|null, onClick?: () => void){
-
-    if(list===null){
+function linkList(list: Array<NavbarLinks> | null, onClick?: () => void) {
+    if (list === null) {
         return null
-    }else{
-        return(
+    } else {
+        return (
             list.map((link, i) =>
-                <li key={i} className="nav-item">
-                    <NavLink className="nav-link" to={link['uri']} onClick={onClick}>{link['descriptor']}</NavLink>
-                </li>
+            {
+                if(link.uri?.length){
+                    return (<li key={i} className="nav-item">
+                        <NavLink className="nav-link" to={link['uri']} onClick={onClick}>{link['descriptor']}</NavLink>
+                    </li>)
+                } else if(link.handler){
+                    const handler:React.Dispatch<boolean> = link.handler
+                    return (
+                        <li key={i} className="nav-item">
+                            <a className='nav-link' onClick={() => handler(true)}>{link['descriptor']}</a>
+                        </li>
+                    )
+                }
+            }
             )
         )
     }
 }
 
-function NavBar({appName}: NavbarConfig){
+function NavBar({ appName, signupDisplayHandler , signinDisplayHandler}: NavbarConfig) {
 
-    const {user} = useAuth()!
+    const { user } = useAuth()!
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-    
-    let navLinks:Array<NavbarLinks> | null = null
-    let sessionLinks:Array<NavbarLinks> = [
-      {'uri':'/signin', 'descriptor': 'Sign in'},
-      {'uri':'/signup', 'descriptor': 'Sign up'}
+
+    let navLinks: Array<NavbarLinks> | null = null
+    let sessionLinks: Array<NavbarLinks> = [
+        { 'handler': signinDisplayHandler, 'descriptor': 'Sign-in' },
+        { 'handler': signupDisplayHandler, 'descriptor': 'Sign-up' }
     ]
 
-    if (user){
+    if (user) {
         navLinks = [
-            {'uri':'/workouts', 'descriptor': 'Workouts'},
-            {'uri':'/exercises', 'descriptor': 'Exercises'}
+            { 'uri': '/workouts', 'descriptor': 'Workouts' },
+            { 'uri': '/exercises', 'descriptor': 'Exercises' }
         ]
 
         sessionLinks = [
-            {'uri': '/profile', 'descriptor': user},
-            {'uri': '/logout', 'descriptor': 'logout'}
+            { 'uri': '/profile', 'descriptor': 'Profile' },
+            { 'uri': '/logout', 'descriptor': 'Logout' }
         ]
     }
 
@@ -50,7 +60,7 @@ function NavBar({appName}: NavbarConfig){
         setIsMenuOpen(false)
     }
 
-    return(
+    return (
         <div className="navbar">
             <div className="navbar-brand">
                 <NavLink to="/">{appName}</NavLink>
@@ -66,6 +76,12 @@ function NavBar({appName}: NavbarConfig){
                 </ul>
                 <ul className="navbar-nav ms-auto" key='profileLinks'>
                     {linkList(sessionLinks, closeMenu)}
+                    {/* <li className="nav-item">
+                        <a onClick={() => signupDisplayHandler(true)}>Signup</a>
+                    </li>
+                    <li className="nav-item">
+                        <a onClick={() => signinDisplayHandler(true)}>Sigin</a>
+                    </li> */}
                 </ul>
             </div>
         </div>

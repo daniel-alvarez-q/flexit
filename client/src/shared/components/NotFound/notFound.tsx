@@ -12,10 +12,12 @@ function NotFound(){
     return(
         <>
             <div className="row">
-                <div className="template-title">Not Found</div>
+                <div className="template-header">
+                    <div className="template-title">Not Found</div>
+                </div>
             </div>
             <div className="row justify-content-center">
-                <div className="col-12 col-sm-8">
+                <div className="col-12">
                     <ContentSection>
                         <p>The view you are looking for does not seem to exist.</p>
                         <button className="btn-md" onClick={()=>return_action()}>

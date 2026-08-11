@@ -62,35 +62,35 @@ function WorkoutCreateForm ({error, errorHandler, displayFlagHandler}:WorkoutCre
 
     return <Popup title="New workout" onClose={()=> {displayFlagHandler(false); errorHandler(null)}}>   
                 <form onSubmit={handleWorkoutSubmit}>
-                    <div className="row g-3 justify-content-center">
-                        <div className="col-12">
-                            <label htmlFor="name">Workout title</label>
-                            <input type="text" name="name" id="name" onChange={(e) => setNewWorkout({...newWorkout, name:e.target.value})}/>
-                        </div>
-                        <div className="col-12">
-                            <label htmlFor="">Workout description</label>
-                            <textarea  name="description" id="description" onChange={(e) => setNewWorkout({...newWorkout, description:e.target.value})}></textarea>
-                        </div>
-                        <div className="col-12">
-                            <label htmlFor="difficulty">Difficulty</label>
-                            <select name="difficulty" id="difficulty" onChange={(e) => setNewWorkout({...newWorkout, difficulty:e.target.value})}>
-                                <option value="ext">Extreme</option>
-                                <option value="hig">High</option>
-                                <option value="med">Medium</option>
-                                <option value="low">Low</option>
-                            </select>
-                        </div>
-                        <div className="col-12">
-                            <label htmlFor="source_url">Source url</label>
-                            <input type="url" name="source_url" id="source_url" onChange={(e) => setNewWorkout({...newWorkout, source_url:e.target.value})}/>
-                        </div>
-                        { error &&
-                        <div className="col-12">
-                            <EventMessage message={error} style="error compact"></EventMessage>
-                        </div>
-                        }
+                    <div className="mb-1">
+                        <label htmlFor="name" className="form-label">Workout title</label>
+                        <input type="text" className="form-control" name="name" id="name" onChange={(e) => setNewWorkout({...newWorkout, name:e.target.value})}/>
+                    </div>
+                    <div className="mb-1">
+                        <label htmlFor="description" className="form-label">Workout description</label>
+                        <textarea  name="description" className="form-control" id="description" onChange={(e) => setNewWorkout({...newWorkout, description:e.target.value})}></textarea>
+                    </div>
+                    <div className="mb-1">
+                        <label htmlFor="difficulty" className="form-label">Difficulty</label>
+                        <select name="difficulty" className="form-control" id="difficulty" onChange={(e) => setNewWorkout({...newWorkout, difficulty:e.target.value})}>
+                            <option value="ext">Extreme</option>
+                            <option value="hig">High</option>
+                            <option value="med">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div className="mb-1">
+                        <label htmlFor="source_url" className="form-label">Source url</label>
+                        <input type="url" className="form-control" name="source_url" id="source_url" onChange={(e) => setNewWorkout({...newWorkout, source_url:e.target.value})}/>
+                    </div>
+                    { error &&
+                    <div className="mb-1">
+                        <EventMessage message={error} style="error compact"></EventMessage>
+                    </div>
+                    }
+                    <div className="row justify-content-center">
                         <div className="col-8">
-                            <button className="btn-full" disabled={handleFormState()}>Create</button>
+                        <button className="btn-full" disabled={handleFormState()}>Create</button>
                         </div>
                     </div>
                 </form>

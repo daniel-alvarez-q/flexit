@@ -64,8 +64,8 @@ function WorkoutDetails(){
                         duration = Number(((end_time.getTime() - start_time.getTime())/60000).toFixed(2))  
                     }
                     return {...session, 
-                        start_time: start_time.toLocaleString(), 
-                        end_time: end_time?.toLocaleString(), 
+                        start_time: start_time.toLocaleDateString(), 
+                        end_time: end_time?.toLocaleDateString(), 
                         exercise_instances:session.exercise_logs.length,
                         duration:duration
                     }
@@ -158,7 +158,9 @@ function WorkoutDetails(){
         { workout ?
         <>
             <div className="row">
-                <div className="template-title">{`${workout.name}`}</div>
+                <div className="template-header">
+                    <div className="template-title">{`${workout.name}`}</div>
+                </div>
             </div>
             <div className="row g-3">
                 <div className="col-12 col-lg-5">

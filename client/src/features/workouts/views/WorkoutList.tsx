@@ -13,7 +13,7 @@ function WorkoutList(){
         queryFn: async():Promise<Array<Workout>>=>{
             let response = await axios_instance.get('api/workouts')
             return response.data.map((w:Workout) =>{
-                return {...w, created_at:new Date(w.created_at).toLocaleString()}
+                return {...w, created_at:new Date(w.created_at).toLocaleDateString()}
             })
             
         }
@@ -39,8 +39,14 @@ function WorkoutList(){
         <>
         {workouts.length ?
             workouts.map(workout =>
-                <div key={workout.id} className="col-12 col-lg-3 custom-justify-content-center">
-                    <Card uri='workouts' id={workout.id} title={workout.name} footer={workout.created_at} body={workout.description} />
+                <div key={workout.id} className="col-6 col-sm-3 custom-justify-content-center">
+                    <Card 
+                    style="workout"
+                    uri="workouts" 
+                    id={workout.id} 
+                    title={workout.name} 
+                    footer={`Created: ${workout.created_at}`} 
+                    body={workout.description} />
                 </div>
             )
         :null

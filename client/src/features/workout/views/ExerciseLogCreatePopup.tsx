@@ -17,7 +17,7 @@ function ExerciseLogCreatePopup({workoutId,exercises,session,popupHandler}:exerc
 
     const [formError, setFormError] = useState<string|null>(null)
     const [newLog, setNewLog] = useState<Partial<ExerciseLog>>({})
-
+    const [submitting, setSubmitting] = useState<boolean>(false)
     const {axios_instance} = useAuth()!
     const queryClient = useQueryClient()
 
@@ -48,6 +48,7 @@ function ExerciseLogCreatePopup({workoutId,exercises,session,popupHandler}:exerc
 
     useEffect(()=>{
         if(logMutation.isError){
+            setSubmitting(false)
             setFormError(logMutation.error.message)
         }
     },[logMutation.isError, queryClient, workoutId])
@@ -55,7 +56,7 @@ function ExerciseLogCreatePopup({workoutId,exercises,session,popupHandler}:exerc
     //Handlers
     const handleFormStatus = ()=>{
         let state = true
-        if(newLog.exercise){
+        if(newLog.exercise && !submitting){
             state = false
         }
         return state
@@ -63,6 +64,7 @@ function ExerciseLogCreatePopup({workoutId,exercises,session,popupHandler}:exerc
 
     const handleExerciseLogSubmit = async(e:FormEvent) =>{
         e.preventDefault()
+        setSubmitting(true)
         const logPayload: Partial<ExerciseLog> = {
             ...newLog,
             session: Number(session?.id),
@@ -74,10 +76,10 @@ function ExerciseLogCreatePopup({workoutId,exercises,session,popupHandler}:exerc
     const session_exercise_form = (exercises:Record<number,Exercise>) =>{
         return(
             <form action="" className="workout-sessions-form" onSubmit={e=> handleExerciseLogSubmit(e)}>
-                <div className="row g-2">
-                    <div className="col-12 col-lg-3">
-                        <label htmlFor="exercise">Exercise</label>
-                        <select name="exercise" id="exercise" onChange={e => setNewLog({...newLog, exercise:Number(e.target.value)})}>
+                
+                    <div className="mb-2">
+                        <label htmlFor="exercise" className="form-label">Exercise</label>
+                        <select className="form-control" name="exercise" id="exercise" onChange={e => setNewLog({...newLog, exercise:Number(e.target.value)})}>
                             {Object.values(processed_exercises)?.map(exercise =>
                                 <option key={exercise.id} value={exercise.id}>{exercise.name}</option>
                             )}
@@ -88,49 +90,47 @@ function ExerciseLogCreatePopup({workoutId,exercises,session,popupHandler}:exerc
                     <>
                     {exercises[newLog.exercise].category === 'str' ?
                         <>
-                            <div className="col-6 col-lg-3">
-                                <label htmlFor="series">Series</label>
-                                <input type="number" id="series" name="series" min="0" onChange={e => setNewLog({...newLog, 'series':Number(e.target.value)})}/>
+                            <div className="mb-2">
+                                <label htmlFor="series" className="form-label">Series (units)</label>
+                                <input type="number" className="form-control" id="series" name="series" min="0" onChange={e => setNewLog({...newLog, 'series':Number(e.target.value)})}/>
                             </div>
-                            <div className="col-6 col-lg-3">
-                                <label htmlFor="reps">Repetitions</label>
-                                <input type="number" name="reps" id="reps" min="0" onChange={e => setNewLog({...newLog, 'repetitions':Number(e.target.value)})}/>
+                            <div className="mb-2">
+                                <label htmlFor="reps" className="form-label">Reps (units)</label>
+                                <input type="number" className="form-control" name="reps" id="reps" min="0" onChange={e => setNewLog({...newLog, 'repetitions':Number(e.target.value)})}/>
                             </div>
-                            <div className="col-6 col-lg-3">
-                                <label htmlFor="weight">Weight</label>
-                                <input type="number" name="weight" id="weight" min="0" step="0.1" onChange={e => setNewLog({...newLog, 'weight':Number(e.target.value)})}/>
+                            <div className="mb-2">
+                                <label htmlFor="weight" className="form-label">Weight (kg)</label>
+                                <input type="number" className="form-control" name="weight" id="weight" min="0" step="0.1" onChange={e => setNewLog({...newLog, 'weight':Number(e.target.value)})}/>
                             </div>
                         </>
                         : 
                         exercises[newLog.exercise].category === 'car' ?
                         <>
-                            <div className="col-6 col-lg-3">
-                                <label htmlFor="distance">Distance (km)</label>
-                                <input type="number" id="distance" name="distance" onChange={e => setNewLog({...newLog, 'distance':Number(e.target.value)})}/>
+                            <div className="mb-2">
+                                <label htmlFor="distance" className="form-label">Distance (km)</label>
+                                <input type="number" className="form-control" id="distance" name="distance" onChange={e => setNewLog({...newLog, 'distance':Number(e.target.value)})}/>
                             </div>
-                            <div className="col-6 col-lg-3">
-                                <label htmlFor="duration">Duration (minutes)</label>
-                                <input type="number" id="duration" name="duration" onChange={e => setNewLog({...newLog, 'duration':Number(e.target.value)})}/>
+                            <div className="mb-2">
+                                <label htmlFor="duration" className="form-label">Duration (minutes)</label>
+                                <input type="number" className="form-control" id="duration" name="duration" onChange={e => setNewLog({...newLog, 'duration':Number(e.target.value)})}/>
                             </div>                            
                         </>
                         : null}
-                        <div className="col-12 col-lg-6">
-                            <label htmlFor="notes">Notes</label>
-                            <textarea id="notes" name="notes" onChange={e => setNewLog({...newLog, 'notes':e.target.value})}></textarea>
+                        <div className="mb-2">
+                            <label htmlFor="notes" className="form-label">Notes</label>
+                            <textarea id="notes" className="form-control" name="notes" onChange={e => setNewLog({...newLog, 'notes':e.target.value})}></textarea>
                         </div>  
                     </>
                     : null
                     }
-                </div>
+                
                 {formError &&
-                <div className="row">
-                    <div className="col-12">
+                    <div className="mb-2">
                         <EventMessage message={formError} style="error compact"></EventMessage>
                     </div>
-                </div>
                 }
                 <div className="row justify-content-center">
-                    <div className="col-6">
+                    <div className="col-7">
                         <button className="btn-full" disabled={handleFormStatus()}>Log</button>
                     </div>
                 </div>

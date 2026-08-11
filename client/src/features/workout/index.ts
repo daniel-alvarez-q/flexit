@@ -1,2 +1,2 @@
-export * from './Workout'
-export {default} from './Workout'
+export * from './WorkoutDetail'
+export {default} from './WorkoutDetail'

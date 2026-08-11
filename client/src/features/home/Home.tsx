@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import type { columnConfig } from "../../shared/components/Table/table.types";
 import type { WorkoutSession } from "../workout/workout.types";
@@ -12,12 +11,12 @@ import './home.css'
 
 function Home(){
     const {user, axios_instance} = useAuth()!
-    const navigate = useNavigate()
+    // const navigate = useNavigate()
     const columns: columnConfig<WorkoutSession>[]=[
         {key: 'workout_name', header:"Workout"},
+        {key: 'start_time', header:"Date"},
         {key: 'exercise_instances', header:'Exercises'},
         {key: 'duration', header:'Duration (mins)'},
-        {key: 'start_time', header:"Date"},
     ]
 
     const {isPending, isError ,error, data:sessions} = useQuery({
@@ -36,8 +35,8 @@ function Home(){
                         }
                         return {...s, 
                             workout_name:[w.name], 
-                            start_time: start_time.toLocaleString(), 
-                            end_time: end_time?.toLocaleString(), 
+                            start_time: start_time.toLocaleDateString(), 
+                            end_time: end_time?.toLocaleDateString(), 
                             exercise_instances:s.exercise_logs.length,
                             duration:duration
                         }
@@ -70,24 +69,26 @@ function Home(){
     })
 
     //Handlers
-    const signup_action = () =>{
-        navigate('/signup')
-    }
+    // const signup_action = () =>{
+    //     navigate('/signup')
+    // }
 
     //Visuals
     if(!user){
         return(
             <>
                 <div className="row">
-                    <div className="template-title">Welcome to FlexIt!</div>
+                    <div className="template-header">
+                        <div className="template-title">Welcome to FlexIt!</div>
+                    </div>
                 </div>
                 <div className="row justify-content-center">
-                    <div className="col-12 col-md-8">
+                    <div className="col-12">
                         <ContentSection>
                             <p><strong>FlexIt!</strong> is an experimental fitness tracker designed as a convenient companionship for those who are ready to take their daily fitness routine to the next level. 
                                 <strong> FlexIt!</strong> helps you plan your sessions, track your performance, and detect opportunities for improving your workouts, unlocking untold levels of performance.</p>
                             <p>Feeling curious? Create a new account and start exploring the features we have to offer!</p>
-                            <button className="btn-md" onClick={() => signup_action()}>Create an account</button>
+                            {/* <button className="btn-md" onClick={() => signup_action()}>Create an account</button> */}
                         </ContentSection>
                     </div>
                 </div>
@@ -99,7 +100,9 @@ function Home(){
         return (
         <>
         <div className="row mb-3">
-            <div className="template-title">Welcome, {user}</div>
+            <div className="template-header">
+                <div className="template-title">Welcome, {user.first_name}</div>
+            </div>
         </div>
             <div className="row mb-3">
                 <div className="col-12">
@@ -114,7 +117,9 @@ function Home(){
         return(
         <>
         <div className="row mb-3">
-            <div className="template-title">Welcome, {user}</div>
+            <div className="template-header">
+                <div className="template-title">Welcome, {user.first_name}</div>
+            </div>
         </div>
         <div className="row mb-3">
             <div className="col-12">
@@ -129,7 +134,9 @@ function Home(){
         <>
             <>
                 <div className="row">
-                    <div className="template-title">Welcome, {user}</div>
+                    <div className="template-header">
+                        <div className="template-title">Welcome, {user.first_name ? user.first_name : 'user'}</div>
+                    </div>
                 </div>
                 <div className="row mb-3 gy-3 justify-content-center">
                     <div className="col-12 col-lg-4">

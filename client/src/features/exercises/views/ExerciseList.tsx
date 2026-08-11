@@ -3,6 +3,7 @@ import Card from "../../../shared/components/Card"
 import EventMessage from "../../../shared/components/EventMessage"
 import { useQuery } from "@tanstack/react-query"
 import type { Exercise } from "../exercises.types"
+import { getCategoryLabel } from "../../../shared/utils/constants/category"
 
 function ExerciseList(){
     
@@ -12,7 +13,13 @@ function ExerciseList(){
         queryKey: ['exercises'],
         queryFn: async ():Promise<Array<Exercise>> => {
             const response = await axios_instance.get('api/exercises')
-            return response.data
+            let data:Exercise[] = []
+            if (response.data.length){
+                data = response.data.map((e:Exercise) =>{
+                    return {...e, category_full:getCategoryLabel(e.category)}
+                })
+            }
+            return data
         }
     })
 
@@ -36,12 +43,13 @@ function ExerciseList(){
     return(
         <>
             { exercises.length ? exercises.map(exercise =>
-                <div className="col-12 col-lg-3 custom-justify-content-center" key={exercise.id}>
+                <div className="col-6 col-sm-3 custom-justify-content-center" key={exercise.id}>
                     <Card 
+                    uri="exercises"
                     id={exercise.id} 
                     title={exercise.name} 
                     body={exercise.description} 
-                    footer={`Last updated: ${exercise.updated_at}`} 
+                    footer={`${exercise.category_full}`} 
                     style="exercise" />
                 </div>
             )

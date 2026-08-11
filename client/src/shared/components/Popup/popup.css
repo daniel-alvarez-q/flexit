@@ -44,6 +44,10 @@
     animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.modal a{
+    text-decoration: underline var(--optional-secondary-color);
+}
+
 @keyframes slideIn {
     from {
         opacity: 0;

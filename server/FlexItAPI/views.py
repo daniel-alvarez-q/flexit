@@ -2,13 +2,13 @@ import datetime
 from typing import Type
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from django.db.models import Model, Count
+from django.db.models import Model
 from collections import Counter
 from rest_framework import permissions, serializers, status
+from rest_framework.utils.serializer_helpers import ReturnList, ReturnDict
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
-from rest_framework.decorators import permission_classes as permission_decorator
 from knox.views import LoginView as KnoxLoginView
 from FlexItAPI.serializers import (
     LoginSerializer,
@@ -360,8 +360,89 @@ class ExerciseListCreate(APIView):
 class ExerciseDetails(APIView):
     serializer_class = ExerciseSerializer
 
-    def get(self, request, id):
-        return query_search(Exercise, self.serializer_class, id, user=request.user)
+    def get(self, request: Request, id):
+        include: list | None = (
+            request.query_params.get("include", "").lower().split(",")
+        )
+        user: User | None = request.user
+        exercise: Exercise = Exercise()
+        exercise_serialized: ReturnDict | ReturnList | None = None
+        try:
+            if user:
+                if not user.is_superuser:
+                    exercise = Exercise.objects.get(pk=id, user=user)
+                else:
+                    exercise = Exercise.objects.get(pk=id)
+        except Exercise.DoesNotExist as e:
+            return Response(f"{e}", status=status.HTTP_404_NOT_FOUND)
+
+        if include:
+            # Auxiliary date entities
+            current_date: datetime.datetime = datetime.datetime.now(
+                datetime.timezone.utc
+            )
+            cutout_month: datetime.datetime = (
+                current_date - datetime.timedelta(days=(current_date.day - 1))
+            ).replace(hour=0, minute=0, second=0, microsecond=1)
+            print(cutout_month)
+
+            # lifecycle_days:int = (current_date - exercise.created_at).days
+            # weeks = int(lifecycle_days/7) if lifecycle_days >= 14 else 1
+
+            # Initialization
+            context: dict = {}
+            logs: list[ExerciseLog] = list(
+                ExerciseLog.objects.filter(exercise=exercise)
+            )
+
+            # Additional payloads
+            if "logs" in include:
+                logs_serialized: ReturnList | ReturnDict = ExerciseLogSerializer(
+                    logs, many=True
+                ).data
+                context["logs"] = logs_serialized
+
+            if "workouts_full" in include:
+                context["workouts_full"] = True
+
+            if "kpis" in include:
+                kpis: dict[str, int] = {}
+                kpis["associated_workouts"] = len(exercise.workouts.all())
+                kpis["total_logs"] = len(logs)
+                kpis["logs_current_month"] = len(
+                    [l for l in logs if l.log_time >= cutout_month]
+                )
+                context["kpis"] = kpis
+
+            if "timeseries" in include:
+                timeseries: dict = {}
+                if exercise.category == "str":
+                    timeseries = {
+                        l.log_time.strftime("%Y-%m-%d, %H:%M"): {
+                            "1RM": l.weight * (1 + (l.repetitions / 30)),
+                            "volume": l.weight * l.repetitions * l.series,
+                            "weight": l.weight,
+                            "reps": l.repetitions,
+                            "series": l.series,
+                        }
+                        for l in logs
+                    }
+                elif exercise.category == "car":
+                    timeseries = {
+                        l.log_time.strftime("%Y-%m-%d, %H:%M"): {
+                            "distance": l.distance,
+                            "duration": l.duration,
+                        }
+                        for l in logs
+                    }
+                context["timeseries"] = timeseries
+
+            exercise_serialized = self.serializer_class(exercise, context=context).data
+
+        else:
+            exercise_serialized = self.serializer_class(exercise).data
+
+        return Response(exercise_serialized)
 
     def patch(self, request, id):
         try:

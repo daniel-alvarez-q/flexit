@@ -13,16 +13,13 @@ type WorkoutSessionListProps = {
 }
 
 const session_columns: columnConfig<WorkoutSession>[]=[
-        {key: 'id', header:'Id'},
+        {key: 'start_time', header:'Date'},
         {key: 'exercise_instances', header:'Exercises'},
         {key: 'duration', header:'Duration (mins)'},
-        {key: 'start_time', header:'Date'},
     ]
 
 //SessionPreviewFlagHandler to be added to function props
 function WorkoutSessionList({sessions, isPending, isError, error}:WorkoutSessionListProps){
-
-
 
     return(
         <ContentSection title="Past sessions">
@@ -38,7 +35,6 @@ function WorkoutSessionList({sessions, isPending, isError, error}:WorkoutSession
                 }
             </div>
         </ContentSection>
-        
     )
 }
 

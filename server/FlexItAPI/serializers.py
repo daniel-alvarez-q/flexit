@@ -107,6 +107,12 @@ class ExerciseSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
+    workouts_full = serializers.SerializerMethodField()
+    logs = serializers.SerializerMethodField()
+    kpis = serializers.SerializerMethodField()
+    timeseries = serializers.SerializerMethodField()
+    
+
     class Meta:
         model = Exercise
         fields = [
@@ -123,6 +129,10 @@ class ExerciseSerializer(serializers.ModelSerializer):
             "distance",
             "category",
             "user",
+            "workouts_full",
+            "logs",
+            "kpis",
+            "timeseries",
             "created_at",
             "updated_at",
         ]
@@ -134,7 +144,7 @@ class ExerciseSerializer(serializers.ModelSerializer):
             instance.workouts.set(workout_instances)
         return instance
 
-    def update(self, instance, validated_data):
+    def update(self, instance: Exercise, validated_data):
         workout_instances = validated_data.pop("workouts", [])
         workouts_updated = Workout.objects.filter(
             pk__in=[x.id for x in instance.workouts.all()]
@@ -147,6 +157,30 @@ class ExerciseSerializer(serializers.ModelSerializer):
         instance.save()
         instance.workouts.set(workouts_updated)
         return instance
+
+    def get_logs(self, obj: Exercise):
+        logs: list | None = self.context.get("logs")
+        if isinstance(logs, list):
+            return logs
+        return None
+
+    def get_workouts_full(self, obj: Exercise):
+        workouts_full: bool | None = self.context.get("workouts_full")
+        if workouts_full:
+            return WorkoutSerializer(obj.workouts.all(), many=True).data
+        return None
+
+    def get_kpis(self, obj: Exercise):
+        kpis: dict | None = self.context.get("kpis")
+        if isinstance(kpis, dict):
+            return kpis
+        return None
+    
+    def get_timeseries(self, obj:Exercise):
+        timeseries:dict|None = self.context.get("timeseries")
+        if timeseries:
+            return timeseries
+        return None
 
 
 class ExerciseLogSerializer(serializers.ModelSerializer):
