@@ -14,9 +14,8 @@ function ExerciseEditPopup({exercise, displayHandler}:ExerciseEditPopupParams){
 
     const [exerciseUpdate, setExerciseUpdate] = useState<Exercise>(exercise)
     const [error, setError] = useState<string|null>(null)
-
+    const [loading,setLoading] = useState<boolean>(false)
     const {axios_instance} = useAuth()!
-
     const queryClient = useQueryClient()
 
     const mutation = useMutation({
@@ -25,16 +24,16 @@ function ExerciseEditPopup({exercise, displayHandler}:ExerciseEditPopupParams){
             const response = axios_instance.patch(`api/exercise/${exercise.id}`, exercise).then(r=>r)
             return response
         },
-        onSuccess: async(data)=>{
+        onSuccess: async()=>{
             await Promise.all([
                 queryClient.invalidateQueries({queryKey:['exercise', String(exercise.id)]}),
             ])
             displayHandler(false)
-            console.log(data)
+            setLoading(false)
         },
         onError: (error)=>{
             setError(error.message)
-            console.log(`Error: ${error.message}`)
+            setLoading(false)
         }
     })
 
@@ -44,7 +43,9 @@ function ExerciseEditPopup({exercise, displayHandler}:ExerciseEditPopupParams){
 
     function submitHander(e:FormEvent){
         e.preventDefault()
-        mutation.mutate(exerciseUpdate)        
+        setError(null)
+        setLoading(true)
+        mutation.mutate(exerciseUpdate)      
     }
 
     return(
@@ -62,7 +63,7 @@ function ExerciseEditPopup({exercise, displayHandler}:ExerciseEditPopupParams){
                     <EventMessage message={error} style="error compact"/>
                 }
                 <div className="mb-1">
-                    <button>Update</button>
+                    <button disabled={loading}>Update</button>
                 </div>
             </form>
         </Popup>
