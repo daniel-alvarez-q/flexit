@@ -29,7 +29,6 @@ function CurrentSessionPanel({workoutId,exercises,session,logPopupDisplayHandler
     const [sessionError, setSessionError] = useState<string|null>(null)
     const [logs, setLogs] = useState<ExerciseLog[]>([])
     const [submitting, setSubmitting] = useState<boolean>(false)
-    
     const {axios_instance} = useAuth()!
     const queryClient = useQueryClient()
 
