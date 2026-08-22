@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend} from 'chart.js';
@@ -25,7 +25,10 @@ function ExerciseDetail(){
     const [logs,setLogs] = useState<Array<ExerciseLog>|null>(null)
     const [metrics, setMetrics] = useState<exerciseMetrics|null>(null)
     const [editingExercise, setEditingExercise] = useState<boolean>(false)
-    const [deletingExercise, setDeletingExercise] = useState<boolean>(true)
+    const [deletingExercise, setDeletingExercise] = useState<boolean>(false)
+    const [isDeleted, setIsDeleted] = useState<boolean>(false)
+
+    const navigate = useNavigate()
 
     ChartJS.register( CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -81,6 +84,12 @@ function ExerciseDetail(){
             })          
         }
     },[exercise])
+
+    useEffect(()=>{
+        if(isDeleted){
+            navigate(-1)
+        }
+    },[isDeleted])
 
     // Managing of visual states depending on fetch status
     if(isPending){
@@ -152,7 +161,7 @@ function ExerciseDetail(){
             <ExerciseEditPopup displayHandler={setEditingExercise} exercise={exercise}/>
         }
         {deletingExercise &&
-            <ExerciseDeletePopup displayHandler={setDeletingExercise} exerciseId={exercise.id}></ExerciseDeletePopup>
+            <ExerciseDeletePopup displayHandler={setDeletingExercise} exerciseId={exercise.id} deleteFlagHandler={setIsDeleted}/>
         }
     </>
     )

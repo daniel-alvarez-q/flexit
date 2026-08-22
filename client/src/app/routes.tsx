@@ -16,7 +16,7 @@ export const routes: RouteObject[] = [
             {'path': '/logout', element: <Logout />},
             {'path': '/workouts', element: <Workouts />},
             {'path': '/workouts/:workoutId', element: <WorkoutDetails/>},
-            {'path':'/exercises', element: <Exercises />},
+            {'path': '/exercises', element: <Exercises />},
             {'path': '/exercises/:exerciseId', element: <ExerciseDetail/>},
             {'path': '*', element: <NotFound />}
         ],

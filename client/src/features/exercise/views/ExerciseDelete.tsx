@@ -8,13 +8,17 @@ import '../exerciseDetail.css'
 type ExerciseDeletePopupParams = {
     exerciseId:Number;
     displayHandler: React.Dispatch<boolean>;
+    deleteFlagHandler:React.Dispatch<boolean>;
 }
 
 
-function ExerciseDeletePopup({exerciseId, displayHandler}:ExerciseDeletePopupParams){
+function ExerciseDeletePopup({exerciseId, displayHandler, deleteFlagHandler}:ExerciseDeletePopupParams){
 
     const {axios_instance} = useAuth()!
     const queryClient = useQueryClient()
+    const [loading, setLoading] = useState<boolean>(false)
+    const [serverError, setServerError] = useState<string|null>(null)
+
     const mutation = useMutation({
         mutationFn: ()=>{
             const response= axios_instance.delete(`api/exercise/${exerciseId}`).then(r=>r)
@@ -23,18 +27,22 @@ function ExerciseDeletePopup({exerciseId, displayHandler}:ExerciseDeletePopupPar
         onSuccess: async()=>{
             await Promise.all([
                 queryClient.invalidateQueries({
-                    queryKey:['exercise', String(exerciseId)]
+                    queryKey:['exercises']
                 }
             ),
             ])
+            deleteFlagHandler(true)
             displayHandler(false)
+
         },
         onError: (error)=>{
-            console.log(error)
+            setServerError(error.message)
+            setLoading(false)
         }
     })
 
     function handleDelete(){
+        setLoading(true)
         mutation.mutate()
     }
 
@@ -44,9 +52,12 @@ function ExerciseDeletePopup({exerciseId, displayHandler}:ExerciseDeletePopupPar
                 <div className="delete-popup-text">
                     Delete this exercise?
                 </div>
+                {serverError && 
+                    <EventMessage message={serverError} style="error compact"/>
+                }
                 <div className="delete-popup-actions">
-                    <button onClick={()=>handleDelete()}>Delete</button>
-                    <button onClick={()=>displayHandler(false)}>Cancel</button>
+                    <button onClick={()=>handleDelete()} disabled={loading}>Delete</button>
+                    <button onClick={()=>displayHandler(false)} disabled={loading}>Cancel</button>
                 </div>
             </div>
         </Popup>
