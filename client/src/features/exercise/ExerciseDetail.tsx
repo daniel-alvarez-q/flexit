@@ -14,6 +14,7 @@ import KpiCard from "../../shared/components/KpiCard";
 import Table from "../../shared/components/Table";
 import ExerciseEditPopup from "./views/ExerciseEditPopup";
 import ExerciseChartComponent from "./views/ExerciseChart";
+import ExerciseDeletePopup from "./views/ExerciseDelete";
 import './exerciseDetail.css'
 
 
@@ -24,6 +25,7 @@ function ExerciseDetail(){
     const [logs,setLogs] = useState<Array<ExerciseLog>|null>(null)
     const [metrics, setMetrics] = useState<exerciseMetrics|null>(null)
     const [editingExercise, setEditingExercise] = useState<boolean>(false)
+    const [deletingExercise, setDeletingExercise] = useState<boolean>(true)
 
     ChartJS.register( CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -102,7 +104,6 @@ function ExerciseDetail(){
         </div>
         )
     }
-
     
     return(
     <>
@@ -111,6 +112,7 @@ function ExerciseDetail(){
                 <div className="template-title">{exercise?.name}</div>
                 <div className="template-actions">
                     <button className="btn-template-header" onClick={()=> setEditingExercise(true)}>Update</button>
+                    <button className="btn-template-header" onClick={()=> setDeletingExercise(true)}>Delete</button>
                 </div>
             </div>
         </div>
@@ -148,6 +150,9 @@ function ExerciseDetail(){
         </div>
         {editingExercise &&
             <ExerciseEditPopup displayHandler={setEditingExercise} exercise={exercise}/>
+        }
+        {deletingExercise &&
+            <ExerciseDeletePopup displayHandler={setDeletingExercise} exerciseId={exercise.id}></ExerciseDeletePopup>
         }
     </>
     )

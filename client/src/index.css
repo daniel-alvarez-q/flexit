@@ -301,8 +301,8 @@ textarea.input-md {
 
 .template-actions {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  gap: 1rem;
   align-items: center;
   height: 100%;
 }
@@ -356,9 +356,23 @@ button.btn-alert:hover:not(:disabled) {
     gap: 1rem;
   }
 
-  /* .template-header {
-    justify-content: center;
-  }  */
+  .template-header {
+    height: 150px;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+    align-items: center;
+  } 
+  .template-title{
+    height: 2.6rem;
+    width: 100%;
+  }
+
+  .template-actions{
+    width: 100%;
+    justify-content: left;
+    gap: 1rem;
+  }
 }
 
 /* ============================================
