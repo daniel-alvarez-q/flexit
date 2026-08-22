@@ -1,0 +1,19 @@
+.delete-popup{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: left;
+}
+
+.delete-popup-text{
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+}
+
+.delete-popup-actions{
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    gap:1rem;
+}
