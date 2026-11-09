@@ -34,7 +34,11 @@ function ContentSection({
             )}
             <div className="content-section__body">
                 {loading ? 
-                    <h4>Loading...</h4>
+                    <div className="content-section__loading" role="status" aria-label="Loading content">
+                        <span className="content-section__skeleton content-section__skeleton--wide" />
+                        <span className="content-section__skeleton content-section__skeleton--medium" />
+                        <span className="content-section__skeleton content-section__skeleton--short" />
+                    </div>
                 :
                 children}
             </div>

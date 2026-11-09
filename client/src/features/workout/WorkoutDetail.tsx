@@ -30,7 +30,7 @@ function WorkoutDetails(){
     const {axios_instance} = useAuth()!
     const params = useParams()
 
-    // Fetch queries initial data load
+    // Fetch queries
     const fetch_workout = async():Promise<Workout> => {
         return await axios_instance.get(`api/workout/${params.workoutId}`).then((r) => {
             const w:Workout = r.data
@@ -117,14 +117,14 @@ function WorkoutDetails(){
         return(
             <div className="workout-detail">
                 <div className="workout-attribute">
-                    <strong>Description: </strong>{workout.description}
+                    &#128221; <strong>Description: </strong>{workout.description}
                 </div>
                 <div className="workout-attribute">
-                    <strong>Difficulty: </strong>{workout.difficulty}
+                    &#128202; <strong>Difficulty: </strong>{workout.difficulty}
                 </div>
                 {workout.source_url &&
                     <div className="workout-attribute">
-                        <strong>Source: </strong><a href={workout.source_url} target="_blank">{workout.source_url}</a>
+                        &#128279; <strong><a href={workout.source_url} target="_blank">Source link</a></strong>
                     </div>
                 }
             </div>

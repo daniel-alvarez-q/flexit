@@ -92,42 +92,40 @@ function Home(){
 
     return(
         <>
-            <>
-                <div className="row">
-                    <div className="template-header">
-                        <div className="template-title">Welcome, {user.first_name ? user.first_name : 'user'}</div>
-                    </div>
+            <div className="row">
+                <div className="template-header">
+                    <div className="template-title">Welcome, {user.first_name ? user.first_name : 'user'}</div>
                 </div>
-                <div className="row mb-3 gy-3 justify-content-center">
-                    <div className="col-12 col-lg-4">
-                        
-                        <ContentSection title="Your stats" loading={user_kpis.isLoading}>
-                            {user_kpis.isSuccess ?
-                            <div className="row g-2">
-                                {Object.entries(user_kpis.data).map(((k,i) => 
-                                <div className="col-6" key={i}>
-                                    <KpiCard label={k[0]} value={k[1][0]} delta_reference={k[1][1]}/>
-                                </div>
-                                ))}
+            </div>
+            <div className="row mb-3 gy-3 justify-content-center">
+                <div className="col-12 col-lg-4">
+                    
+                    <ContentSection title="Your stats" loading={user_kpis.isLoading}>
+                        {user_kpis.isSuccess ?
+                        <div className="row g-2">
+                            {Object.entries(user_kpis.data).map(((k,i) => 
+                            <div className="col-6" key={i}>
+                                <KpiCard label={k[0]} value={k[1][0]} delta_reference={k[1][1]}/>
                             </div>
-                            : user_kpis.isError &&
-                                <EventMessage style="error" message={user_kpis.error.message}/>
-                            }
-                        </ContentSection>
-                        
-                    </div>
-                    <div className="col-12 col-lg-8">
-                        <ContentSection title="Latest workout sessions" loading={sessions.isLoading}>
-                            {sessions.isSuccess ?
-                                sessions.data.length ?
-                                    <Table<WorkoutSession> data={sessions.data!} columns={columns}></Table>
-                                : <EventMessage style="warning" message="No sessions have been logged, create one through any existing workout."/>
-                            : sessions.isError && <EventMessage style="error" message={sessions.error.message}/>
-                            }
-                        </ContentSection>
-                    </div>
+                            ))}
+                        </div>
+                        : user_kpis.isError &&
+                            <EventMessage style="error" message={user_kpis.error.message}/>
+                        }
+                    </ContentSection>
+                    
                 </div>
-            </>
+                <div className="col-12 col-lg-8">
+                    <ContentSection title="Latest workout sessions" loading={sessions.isLoading}>
+                        {sessions.isSuccess ?
+                            sessions.data.length ?
+                                <Table<WorkoutSession> data={sessions.data!} columns={columns}></Table>
+                            : <EventMessage style="warning" message="No sessions have been logged, create one through any existing workout."/>
+                        : sessions.isError && <EventMessage style="error" message={sessions.error.message}/>
+                        }
+                    </ContentSection>
+                </div>
+            </div>
         </>
     )
 }

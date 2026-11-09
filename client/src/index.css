@@ -76,10 +76,11 @@ a {
   font-weight: 500;
   text-decoration: none;
   color: inherit;
+  text-decoration: inherit;
 }
 
 a:hover {
-  text-decoration: underline var(--optional-secondary-color);
+  text-decoration: underline var(--optional-secondary-color) 1.25px;
 }
 
 button {

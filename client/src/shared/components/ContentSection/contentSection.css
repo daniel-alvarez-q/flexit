@@ -4,6 +4,7 @@
 .content-section {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     width: 100%;
     min-width: 0;
     max-width: 100%;
@@ -16,34 +17,70 @@
    ============================================*/
 
 .content-section--loading {
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    padding: 24px;
-    background-color: rgba(255, 255, 255, 0.05);
-    color: var(--font-color);
-    opacity: 0.8;
     position: relative;
+    
 }
 
-.content-section--loading::before{
+.content-section__loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+    flex: 1;
+    width: 100%;
+    min-height: 120px;
+}
+
+.content-section__loading::before {
     content: '';
     position: absolute;
     top: 0;
+    bottom: 0;
+    left: -50%;
+    width: 50%;
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.08),
         transparent
     );
-    animation: shimmer 2s infinite;
+    pointer-events: none;
+    animation: content-section-shimmer 1.8s ease-in-out infinite;
+    z-index: 1;
 }
 
-@keyframes shimmer {
+.content-section--loading .content-section__body {
+    display: flex;
+    flex: 1;
+}
+
+.content-section__skeleton {
+    display: block;
+    height: 1rem;
+    max-width: 100%;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.content-section__skeleton--wide {
+    width: 100%;
+    height: 1.25rem;
+}
+
+.content-section__skeleton--medium {
+    width: 78%;
+}
+
+.content-section__skeleton--short {
+    width: 52%;
+}
+
+@keyframes content-section-shimmer {
     0% {
-        left: -100%;
+        transform: translateX(0);
     }
     100% {
-        left: 100%;
+        transform: translateX(400%);
     }
 }
 
@@ -279,8 +316,10 @@
    ============================================ */
 @media (prefers-reduced-motion: reduce) {
     .content-section,
-    .content-section--outlined::before {
+    .content-section--outlined::before,
+    .content-section--loading::before {
         transition: none;
+        animation: none;
     }
 
     .content-section--elevated:hover {
