@@ -3,6 +3,7 @@ import './contentSection.css'
 
 type ContentSectionProps = {
     title?: string;
+    loading?: boolean;
     children: ReactNode;
     variant?: 'default' | 'elevated' | 'outlined' | 'minimal';
     padding?: 'compact' | 'default' | 'spacious';
@@ -10,7 +11,8 @@ type ContentSectionProps = {
 }
 
 function ContentSection({
-    title, 
+    title,
+    loading = false, 
     children, 
     variant = 'default',
     padding = 'default',
@@ -31,7 +33,10 @@ function ContentSection({
                 </div>
             )}
             <div className="content-section__body">
-                {children}
+                {loading ? 
+                    <h4>Loading...</h4>
+                :
+                children}
             </div>
         </div>
     )

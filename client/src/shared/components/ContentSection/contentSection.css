@@ -12,6 +12,42 @@
 }
 
 /* ============================================
+   Loading state
+   ============================================*/
+
+.content-section--loading {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 24px;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--font-color);
+    opacity: 0.8;
+    position: relative;
+}
+
+.content-section--loading::before{
+    content: '';
+    position: absolute;
+    top: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* ============================================
    Header & Title Styles
    ============================================ */
 .content-section__header {

@@ -19,7 +19,7 @@ function Home(){
         {key: 'duration', header:'Duration (mins)'},
     ]
 
-    const {isPending, isError ,error, data:sessions} = useQuery({
+    const sessions = useQuery({
         queryKey:['latest_sessions'],
         queryFn: async ():Promise<WorkoutSession[]> =>{
             const response:WorkoutSession[] = await axios_instance.get('api/workoutsessions').then(async r=>{
@@ -51,11 +51,10 @@ function Home(){
         }
     })
 
-    const {data:kpis} = useQuery({
+    const user_kpis = useQuery({
         queryKey:['userKpis'],
         queryFn: async () => {
             const data = await axios_instance.get('api/user/metrics').then(r=>r.data)
-            // console.log(`${JSON.stringify(data)}`)
             const kpis = {
                 'Completed sessions':[data['total_sessions'], 0],
                 'Completed exercises' : [data['total_exercise_logs'],0],
@@ -67,11 +66,6 @@ function Home(){
             return kpis
         }
     })
-
-    //Handlers
-    // const signup_action = () =>{
-    //     navigate('/signup')
-    // }
 
     //Visuals
     if(!user){
@@ -96,40 +90,6 @@ function Home(){
         )
     }
 
-    if(user && isPending){
-        return (
-        <>
-        <div className="row mb-3">
-            <div className="template-header">
-                <div className="template-title">Welcome, {user.first_name}</div>
-            </div>
-        </div>
-            <div className="row mb-3">
-                <div className="col-12">
-                    <EventMessage style="loading"></EventMessage>
-                </div>
-            </div>
-        </>
-        )
-    }
-
-    if(user && isError){
-        return(
-        <>
-        <div className="row mb-3">
-            <div className="template-header">
-                <div className="template-title">Welcome, {user.first_name}</div>
-            </div>
-        </div>
-        <div className="row mb-3">
-            <div className="col-12">
-                <EventMessage message={error.message} style='full-width-error'></EventMessage>
-            </div>
-        </div>
-        </>
-        )
-    }
-
     return(
         <>
             <>
@@ -140,25 +100,31 @@ function Home(){
                 </div>
                 <div className="row mb-3 gy-3 justify-content-center">
                     <div className="col-12 col-lg-4">
-                        {kpis &&
-                            <ContentSection title="Your stats">
-                                <div className="row g-2">
-                                    {Object.entries(kpis).map(((k,i) => 
-                                    <div className="col-6" key={i}>
-                                        <KpiCard label={k[0]} value={k[1][0]} delta_reference={k[1][1]}/>
-                                    </div>
-                                    ))}
+                        
+                        <ContentSection title="Your stats" loading={user_kpis.isLoading}>
+                            {user_kpis.isSuccess ?
+                            <div className="row g-2">
+                                {Object.entries(user_kpis.data).map(((k,i) => 
+                                <div className="col-6" key={i}>
+                                    <KpiCard label={k[0]} value={k[1][0]} delta_reference={k[1][1]}/>
                                 </div>
-                            </ContentSection>
-                        }
+                                ))}
+                            </div>
+                            : user_kpis.isError &&
+                                <EventMessage style="error" message={user_kpis.error.message}/>
+                            }
+                        </ContentSection>
+                        
                     </div>
                     <div className="col-12 col-lg-8">
-                        {sessions!.length ?
-                        <ContentSection title="Latest workout sessions">
-                            <Table<WorkoutSession> data={sessions!} columns={columns}></Table>
+                        <ContentSection title="Latest workout sessions" loading={sessions.isLoading}>
+                            {sessions.isSuccess ?
+                                sessions.data.length ?
+                                    <Table<WorkoutSession> data={sessions.data!} columns={columns}></Table>
+                                : <EventMessage style="warning" message="No sessions have been logged, create one through any existing workout."/>
+                            : sessions.isError && <EventMessage style="error" message={sessions.error.message}/>
+                            }
                         </ContentSection>
-                        :<EventMessage style="warning" message="No sessions have been logged, create one through any existing workout."></EventMessage>
-                        }
                     </div>
                 </div>
             </>
