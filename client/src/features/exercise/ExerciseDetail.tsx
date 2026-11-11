@@ -73,7 +73,7 @@ function ExerciseDetail(){
         if(exercise){
             if(exercise.logs.length){
                 const processed_logs:ExerciseLog[] = exercise.logs.map((log:ExerciseLog) =>{
-                return {...log, log_time:new Date(log.log_time).toLocaleString()}
+                    return {...log, log_time:new Date(log.log_time).toLocaleString()}
                 })
                 setLogs(processed_logs)
             }
@@ -125,8 +125,31 @@ function ExerciseDetail(){
                 </div>
             </div>
         </div>
-        <div className="row mb-4">
-            <div className="col-12">
+        <div className="row exercise-header-row">
+            <div className="col-lg-7 mb-4">
+                <ContentSection title="Exercise Details" className="exercise-details">
+                    <div className="exercise-attributes">
+                        <div className="exercise-attribute">
+                            <strong>Description: </strong>{exercise.description}
+                        </div>
+                        <div className="exercise-attribute">
+                            <strong>Associated workouts</strong>
+                        </div>
+                        {exercise.workouts_full.length ?
+                            <div className="exercise-tags">
+                                {exercise.workouts_full.map((w)=>
+                                    <div className="tag">
+                                        <div className="tag-content">{w.name}</div>
+                                    </div>
+                                )}
+                            </div>
+                            :
+                            <EventMessage style="warning" message="This exercise has not been associated to any workout."/>
+                        }
+                    </div>
+                </ContentSection>
+            </div>
+            <div className="col-lg-5 mb-4">
                 <ContentSection title="Exercise KPIs">
                     <div className="row g-3">
                         {metrics && Object.entries(metrics).map((k,i)=>{
@@ -138,8 +161,8 @@ function ExerciseDetail(){
                 </ContentSection>
             </div>
         </div>
-        <div className="row mb-4">
-            <div className="col-12">
+        <div className="row">
+            <div className="col-12 mb-4">
                 <ContentSection title="Timeseries metrics">
                     {/* {chartData ?
                     <Line data={chartData} options={options}></Line>
@@ -148,7 +171,7 @@ function ExerciseDetail(){
                 </ContentSection>
             </div>
         </div>
-        <div className="row">
+        <div className="row mb-4">
             <div className="col-12 col-lg-8">
             <ContentSection title='Logged sessions'>
                 {logs ?

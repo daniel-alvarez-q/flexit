@@ -1,3 +1,52 @@
+.exercise-header-row{
+    min-height: 180px;
+}
+
+.exercise-details{
+    height:100%
+}
+
+.exercise-attributes{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    gap:15px;
+}
+
+.exercise-attribute{
+    flex-basis: auto;
+    text-align: left;
+    font-size: clamp(0.9rem, 3vw, 1.0rem);
+    overflow-y: scroll;
+    overflow-x: hidden;
+    max-height: 200px;
+}
+
+.exercise-tags{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.tag{
+    padding: 0 5px;
+    height:25px;
+    min-width:100px;
+    max-width: 150px;
+    border: solid 1px var(--background-section);
+    background-color: var(--tertiary-color);
+    border-radius: 5px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.tag-content{
+    overflow: hidden;
+    color:black
+}
+
 .delete-popup{
     display: flex;
     flex-direction: column;

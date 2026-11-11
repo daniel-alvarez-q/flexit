@@ -162,26 +162,25 @@ function WorkoutDetails(){
                     <div className="template-title">{`${workout.name}`}</div>
                 </div>
             </div>
-            <div className="row g-3">
-                <div className="col-12 col-lg-5">
-                    <div className="row g-3">
-                        <div className="col-12">
+            <div className="row">
+                <div className="col-md-5">
+                    <div className="row">
+                        <div className="col-12 mb-4">
                             <ContentSection title="Workout details">
                                 {workout_details(workout)}
                             </ContentSection>
                         </div>
-                        <div className="col-12">
+                        <div className="col-12 mb-4">
                             <CurrentSessionPanel session={activeSession!} exercises={tanstackExercises!} workoutId={Number(params.workoutId)} logPopupDisplayHandler={setCreatingLog}/>
                         </div>
-                        <div className="col-12">
+                        <div className="col-12 mb-4">
                             <WorkoutSessionList sessions={sessions!} isError={isErrorSessions} isPending={isPendingSessions} error={errorSessions!}/>
                         </div>
                     </div>
                 </div>
-                <div className="col-12 col-lg-7">
+                <div className="col-md-7">
                     {tanstackExercises &&
-                        <ExerciseListPanel 
-                             
+                        <ExerciseListPanel       
                             exercises={tanstackExercises}
                             isPending={isPendingExercises}
                             isError={isErrorExercises}
@@ -195,7 +194,7 @@ function WorkoutDetails(){
         </>
         :
         <div className="row">
-            <div className="col-12">
+            <div className="col">
                 <br />
                 <EventMessage style="loading"></EventMessage>
             </div>
