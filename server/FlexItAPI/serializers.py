@@ -100,7 +100,7 @@ class WorkoutSerializer(serializers.ModelSerializer):
 
 class ExerciseSerializer(serializers.ModelSerializer):
     workouts = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Workout.objects.all(), write_only=True, required=False
+        many=True, queryset=Workout.objects.all(), required=False
     )
     user = serializers.PrimaryKeyRelatedField(
         many=False,
@@ -111,7 +111,6 @@ class ExerciseSerializer(serializers.ModelSerializer):
     logs = serializers.SerializerMethodField()
     kpis = serializers.SerializerMethodField()
     timeseries = serializers.SerializerMethodField()
-    
 
     class Meta:
         model = Exercise
@@ -175,9 +174,9 @@ class ExerciseSerializer(serializers.ModelSerializer):
         if isinstance(kpis, dict):
             return kpis
         return None
-    
-    def get_timeseries(self, obj:Exercise):
-        timeseries:dict|None = self.context.get("timeseries")
+
+    def get_timeseries(self, obj: Exercise):
+        timeseries: dict | None = self.context.get("timeseries")
         if timeseries:
             return timeseries
         return None

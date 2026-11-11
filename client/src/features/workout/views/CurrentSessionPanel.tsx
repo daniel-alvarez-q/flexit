@@ -1,4 +1,4 @@
-import type { ExerciseLog, WorkoutSession } from "../workout.types";
+import type { ExerciseLog, WorkoutSession } from "../../workouts/workout.types";
 import type { Exercise } from "../../exercises/exercises.types";
 import type { columnConfig } from "../../../shared/components/Table/table.types";
 import { getCategoryLabel } from "../../../shared/utils/constants/category";

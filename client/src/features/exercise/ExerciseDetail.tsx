@@ -5,7 +5,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import { useAuth } from "../../context/AuthContext";
 import { getCategoryLabel } from "../../shared/utils/constants/category";
 import type { Exercise } from "../exercises/exercises.types";
-import type { ExerciseLog } from "../workout/workout.types";
+import type { Workout, ExerciseLog } from "../workouts/workout.types";
 import type { Params } from "react-router-dom";
 import type { columnConfig } from "../../shared/components/Table/table.types";
 import ContentSection from "../../shared/components/ContentSection";
@@ -53,10 +53,9 @@ function ExerciseDetail(){
 
     // Data fetch, with query_params 
 
-    const {isPending, isError, error, data:exercise} = useQuery({
+    const exercise = useQuery({
         queryKey:['exercise', params.exerciseId],
-        queryFn: async (context):Promise<Exercise> =>{
-            console.log(context.client)
+        queryFn: async ():Promise<Exercise> =>{
             let query_params = {
                 include:'logs,workouts_full,kpis,timeseries'
             }
@@ -67,23 +66,30 @@ function ExerciseDetail(){
         }
     })
 
+    const workouts = useQuery({
+        queryKey:['workouts'],
+        queryFn: async():Promise<Array<Workout>>=>{
+            return await axios_instance.get('api/workouts').then(r => r.data)
+        }
+    })
+
 
     // Set state based on fetched data
     useEffect(()=>{
-        if(exercise){
-            if(exercise.logs.length){
-                const processed_logs:ExerciseLog[] = exercise.logs.map((log:ExerciseLog) =>{
+        if(exercise.data){
+            if(exercise.data.logs.length){
+                const processed_logs:ExerciseLog[] = exercise.data.logs.map((log:ExerciseLog) =>{
                     return {...log, log_time:new Date(log.log_time).toLocaleString()}
                 })
                 setLogs(processed_logs)
             }
             setMetrics({
-                'associated workouts': [exercise.kpis.associated_workouts ?? 0, 0],
-                'total logs': [exercise.kpis.total_logs ?? 0, 0],
-                'logs current month': [exercise.kpis.logs_current_month ?? 0,0]
+                'associated workouts': [exercise.data.kpis.associated_workouts ?? 0, 0],
+                'total logs': [exercise.data.kpis.total_logs ?? 0, 0],
+                'logs current month': [exercise.data.kpis.logs_current_month ?? 0,0]
             })          
         }
-    },[exercise])
+    },[exercise.data])
 
     useEffect(()=>{
         if(isDeleted){
@@ -92,7 +98,7 @@ function ExerciseDetail(){
     },[isDeleted])
 
     // Managing of visual states depending on fetch status
-    if(isPending){
+    if(exercise.isPending){
         return(
             <div className="row">
                 <div className="col-12">
@@ -103,12 +109,12 @@ function ExerciseDetail(){
         )
     }
 
-    if(isError){
+    if(exercise.isError){
         return(
             <div className="row">
             <div className="col-12">
                 <br />
-                <EventMessage style="error" message={error.message}/>
+                <EventMessage style="error" message={exercise.error.message}/>
             </div>
         </div>
         )
@@ -118,9 +124,9 @@ function ExerciseDetail(){
     <>
         <div className="row">
             <div className="template-header">
-                <div className="template-title">{exercise?.name}</div>
+                <div className="template-title">{exercise.data.name}</div>
                 <div className="template-actions">
-                    <button className="btn-template-header" onClick={()=> setEditingExercise(true)}>Update</button>
+                    <button className="btn-template-header" disabled={workouts.isPending || workouts.isError} onClick={()=> setEditingExercise(true)}>Update</button>
                     <button className="btn-template-header" onClick={()=> setDeletingExercise(true)}>Delete</button>
                 </div>
             </div>
@@ -130,14 +136,14 @@ function ExerciseDetail(){
                 <ContentSection title="Exercise Details" className="exercise-details">
                     <div className="exercise-attributes">
                         <div className="exercise-attribute">
-                            <strong>Description: </strong>{exercise.description}
+                            <strong>Description: </strong>{exercise.data.description}
                         </div>
                         <div className="exercise-attribute">
                             <strong>Associated workouts</strong>
                         </div>
-                        {exercise.workouts_full.length ?
+                        {exercise.data.workouts_full.length ?
                             <div className="exercise-tags">
-                                {exercise.workouts_full.map((w)=>
+                                {exercise.data.workouts_full.map((w)=>
                                     <div className="tag">
                                         <div className="tag-content">{w.name}</div>
                                     </div>
@@ -167,24 +173,24 @@ function ExerciseDetail(){
                     {/* {chartData ?
                     <Line data={chartData} options={options}></Line>
                     :<EventMessage style="warning" message="At least two exercise logs are required to track these metrics."/>} */}
-                    <ExerciseChartComponent timeseries={exercise.timeseries} category={exercise.category} />
+                    <ExerciseChartComponent timeseries={exercise.data.timeseries} category={exercise.data.category} />
                 </ContentSection>
             </div>
         </div>
         <div className="row mb-4">
-            <div className="col-12 col-lg-8">
+            <div className="col-12">
             <ContentSection title='Logged sessions'>
                 {logs ?
-                <Table data={logs} columns={exercise.category == 'str' ? str_log_columns : car_log_columns}/>
+                <Table data={logs} columns={exercise.data.category == 'str' ? str_log_columns : car_log_columns}/>
                 :<EventMessage style="warning" message="There are no logs for this exercise."/>}
             </ContentSection>
             </div>
         </div>
         {editingExercise &&
-            <ExerciseEditPopup displayHandler={setEditingExercise} exercise={exercise}/>
+            <ExerciseEditPopup displayHandler={setEditingExercise} exercise={exercise.data} workouts={workouts.data}/>
         }
         {deletingExercise &&
-            <ExerciseDeletePopup displayHandler={setDeletingExercise} exerciseId={exercise.id} deleteFlagHandler={setIsDeleted}/>
+            <ExerciseDeletePopup displayHandler={setDeletingExercise} exerciseId={exercise.data.id} deleteFlagHandler={setIsDeleted}/>
         }
     </>
     )

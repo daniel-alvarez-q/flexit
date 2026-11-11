@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useAuth } from "../../../context/AuthContext"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import type { WorkoutCreate } from "../workouts.types"
+import type { WorkoutCreate } from "../workout.types"
 import EventMessage from "../../../shared/components/EventMessage"
 import Popup from "../../../shared/components/Popup"
 

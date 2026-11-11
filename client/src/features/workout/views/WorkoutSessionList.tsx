@@ -1,4 +1,4 @@
-import type { WorkoutSession } from "../workout.types"
+import type { WorkoutSession } from "../../workouts/workout.types"
 import type { columnConfig } from "../../../shared/components/Table/table.types"
 import ContentSection from "../../../shared/components/ContentSection"
 import EventMessage from "../../../shared/components/EventMessage"

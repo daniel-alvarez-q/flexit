@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../../context/AuthContext";
-import type { Workout } from "../workouts.types";
+import type { Workout } from "../workout.types";
 import Card from "../../../shared/components/Card";
 import EventMessage from "../../../shared/components/EventMessage";
 

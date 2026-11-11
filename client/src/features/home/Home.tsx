@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
 import type { columnConfig } from "../../shared/components/Table/table.types";
-import type { WorkoutSession } from "../workout/workout.types";
-import type { Workout } from "../workouts/workouts.types";
+import type { WorkoutSession } from "../workouts/workout.types";
+import type { Workout } from "../workouts/workout.types";
 import ContentSection from "../../shared/components/ContentSection";
 import EventMessage from "../../shared/components/EventMessage";
 import Table from "../../shared/components/Table";

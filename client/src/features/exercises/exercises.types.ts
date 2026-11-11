@@ -1,5 +1,5 @@
-import type { ExerciseLog } from "../workout/workout.types";
-import type { Workout } from "../workouts/workouts.types";
+import type { ExerciseLog } from "../workouts/workout.types";
+import type { Workout } from "../workouts/workout.types";
 
 type ExerciseKpis = {
     associated_workouts: number;
