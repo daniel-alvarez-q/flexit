@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useAuth } from "../../../context/AuthContext";
 import type { Exercise } from "../../exercises/exercises.types";
-import type { WorkoutSession, ExerciseLog } from "../workout.types";
+import type { WorkoutSession, ExerciseLog } from "../../workouts/workout.types";
 import Popup from "../../../shared/components/Popup";
 import EventMessage from "../../../shared/components/EventMessage";
 

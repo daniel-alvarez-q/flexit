@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../../context/AuthContext";
 import type { Exercise } from "../../exercises/exercises.types";
-import type { ExerciseLog } from "../workout.types";
+import type { ExerciseLog } from "../../workouts/workout.types";
 import type { columnConfig } from "../../../shared/components/Table/table.types";
 import { NavLink } from "react-router-dom";
 import Popup from "../../../shared/components/Popup";
