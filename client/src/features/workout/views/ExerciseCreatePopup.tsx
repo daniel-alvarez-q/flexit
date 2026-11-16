@@ -1,12 +1,13 @@
 import { useState, type FormEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../../context/AuthContext";
-import type { ExerciseCreate } from "../../exercises/exercises.types";
+import type { Exercise, ExerciseCreate } from "../../exercises/exercises.types";
 import Popup from "../../../shared/components/Popup";
 import EventMessage from "../../../shared/components/EventMessage";
 
 type ExerciseListCreateParams = {
     displayHandler:React.Dispatch<boolean>;
+    exercises:Array<Exercise>;
     errorHandler:React.Dispatch<string|null>;
     workoutId?:number;
 }
@@ -39,7 +40,7 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
                 setExercise(set_exercise())
                 await Promise.all([
                     queryClient.invalidateQueries({
-                        queryKey:['workout', workoutId, 'exercises']
+                        queryKey:['exercises']
                     }),
                     queryClient.invalidateQueries({
                         queryKey:['workout', workoutId, 'sessions']

@@ -23,6 +23,7 @@ function WorkoutDetails(){
     
     // Component behavior states
     const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
+    const [workoutExercises, setWorkoutExercises] = useState(Array<Exercise>)
     const [activeSession, setActiveSession] = useState<WorkoutSession|null>(null)
     const [creatingLog, setCreatingLog] = useState<boolean>(false)
     const [selectedExercise, setSelectedExercise] = useState<number|null>(null)
@@ -39,16 +40,7 @@ function WorkoutDetails(){
     }
 
     const fetch_exercises = async():Promise<Exercise[]>=>{
-        return await axios_instance.get(`api/workout/${params.workoutId}/exercises`).then(r=>{
-            const data:Exercise[] = r.data
-            const e:Exercise[] = data.map(e=>{
-                return {...e, 
-                    category_full:getCategoryLabel(e.category),
-                    focus_area_full:getFocusLabel(e.focus_area || '')
-                }
-            })
-            return e
-        })
+        return await axios_instance.get(`api/workout/${params.workoutId}/exercises`).then(r=>r.data)
     }
 
     const fetch_sessions = async():Promise<WorkoutSession[]> => {
@@ -95,11 +87,23 @@ function WorkoutDetails(){
 
     const workoutId = Number(params.workoutId)
 
-    const {isError:isErrorExercises, isPending:isPendingExercises, error:errorExercises, data:tanstackExercises} = useQuery({
-        queryKey:['workout',workoutId,'exercises'],
+    const exercises = useQuery({
+        queryKey:['exercises'],
         queryFn: fetch_exercises,
         enabled:!!workoutId
     })
+
+    useEffect(()=>{
+        if(exercises.data){
+            let e:Exercise[] = exercises.data.map(e=>{
+            return {...e, 
+                category_full:getCategoryLabel(e.category),
+                focus_area_full:getFocusLabel(e.focus_area || '')
+                }
+            })
+            setWorkoutExercises(e)
+        }
+    }, [exercises.data])
 
     const {isError:isErrorSessions, isPending:isPendingSessions, error:errorSessions, data:sessions} = useQuery<WorkoutSession[]>({
         queryKey:['workout', workoutId, 'sessions'],
@@ -171,7 +175,7 @@ function WorkoutDetails(){
                             </ContentSection>
                         </div>
                         <div className="col-12 mb-4">
-                            <CurrentSessionPanel session={activeSession!} exercises={tanstackExercises!} workoutId={Number(params.workoutId)} logPopupDisplayHandler={setCreatingLog}/>
+                            <CurrentSessionPanel session={activeSession!} exercises={workoutExercises} workoutId={Number(params.workoutId)} logPopupDisplayHandler={setCreatingLog}/>
                         </div>
                         <div className="col-12 mb-4">
                             <WorkoutSessionList sessions={sessions!} isError={isErrorSessions} isPending={isPendingSessions} error={errorSessions!}/>
@@ -179,12 +183,12 @@ function WorkoutDetails(){
                     </div>
                 </div>
                 <div className="col-md-7">
-                    {tanstackExercises &&
+                    {workoutExercises &&
                         <ExerciseListPanel       
-                            exercises={tanstackExercises}
-                            isPending={isPendingExercises}
-                            isError={isErrorExercises}
-                            error={errorExercises}
+                            exercises={workoutExercises}
+                            isPending={exercises.isPending} //Inconsistent state coupling, needs changing
+                            isError={exercises.isError}     //Inconsistent state coupling, needs changing
+                            error={exercises.error}         //Inconsistent state coupling, needs changing
                             exerciseCreateFlagHandler={setCreatingExercise}
                             exercisePreviewFlagHandler={setSelectedExercise}
                         />
@@ -202,11 +206,11 @@ function WorkoutDetails(){
         {workout && creatingExercise &&
             <ExerciseCreatePopup displayHandler={setCreatingExercise} errorHandler={setError} workoutId={workout.id}/>
         }
-        {tanstackExercises && selectedExercise &&
+        {workoutExercises && selectedExercise &&
             <ExercisePreview id={selectedExercise} displayFlagHandler={setSelectedExercise} errorHandler={setError}/>
         }
-        {tanstackExercises && activeSession && creatingLog &&
-            <ExerciseLogCreatePopup workoutId={workoutId} session={activeSession} exercises={tanstackExercises} popupHandler={setCreatingLog}/>    
+        {workoutExercises && activeSession && creatingLog &&
+            <ExerciseLogCreatePopup workoutId={workoutId} session={activeSession} exercises={workoutExercises} popupHandler={setCreatingLog}/>    
         }
         </>
     )
