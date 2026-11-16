@@ -47,7 +47,15 @@ function WorkoutDetails(){
     }
 
     const fetch_exercises = async():Promise<Exercise[]>=>{
-        return await axios_instance.get(`api/exercises`).then(r=>r.data)
+        return await axios_instance.get(`api/exercises`).then(r=>{
+            let data:Exercise[] = r.data
+             return data.map(e=>{
+                return {...e, 
+                    category_full:getCategoryLabel(e.category),
+                    focus_area_full:getFocusLabel(e.focus_area || '')
+                    }
+                })
+        })
     }
 
     const fetch_sessions = async():Promise<WorkoutSession[]> => {
@@ -101,12 +109,6 @@ function WorkoutDetails(){
     useEffect(()=>{
         if(exercises.data){
             let e:Exercise[] = exercises.data.filter((e)=>e.workouts?.includes(workoutId))
-            e.map(e=>{
-            return {...e, 
-                category_full:getCategoryLabel(e.category),
-                focus_area_full:getFocusLabel(e.focus_area || '')
-                }
-            })
             setWorkoutExercises(e)
         }
     }, [exercises.data])
