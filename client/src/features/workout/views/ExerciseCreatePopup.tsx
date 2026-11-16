@@ -7,7 +7,6 @@ import EventMessage from "../../../shared/components/EventMessage";
 
 type ExerciseListCreateParams = {
     displayHandler:React.Dispatch<boolean>;
-    exercises:Array<Exercise>;
     errorHandler:React.Dispatch<string|null>;
     workoutId?:number;
 }
@@ -32,9 +31,7 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
         {
             mutationKey:['exerciseCreate'],
             mutationFn: (exercise:ExerciseCreate)=>{
-                const response = axios_instance.post('api/exercises', exercise).then(r=>r)
-                console.log(response)
-                return response
+                return axios_instance.post('api/exercises', exercise).then(r=>r)
             },
             onSuccess: async ()=>{
                 setExercise(set_exercise())
@@ -73,7 +70,7 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
     }
 
     return(
-        <Popup title="New exercise" onClose={()=> {displayHandler(false); errorHandler(null);}}>
+        <Popup title="Create new exercise" onClose={()=> {displayHandler(false); errorHandler(null);}}>
             <form onSubmit={(e) => submitHander(e)}>
                 <div className="mb-1">
                     <label htmlFor="name" className="form-label">Name</label>

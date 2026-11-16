@@ -9,6 +9,7 @@ import ContentSection from "../../shared/components/ContentSection"
 import EventMessage from "../../shared/components/EventMessage"
 import ExercisePreview from "./views/ExercisePreview"
 import ExerciseCreatePopup from "./views/ExerciseCreatePopup"
+import ExerciseAssociatePopup from "./views/ExerciseAssociatePopup"
 import ExerciseLogCreatePopup from "./views/ExerciseLogCreatePopup"
 import WorkoutSessionList from "./views/WorkoutSessionList"
 import CurrentSessionPanel from "./views/CurrentSessionPanel"
@@ -21,17 +22,23 @@ import './workout.css'
 
 function WorkoutDetails(){
     
-    // Component behavior states
-    const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
-    const [workoutExercises, setWorkoutExercises] = useState(Array<Exercise>)
-    const [activeSession, setActiveSession] = useState<WorkoutSession|null>(null)
-    const [creatingLog, setCreatingLog] = useState<boolean>(false)
-    const [selectedExercise, setSelectedExercise] = useState<number|null>(null)
-    const [error, setError] = useState<string|null>(null)
+    //Shared tools & params
     const {axios_instance} = useAuth()!
     const params = useParams()
 
-    // Fetch queries
+    //Component behavior states
+    const [workoutExercises, setWorkoutExercises] = useState(Array<Exercise>)
+    const [activeSession, setActiveSession] = useState<WorkoutSession|null>(null)
+    const [selectedExercise, setSelectedExercise] = useState<number|null>(null)
+    const [error, setError] = useState<string|null>(null)
+    const [creatingExercise, setCreatingExercise] = useState<boolean>(false)
+    const [creatingLog, setCreatingLog] = useState<boolean>(false)
+    const [associatingExercise, setAssociatingExercise] = useState<boolean>(false)
+
+    //Param-passed workoutId
+    const workoutId = Number(params.workoutId)
+
+    //Fetch queries
     const fetch_workout = async():Promise<Workout> => {
         return await axios_instance.get(`api/workout/${params.workoutId}`).then((r) => {
             const w:Workout = r.data
@@ -40,7 +47,7 @@ function WorkoutDetails(){
     }
 
     const fetch_exercises = async():Promise<Exercise[]>=>{
-        return await axios_instance.get(`api/workout/${params.workoutId}/exercises`).then(r=>r.data)
+        return await axios_instance.get(`api/exercises`).then(r=>r.data)
     }
 
     const fetch_sessions = async():Promise<WorkoutSession[]> => {
@@ -80,12 +87,10 @@ function WorkoutDetails(){
     }
 
     //Data fetch
-    const {isError, isPending, error:tanstackError ,data:workout} = useQuery({
+    const workout = useQuery({
         queryKey:['workout', params.workoutId],
         queryFn: fetch_workout,
     })
-
-    const workoutId = Number(params.workoutId)
 
     const exercises = useQuery({
         queryKey:['exercises'],
@@ -95,7 +100,8 @@ function WorkoutDetails(){
 
     useEffect(()=>{
         if(exercises.data){
-            let e:Exercise[] = exercises.data.map(e=>{
+            let e:Exercise[] = exercises.data.filter((e)=>e.workouts?.includes(workoutId))
+            e.map(e=>{
             return {...e, 
                 category_full:getCategoryLabel(e.category),
                 focus_area_full:getFocusLabel(e.focus_area || '')
@@ -135,7 +141,7 @@ function WorkoutDetails(){
         )
     }
 
-    if(isPending){
+    if(workout.isPending){
         return(
             <div className="row">
                 <div className="col-12">
@@ -146,12 +152,12 @@ function WorkoutDetails(){
         )
     }
 
-    if(isError){
+    if(workout.isError){
         return(
             <div className="row">
             <div className="col-12">
                 <br />
-                <EventMessage style="error" message={tanstackError.message}/>
+                <EventMessage style="error" message={workout.error.message}/>
             </div>
         </div>
         )
@@ -159,11 +165,11 @@ function WorkoutDetails(){
     
     return(
         <>
-        { workout ?
+        { workout.data ?
         <>
             <div className="row">
                 <div className="template-header">
-                    <div className="template-title">{`${workout.name}`}</div>
+                    <div className="template-title">{`${workout.data.name}`}</div>
                 </div>
             </div>
             <div className="row">
@@ -171,7 +177,7 @@ function WorkoutDetails(){
                     <div className="row">
                         <div className="col-12 mb-4">
                             <ContentSection title="Workout details">
-                                {workout_details(workout)}
+                                {workout_details(workout.data)}
                             </ContentSection>
                         </div>
                         <div className="col-12 mb-4">
@@ -186,10 +192,11 @@ function WorkoutDetails(){
                     {workoutExercises &&
                         <ExerciseListPanel       
                             exercises={workoutExercises}
-                            isPending={exercises.isPending} //Inconsistent state coupling, needs changing
-                            isError={exercises.isError}     //Inconsistent state coupling, needs changing
-                            error={exercises.error}         //Inconsistent state coupling, needs changing
+                            isPending={exercises.isPending} //Inconsistent state coupling, needs to be synched with workoutExercises
+                            isError={exercises.isError}     //Inconsistent state coupling, needs to be synched with workoutExercises
+                            error={exercises.error}         //Inconsistent state coupling, needs to be synched with workoutExercises
                             exerciseCreateFlagHandler={setCreatingExercise}
+                            exerciseAssociateFlagHandler={setAssociatingExercise}
                             exercisePreviewFlagHandler={setSelectedExercise}
                         />
                     }
@@ -204,13 +211,16 @@ function WorkoutDetails(){
             </div>
         </div>}
         {workout && creatingExercise &&
-            <ExerciseCreatePopup displayHandler={setCreatingExercise} errorHandler={setError} workoutId={workout.id}/>
+            <ExerciseCreatePopup displayHandler={setCreatingExercise} errorHandler={setError} workoutId={workout.data.id}/>
         }
         {workoutExercises && selectedExercise &&
             <ExercisePreview id={selectedExercise} displayFlagHandler={setSelectedExercise} errorHandler={setError}/>
         }
         {workoutExercises && activeSession && creatingLog &&
             <ExerciseLogCreatePopup workoutId={workoutId} session={activeSession} exercises={workoutExercises} popupHandler={setCreatingLog}/>    
+        }
+        {exercises.data && associatingExercise &&
+            <ExerciseAssociatePopup exercises={exercises.data} closeHandler={setAssociatingExercise}/>
         }
         </>
     )

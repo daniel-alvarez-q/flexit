@@ -10,11 +10,11 @@ type WorkoutExerciseListProps = {
     isPending:boolean;
     error:Error|null;
     exerciseCreateFlagHandler:React.Dispatch<React.SetStateAction<boolean>>;
+    exerciseAssociateFlagHandler:React.Dispatch<React.SetStateAction<boolean>>;
     exercisePreviewFlagHandler:React.Dispatch<React.SetStateAction<number|null>>;
 }
 
-function ExerciseListPanel({exercises, isError, isPending, error, exerciseCreateFlagHandler, exercisePreviewFlagHandler}:WorkoutExerciseListProps){
-
+function ExerciseListPanel({exercises, isError, isPending, error, exerciseCreateFlagHandler, exerciseAssociateFlagHandler, exercisePreviewFlagHandler}:WorkoutExerciseListProps){
     return(
         <ContentSection title="Exercises">
             <div className="workout-exercises">
@@ -37,9 +37,12 @@ function ExerciseListPanel({exercises, isError, isPending, error, exerciseCreate
                     )}
                 </div>
                 }
-                <div className="row justify-content-center">
-                    <div className="col-8">
-                        <button className="btn-full" onClick={() => exerciseCreateFlagHandler(true)}>Add new exercise</button>
+                <div className="row g-2">
+                    <div className="col-6">
+                        <button className="btn-full" onClick={() => exerciseCreateFlagHandler(true)}>Create new exercise</button>
+                    </div>
+                    <div className="col-6">
+                        <button className="btn-full" onClick={() => exerciseAssociateFlagHandler(true)}>Add existing exercise</button>
                     </div>
                 </div>
             </div>
