@@ -120,7 +120,7 @@ function Home(){
                         {sessions.isSuccess ?
                             sessions.data.length ?
                                 <Table<WorkoutSession> data={sessions.data!} columns={columns}></Table>
-                            : <EventMessage style="warning" message="No sessions have been logged, create one through any existing workout."/>
+                            : <EventMessage style="warning" message="No sessions have been logged"/>
                         : sessions.isError && <EventMessage style="error" message={sessions.error.message}/>
                         }
                     </ContentSection>

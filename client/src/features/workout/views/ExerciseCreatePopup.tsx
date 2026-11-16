@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../../context/AuthContext";
-import type { Exercise, ExerciseCreate } from "../../exercises/exercises.types";
+import type { ExerciseCreate } from "../../exercises/exercises.types";
 import Popup from "../../../shared/components/Popup";
 import EventMessage from "../../../shared/components/EventMessage";
 
