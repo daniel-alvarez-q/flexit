@@ -21,8 +21,12 @@ function ExerciseAssociatePopup({exercises, closeHandler}:ExerciseAssociatePopup
         console.log(selectedExercises)
     }
 
+    function handleClose(){
+        closeHandler(false)
+    }
+
     return(
-        <Popup title="Add existing exercise" onClose={() => closeHandler(false)}>
+        <Popup title="Add existing exercise" onClose={handleClose}>
             <div className="exercise-selection-list">
                 {exercises.length ? 
                     exercises.map((ex:Exercise) => 

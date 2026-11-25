@@ -73,6 +73,9 @@ class UserMetricsSerializer(serializers.Serializer):
 class WorkoutSerializer(serializers.ModelSerializer):
     source_url = serializers.URLField(allow_null=True, required=False)
     user = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
+    exercises = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Exercise.objects.all(), required=False
+    )
 
     class Meta:
         model = Workout
@@ -83,6 +86,7 @@ class WorkoutSerializer(serializers.ModelSerializer):
             "difficulty",
             "source_url",
             "user",
+            "exercises",
             "created_at",
             "updated_at",
         ]
@@ -90,11 +94,21 @@ class WorkoutSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return Workout.objects.create(**validated_data)
 
-    def update(self, instance, validated_data):
+    def update(self, instance: Workout, validated_data: dict):
         instance.name = validated_data.get("name", instance.name)
         instance.description = validated_data.get("description", instance.description)
         instance.source_url = validated_data.get("source_url", instance.source_url)
         instance.save()
+
+        # Exercise update handling
+        validated_exercises: list = validated_data.get("exercises", [])
+        if validated_exercises:
+            
+            try:
+                instance.exercises.add(*validated_exercises)
+            except Exception as e:
+                raise e
+
         return instance
 
 
