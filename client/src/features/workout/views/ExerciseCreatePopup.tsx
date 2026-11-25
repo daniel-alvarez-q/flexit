@@ -37,6 +37,9 @@ function ExerciseCreatePopup({displayHandler, errorHandler, workoutId}:ExerciseL
                 setExercise(set_exercise())
                 await Promise.all([
                     queryClient.invalidateQueries({
+                        queryKey:['workout']
+                    }),
+                    queryClient.invalidateQueries({
                         queryKey:['exercises']
                     }),
                     queryClient.invalidateQueries({

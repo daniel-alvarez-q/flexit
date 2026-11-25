@@ -5,6 +5,7 @@ export type Workout = {
     'difficulty':string;
     'source_url'?:string;
     'user':number;
+    'exercises'?:Array<number>
     'created_at':string
 }
 

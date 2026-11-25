@@ -96,7 +96,7 @@ function WorkoutDetails(){
 
     //Data fetch
     const workout = useQuery({
-        queryKey:['workout', params.workoutId],
+        queryKey:['workout', Number(params.workoutId)],
         queryFn: fetch_workout,
     })
 
@@ -183,7 +183,7 @@ function WorkoutDetails(){
                             </ContentSection>
                         </div>
                         <div className="col-12 mb-4">
-                            <CurrentSessionPanel session={activeSession!} exercises={workoutExercises} workoutId={Number(params.workoutId)} logPopupDisplayHandler={setCreatingLog}/>
+                            <CurrentSessionPanel session={activeSession!} exercises={exercises.data??[]} workoutId={Number(params.workoutId)} logPopupDisplayHandler={setCreatingLog}/>
                         </div>
                         <div className="col-12 mb-4">
                             <WorkoutSessionList sessions={sessions!} isError={isErrorSessions} isPending={isPendingSessions} error={errorSessions!}/>
@@ -212,7 +212,7 @@ function WorkoutDetails(){
                 <EventMessage style="loading"></EventMessage>
             </div>
         </div>}
-        {workout && creatingExercise &&
+        {workout.data && creatingExercise &&
             <ExerciseCreatePopup displayHandler={setCreatingExercise} errorHandler={setError} workoutId={workout.data.id}/>
         }
         {workoutExercises && selectedExercise &&
@@ -221,8 +221,8 @@ function WorkoutDetails(){
         {workoutExercises && activeSession && creatingLog &&
             <ExerciseLogCreatePopup workoutId={workoutId} session={activeSession} exercises={workoutExercises} popupHandler={setCreatingLog}/>    
         }
-        {exercises.data && associatingExercise &&
-            <ExerciseAssociatePopup exercises={exercises.data} closeHandler={setAssociatingExercise}/>
+        {workout.data && exercises.data && associatingExercise &&
+            <ExerciseAssociatePopup workout={workout.data} exercises={exercises.data} closeHandler={setAssociatingExercise}/>
         }
         </>
     )
