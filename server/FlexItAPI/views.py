@@ -322,32 +322,6 @@ class WorkoutExercises(APIView):
                 {f"Error fetching data: {e}"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    def patch(self, request: Request, id: int):
-        print(request.data.get("exercises", []))
-        try:
-            workout_instance = Workout.objects.get(pk=id, user=request.user)
-            current_exercise_list = {e.id for e in workout_instance.exercises.filter()}
-            request_exercise_list = (
-                {int(e) for e in request.data.get("exercises", [])}
-                if isinstance(request.data, dict)
-                else []
-            )
-            data: dict = {
-                "exercises": current_exercise_list.union(request_exercise_list)
-            }
-
-            serializer = self.workout_serializer_class(
-                instance=workout_instance, data=data, partial=True
-            )
-
-            return query_save(serializer)
-
-        except Exception as e:
-            print(e)
-            return Response(
-                {f"Error performing operation: {e}"}, status=status.HTTP_400_BAD_REQUEST
-            )
-
 
 class WorkoutSessions(APIView):
     serializer_class = WorkoutSessionSerializer

@@ -95,17 +95,18 @@ class WorkoutSerializer(serializers.ModelSerializer):
         return Workout.objects.create(**validated_data)
 
     def update(self, instance: Workout, validated_data: dict):
+        print(validated_data)
         instance.name = validated_data.get("name", instance.name)
         instance.description = validated_data.get("description", instance.description)
         instance.source_url = validated_data.get("source_url", instance.source_url)
         instance.save()
 
         # Exercise update handling
-        validated_exercises: list = validated_data.get("exercises", [])
-        if validated_exercises:
-            
+        validated_exercises: list[int] | None = validated_data.get("exercises", None)
+        if validated_exercises is not None:
             try:
-                instance.exercises.add(*validated_exercises)
+                # .set() is internally atomic! Any failed operation will be rolled back to previous state
+                instance.exercises.set(validated_exercises)
             except Exception as e:
                 raise e
 
